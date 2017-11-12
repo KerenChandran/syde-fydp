@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { resourceActions, resourceSelectors } from '../modules/resources'; 
+import { resourceSelectors } from '../modules/resources'; 
 
 import MyResourcesView from '../views/MyResources';
 

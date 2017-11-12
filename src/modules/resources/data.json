@@ -11,7 +11,10 @@
         "Voltage (V)":"12",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Battery Chargers",
@@ -24,7 +27,10 @@
         "Voltage (V)":"12",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Bio Medical Equipment",
@@ -35,7 +41,10 @@
         "Comments":"For upper arm.",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Bio Medical Equipment",
@@ -46,7 +55,10 @@
         "Comments":"Pre-gelled.",
         "Total Stock":"4",
         "Available Stock":"4",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Breadboards",
@@ -59,7 +71,10 @@
         "Length (in)":"Varies",
         "Total Stock":"2",
         "Available Stock":"2",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Breadboards",
@@ -72,7 +87,10 @@
         "Length (in)":"6.5",
         "Total Stock":"103",
         "Available Stock":"98",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Breadboards",
@@ -85,7 +103,10 @@
         "Length (in)":"1.75",
         "Total Stock":"11",
         "Available Stock":"10",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Breadboards",
@@ -98,7 +119,10 @@
         "Length (in)":"15",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Breadboards",
@@ -111,7 +135,10 @@
         "Length (in)":"3.25",
         "Total Stock":"11",
         "Available Stock":"11",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Cables",
@@ -123,7 +150,10 @@
         "Length(m)":"0.1",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Cables",
@@ -135,7 +165,10 @@
         "Length(m)":"0.3",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Cables",
@@ -147,7 +180,10 @@
         "Length(m)":"2.0",
         "Total Stock":"66",
         "Available Stock":"60",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Cables",
@@ -159,7 +195,10 @@
         "Length(m)":"1",
         "Total Stock":"16",
         "Available Stock":"16",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Cables",
@@ -171,7 +210,10 @@
         "Length(m)":"0.6",
         "Total Stock":"11",
         "Available Stock":"11",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Cables",
@@ -183,7 +225,10 @@
         "Length(m)":"0.05",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Cables",
@@ -195,7 +240,10 @@
         "Length(m)":"1.9",
         "Total Stock":"7",
         "Available Stock":"7",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Clamps",
@@ -208,7 +256,10 @@
         "Length":"12 inch",
         "Total Stock":"10",
         "Available Stock":"10",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Counters",
@@ -219,7 +270,10 @@
         "Comments":"",
         "Total Stock":"2",
         "Available Stock":"2",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Data Acquisition",
@@ -230,7 +284,10 @@
         "Comments":"8 differential or 16 single ended analog inputs.  1 MHz and 16-bit ADC.  24 digital I/O lines.",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Drills",
@@ -241,7 +298,10 @@
         "Comments":"Comes with set of drill bits and drivers.",
         "Total Stock":"2",
         "Available Stock":"2",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Heat Guns",
@@ -252,7 +312,10 @@
         "Comments":"",
         "Total Stock":"1",
         "Available Stock":"1",
-        "ownerId": 1
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Instrumentation (Force)",
@@ -262,7 +325,11 @@
         "Resources":"",
         "Comments":"",
         "Total Stock":"1",
-        "Available Stock":"1"
+        "Available Stock":"1",
+        "ownerId": 1,
+        "location": "Engineering 5",
+        "incentive": "User Fees",
+        "available": true
      },
      {
         "Category":"Instrumentation (Force)",
