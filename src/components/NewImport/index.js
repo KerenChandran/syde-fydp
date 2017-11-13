@@ -62,7 +62,7 @@ class NewImport extends Component {
               New
             </Button>
           </Target>
-          <Popper placement="bottom-start" eventsEnabled={open}>
+          <Popper placement="bottom-start" eventsEnabled={open} style={{visibility: !open ? 'hidden': 'visible'}}>
             <ClickAwayListener onClickAway={this.handleRequestClose}>
               <Grow in={open} id="menu-list" style={{ transformOrigin: '0 0 0' }}>
                 <Paper>
