@@ -11,7 +11,7 @@ class MyResources extends Component {
   render() {
     const { resources, deleteResource, editResource, showEditForm, isEditFormOpen, hideEditForm } = this.props;
     return (
-      <div>
+      <div style={{width: '100%'}}>
         <MyResourcesView
           resources={resources}
           deleteResource={deleteResource}
