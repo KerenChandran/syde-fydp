@@ -4,7 +4,8 @@ import * as ResourceConstants from './constants';
 const initialState = {
   resources: data.resources,
   showDataImport: false,
-  showBulkImport: false
+  showBulkImport: false,
+  editResourceId: null
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -45,6 +46,23 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         showBulkImport: !state.showBulkImport
       }
+    }
+
+    case ResourceConstants.DELETE_RESOURCE: {
+      const { resources, ...others } = state;
+      const newResources = resources.filter((element, index) => index !== payload);
+      return {
+        resources: newResources,
+        ...others
+      };
+    }
+
+    case ResourceConstants.SET_EDIT_RESOURCE: {
+      return {
+        ...state,
+        showDataImport: true,
+        editResourceId: payload
+      };
     }
 
     default:

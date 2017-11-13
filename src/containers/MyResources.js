@@ -1,21 +1,39 @@
 import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { resourceSelectors } from '../modules/resources'; 
+import { resourceActions, resourceSelectors } from '../modules/resources'; 
 
 import MyResourcesView from '../views/MyResources';
+import DataInput from '../components/DataInput';
 
 class MyResources extends Component {
   render() {
-    const { resources } = this.props;
+    const { resources, deleteResource, editResource, showEditForm, isEditFormOpen, hideEditForm } = this.props;
+    debugger;
     return (
-      <MyResourcesView resources={resources}/>
+      <div>
+        <MyResourcesView
+          resources={resources}
+          deleteResource={deleteResource}
+          showEditForm={showEditForm}
+        />
+        <DataInput open={isEditFormOpen} resource={editResource} closeForm={hideEditForm}/>
+      </div>
     );
   }
 }
 
 const mapStateToProps = (state) => ({
-  resources: resourceSelectors.currentUserResources(state)
+  resources: resourceSelectors.currentUserResources(state),
+  editResource: resourceSelectors.getEditResource(state),
+  isEditFormOpen: resourceSelectors.showDataImport(state)
 });
 
-export default connect(mapStateToProps, null)(MyResources);
+const mapDispatchToProps = (dispatch) => ({
+  deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
+  showEditForm: bindActionCreators(resourceActions.setEditResource, dispatch),
+  hideEditForm: bindActionCreators(resourceActions.toggleDataImportForm, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(MyResources);

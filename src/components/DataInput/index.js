@@ -14,17 +14,13 @@ import Dialog, {
 } from 'material-ui/Dialog';
 
 class DataImport extends Component {
-  state = {
-    name: '',
-    location: '',
-    faculty: '',
-    description: '',
-    rules: '',
-    available: false,
-    date: Date.now(),
-    incentive: '',
-    mobile: false,
-    usage: ''
+  constructor(props) {
+    super(props);
+    this.state = { ...this.props.resource }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState(nextProps.resource)
   }
 
   handleRequestClose = () => {
@@ -46,6 +42,17 @@ class DataImport extends Component {
 
   render() {
     const { fullScreen, open } = this.props;
+    const {
+      name,
+      faculty,
+      location,
+      mobile,
+      available,
+      description,
+      rules,
+      usage,
+      incentive
+    } = this.state;
 
     return (
       <div>
@@ -56,20 +63,20 @@ class DataImport extends Component {
         >
           <DialogTitle>Data Import</DialogTitle>
           <DialogContent>
-            <TextField fullWidth label="Name" onChange={this.handleChange('name')} />
-            <TextField label="Faculty" onChange={this.handleChange('faculty')} margin="normal" />
-            <TextField label="Location" onChange={this.handleChange('location')} margin="normal" />
+            <TextField fullWidth label="Name" onChange={this.handleChange('name')} value={name} />
+            <TextField label="Faculty" onChange={this.handleChange('faculty')} margin="normal" value={faculty} />
+            <TextField label="Location" onChange={this.handleChange('location')} margin="normal" value={location} />
             <FormGroup row>
               <FormControlLabel
                 label="Mobile"
                 control={<Switch/>}
-                checked={this.state.mobile}
+                checked={mobile}
                 onChange={this.handleSwitchChange('mobile')}
               />
               <FormControlLabel
                 label="Available"
                 control={<Switch/>}
-                checked={this.state.available}
+                checked={available}
                 onChange={this.handleSwitchChange('available')}
               />
             </FormGroup>
@@ -79,6 +86,7 @@ class DataImport extends Component {
               label="Description"
               onChange={this.handleChange('description')}
               margin="normal"
+              value={description}
             />
             <TextField
               fullWidth
@@ -86,6 +94,7 @@ class DataImport extends Component {
               label="Rules & Regulation"
               onChange={this.handleChange('rules')}
               margin="normal"
+              value={rules}
             />
             <TextField
               fullWidth
@@ -93,6 +102,7 @@ class DataImport extends Component {
               label="Use Cases"
               onChange={this.handleChange('usage')}
               margin="normal"
+              value={usage}
             />
             <TextField
               fullWidth
@@ -100,6 +110,7 @@ class DataImport extends Component {
               label="Incentive"
               onChange={this.handleChange('incentive')}
               margin="normal"
+              value={incentive}
             />
           </DialogContent>
           <DialogActions>
@@ -109,6 +120,21 @@ class DataImport extends Component {
         </Dialog>
       </div>
     );
+  }
+}
+
+DataImport.defaultProps = {
+  resource: {
+    name: '',
+    location: '',
+    faculty: '',
+    description: '',
+    rules: '',
+    available: false,
+    date: Date.now(),
+    incentive: '',
+    mobile: false,
+    usage: ''
   }
 }
 
