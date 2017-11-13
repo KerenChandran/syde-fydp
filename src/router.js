@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 
 import Input from './containers/Input';
+import AllResources from './containers/AllResources';
 import MyResources from './containers/MyResources';
 import Search from './containers/Search';
 
@@ -16,7 +17,8 @@ export default (props) => (
         <Sidebar />
         <div className="App-content">
           <Route exact path="/" component={MyResources} />
-          <Route exact path="/resources" component={MyResources} />
+          <Route exact path="/resources" component={AllResources} />
+          <Route exact path="/resources/myresources" component={MyResources} />
           <Route path="/search" component={Search} />   
         </div>
       </div>

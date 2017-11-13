@@ -1,10 +1,13 @@
-// Create Form Actions
+// Toggle display
 export const TOGGLE_BULK_IMPORT_FORM = 'TOGGLE_BULK_IMPORT_FORM';
 export const TOGGLE_DATA_IMPORT_FORM = 'TOGGLE_DATA_IMPORT_FORM';
+export const TOGGLE_RESOURCE_DETAIL = 'TOGGLE_RESOURCE_DETAIL';
 
 // Add to Database
 export const ADD_BULK_IMPORT = 'ADD_BULK_IMPORT';
 export const ADD_DATA_IMPORT = 'ADD_DATA_IMPORT';
 
+// Set selected item
 export const SET_EDIT_RESOURCE = 'SET_EDIT_RESOURCE';
 export const DELETE_RESOURCE = 'DELETE_RESOURCE';
+export const SET_DETAIL_RESOURCE = 'SET_DETAIL_RESOURCE';

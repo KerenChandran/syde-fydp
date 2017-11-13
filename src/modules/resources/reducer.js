@@ -5,7 +5,9 @@ const initialState = {
   resources: data.resources,
   showDataImport: false,
   showBulkImport: false,
-  editResourceId: null
+  editResourceId: null,
+  detailResourceId: null,
+  showDetailsResource: false
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -50,7 +52,7 @@ export default (state = initialState, { type, payload }) => {
 
     case ResourceConstants.DELETE_RESOURCE: {
       const { resources, ...others } = state;
-      const newResources = resources.filter((element, index) => index !== payload);
+      const newResources = resources.filter((element, index) => index !== payload.id);
       return {
         resources: newResources,
         ...others
@@ -61,8 +63,23 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         showDataImport: true,
-        editResourceId: payload
+        editResourceId: payload.id
       };
+    }
+
+    case ResourceConstants.TOGGLE_RESOURCE_DETAIL: {
+      return {
+        ...state,
+        showDetailsResource: !state.showDetailsResource
+      }
+    }
+
+    case ResourceConstants.SET_DETAIL_RESOURCE: {
+      return {
+        ...state,
+        showDetailsResource: true,
+        detailResourceId: payload.id
+      }
     }
 
     default:

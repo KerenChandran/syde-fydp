@@ -13,7 +13,7 @@ import Dialog, {
   withMobileDialog,
 } from 'material-ui/Dialog';
 
-class DataImport extends Component {
+class ResourceInfo extends Component {
   constructor(props) {
     super(props);
     this.state = { ...this.props.resource }
@@ -41,7 +41,7 @@ class DataImport extends Component {
   )
 
   render() {
-    const { fullScreen, open } = this.props;
+    const { fullScreen, open, resource } = this.props;
     const {
       name,
       faculty,
@@ -52,7 +52,7 @@ class DataImport extends Component {
       rules,
       usage,
       incentive
-    } = this.state;
+     } = resource;
 
     return (
       <div>
@@ -63,59 +63,59 @@ class DataImport extends Component {
         >
           <DialogTitle>Data Import</DialogTitle>
           <DialogContent>
-            <TextField fullWidth label="Name" onChange={this.handleChange('name')} value={name} />
-            <TextField label="Faculty" onChange={this.handleChange('faculty')} margin="normal" value={faculty} />
-            <TextField label="Location" onChange={this.handleChange('location')} margin="normal" value={location} />
+            <TextField fullWidth label="Name" value={name} disabled />
+            <TextField label="Faculty" margin="normal" value={faculty} disabled/>
+            <TextField label="Location" margin="normal" value={location} disabled/>
             <FormGroup row>
               <FormControlLabel
                 label="Mobile"
                 control={<Switch/>}
                 checked={mobile}
-                onChange={this.handleSwitchChange('mobile')}
+                disabled
               />
               <FormControlLabel
                 label="Available"
                 control={<Switch/>}
                 checked={available}
-                onChange={this.handleSwitchChange('available')}
+                disabled
               />
             </FormGroup>
             <TextField
               fullWidth
               multiline
               label="Description"
-              onChange={this.handleChange('description')}
               margin="normal"
               value={description}
+              disabled
             />
             <TextField
               fullWidth
               multiline
               label="Rules & Regulation"
-              onChange={this.handleChange('rules')}
               margin="normal"
               value={rules}
+              disabled
             />
             <TextField
               fullWidth
               multiline
               label="Use Cases"
-              onChange={this.handleChange('usage')}
               margin="normal"
               value={usage}
+              disabled
             />
             <TextField
               fullWidth
               multiline
               label="Incentive"
-              onChange={this.handleChange('incentive')}
               margin="normal"
               value={incentive}
+              disabled
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleRequestClose} color="primary">Cancel</Button>
-            <Button onClick={this.handleSubmit} raised color="primary" autoFocus>Submit</Button>
+            <Button onClick={this.handleRequestClose} color="primary">Close</Button>
+            <Button onClick={this.handleContactInfo} raised color="primary" autoFocus>Contact Info</Button>
           </DialogActions>
         </Dialog>
       </div>
@@ -123,24 +123,15 @@ class DataImport extends Component {
   }
 }
 
-DataImport.defaultProps = {
-  resource: {
-    id: '-1',
-    name: '',
-    location: '',
-    faculty: '',
-    description: '',
-    rules: '',
-    available: false,
-    date: Date.now(),
-    incentive: '',
-    mobile: false,
-    usage: ''
-  }
-}
+ResourceInfo.defaultProps = {
+  open: false,
+  resource: {},
+  submitForm: () => {},
+  closeForm: () => {}
+};
 
-DataImport.propTypes = {
+ResourceInfo.propTypes = {
   fullScreen: PropTypes.bool.isRequired,
 };
 
-export default withMobileDialog()(DataImport);
+export default withMobileDialog()(ResourceInfo);
