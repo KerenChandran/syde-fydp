@@ -10,7 +10,6 @@ import DataInput from '../components/DataInput';
 class MyResources extends Component {
   render() {
     const { resources, deleteResource, editResource, showEditForm, isEditFormOpen, hideEditForm } = this.props;
-    debugger;
     return (
       <div>
         <MyResourcesView
