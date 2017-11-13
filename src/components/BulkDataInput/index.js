@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { withStyles } from 'material-ui/styles';
 import Button from 'material-ui/Button';
+import FileUpload from 'material-ui-icons/FileUpload';
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -9,6 +11,15 @@ import Dialog, {
   DialogTitle,
   withMobileDialog,
 } from 'material-ui/Dialog';
+
+const styles = theme => ({
+  button: {
+    marginTop: theme.spacing.unit
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit,
+  },
+});
 
 class BulkDataImport extends Component {
   static state = {
@@ -31,7 +42,7 @@ class BulkDataImport extends Component {
   }
 
   render() {
-    const { fullScreen, open } = this.props;
+    const { classes, fullScreen, open } = this.props;
 
     return (
       <div>
@@ -45,8 +56,9 @@ class BulkDataImport extends Component {
             <DialogContentText>Download template here</DialogContentText>
             <input accept="*" id="file" type="file" style={{ display: 'none' }}/>
             <label htmlFor="file">
-              <Button raised color="primary" component="span">
+              <Button raised color="primary" component="span" className={classes.button}>
                 Upload
+                <FileUpload className={classes.rightIcon} />
               </Button>
             </label>
           </DialogContent>
@@ -64,4 +76,4 @@ BulkDataImport.propTypes = {
   fullScreen: PropTypes.bool.isRequired,
 };
 
-export default withMobileDialog()(BulkDataImport);
+export default withStyles(styles)(withMobileDialog()(BulkDataImport));
