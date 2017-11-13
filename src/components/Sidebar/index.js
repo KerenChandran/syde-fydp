@@ -1,9 +1,10 @@
 import React from 'react';
+import NewImport from '../NewImport';
 import './index.css';
 
 const Sidebar = () => (
   <div className="App-Sidebar">
-    <div>New</div>
+    <NewImport />
     <div className="App-Sidebar-filters">
       <div>My Resources</div>
       <div>Available</div>

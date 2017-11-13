@@ -17,7 +17,7 @@ export default (props) => (
         <div className="App-content">
           <Route exact path="/" component={MyResources} />
           <Route exact path="/resources" component={MyResources} />
-          <Route path="/search" component={Search} />        
+          <Route path="/search" component={Search} />   
         </div>
       </div>
     </div>

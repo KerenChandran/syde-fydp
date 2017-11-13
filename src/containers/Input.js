@@ -1,8 +1,7 @@
 import React from 'react';
-import InputView from '../views/Input';
 
 const Input = () => (
-  <InputView />
+  <div>Input Page</div>
 );
 
 export default Input;

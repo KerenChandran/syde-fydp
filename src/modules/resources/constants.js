@@ -1,6 +1,6 @@
 // Create Form Actions
-export const CREATE_BULK_IMPORT = 'CREATE_BULK_IMPORT';
-export const CREATE_DATA_IMPORT = 'CREATE_DATA_IMPORT';
+export const TOGGLE_BULK_IMPORT_FORM = 'TOGGLE_BULK_IMPORT_FORM';
+export const TOGGLE_DATA_IMPORT_FORM = 'TOGGLE_DATA_IMPORT_FORM';
 
 // Add to Database
 export const ADD_BULK_IMPORT = 'ADD_BULK_IMPORT';
