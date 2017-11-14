@@ -14,10 +14,10 @@ export default (state = initialState, { type, payload }) => {
   switch(type) {
     case ResourceConstants.ADD_BULK_IMPORT: {
       let { resources, ...others } = state;
-      let newResources = {
+      let newResources = [
         ...resources,
         ...payload
-      }
+      ];
       return {
         resources: newResources,
         ...others
@@ -26,10 +26,34 @@ export default (state = initialState, { type, payload }) => {
 
     case ResourceConstants.ADD_DATA_IMPORT: {
       let { resources, ...others } = state;
-      let newResources = {
+      payload.resource.id = resources.length;
+      let newResources = [
         ...resources,
-        payload
-      }
+        payload.resource
+      ];
+      return {
+        resources: newResources,
+        ...others
+      };
+    }
+
+    case ResourceConstants.UPDATE_DATA_IMPORT: {
+      let { resources, ...others } = state;
+      let foundIndex = -1;
+
+      resources.find((element, index) => {
+        if (index === payload.resource.id) {
+          foundIndex = index;
+          return true;
+        }
+      });
+
+      let newResources = [
+        ...resources.slice(0, foundIndex),
+        payload.resource,
+        ...resources.slice(foundIndex + 1)
+      ];
+
       return {
         resources: newResources,
         ...others

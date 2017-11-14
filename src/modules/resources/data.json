@@ -14,7 +14,8 @@
         "ownerId": 1,
         "location": "Engineering 5",
         "incentive": "User Fees",
-        "available": true
+        "available": true,
+        "id": 0
      },
      {
         "Category":"Battery Chargers",
@@ -30,7 +31,8 @@
         "ownerId": 1,
         "location": "Engineering 5",
         "incentive": "User Fees",
-        "available": true
+        "available": true,
+        "id": 1
      },
      {
         "Category":"Bio Medical Equipment",
@@ -44,7 +46,8 @@
         "ownerId": 1,
         "location": "Engineering 5",
         "incentive": "User Fees",
-        "available": true
+        "available": true,
+        "id": 2
      },
      {
         "Category":"Bio Medical Equipment",
@@ -58,7 +61,8 @@
         "ownerId": 1,
         "location": "Engineering 5",
         "incentive": "User Fees",
-        "available": true
+        "available": true,
+        "id": 3
      },
      {
         "Category":"Breadboards",

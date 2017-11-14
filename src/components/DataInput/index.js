@@ -13,7 +13,7 @@ import Dialog, {
   withMobileDialog,
 } from 'material-ui/Dialog';
 
-class DataImport extends Component {
+class DataInput extends Component {
   constructor(props) {
     super(props);
     this.state = { ...this.props.resource }
@@ -123,7 +123,7 @@ class DataImport extends Component {
   }
 }
 
-DataImport.defaultProps = {
+DataInput.defaultProps = {
   resource: {
     id: '-1',
     name: '',
@@ -139,8 +139,8 @@ DataImport.defaultProps = {
   }
 }
 
-DataImport.propTypes = {
+DataInput.propTypes = {
   fullScreen: PropTypes.bool.isRequired,
 };
 
-export default withMobileDialog()(DataImport);
+export default withMobileDialog()(DataInput);

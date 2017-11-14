@@ -8,7 +8,8 @@ export const toggleResourceDetail = createAction(ResourceConstants.TOGGLE_RESOUR
 
 // Add to Database
 export const addBulkImport = createAction(ResourceConstants.ADD_BULK_IMPORT);
-export const addDataImport = createAction(ResourceConstants.ADD_DATA_IMPORT);
+export const addDataImport = createAction(ResourceConstants.ADD_DATA_IMPORT, resource => ({ resource }));
+export const updateResource = createAction(ResourceConstants.UPDATE_DATA_IMPORT, resource => ({ resource }));
 
 export const setEditResource = createAction(ResourceConstants.SET_EDIT_RESOURCE, id => ({ id }));
 export const deleteResource = createAction(ResourceConstants.DELETE_RESOURCE, id => ({ id }));

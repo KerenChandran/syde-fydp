@@ -4,10 +4,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 
-import Input from './containers/Input';
 import AllResources from './containers/AllResources';
 import MyResources from './containers/MyResources';
-import Search from './containers/Search';
 
 export default (props) => (
   <Router {...props}>
@@ -19,7 +17,6 @@ export default (props) => (
           <Route exact path="/" component={MyResources} />
           <Route exact path="/resources" component={AllResources} />
           <Route exact path="/resources/myresources" component={MyResources} />
-          <Route path="/search" component={Search} />   
         </div>
       </div>
     </div>

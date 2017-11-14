@@ -9,7 +9,7 @@ import DataInput from '../components/DataInput';
 
 class MyResources extends Component {
   render() {
-    const { resources, deleteResource, editResource, showEditForm, isEditFormOpen, hideEditForm } = this.props;
+    const { resources, deleteResource, editResource, showEditForm, isEditFormOpen, hideEditForm, updateResource } = this.props;
     return (
       <div style={{width: '100%'}}>
         <MyResourcesView
@@ -17,7 +17,7 @@ class MyResources extends Component {
           deleteResource={deleteResource}
           showEditForm={showEditForm}
         />
-        <DataInput open={isEditFormOpen} resource={editResource} closeForm={hideEditForm}/>
+        <DataInput open={isEditFormOpen} resource={editResource} submitForm={updateResource} closeForm={hideEditForm}/>
       </div>
     );
   }
@@ -32,7 +32,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
   showEditForm: bindActionCreators(resourceActions.setEditResource, dispatch),
-  hideEditForm: bindActionCreators(resourceActions.toggleDataImportForm, dispatch)
+  hideEditForm: bindActionCreators(resourceActions.toggleDataImportForm, dispatch),
+  updateResource: bindActionCreators(resourceActions.updateResource, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyResources);
