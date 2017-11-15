@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import cx from 'classnames';
 
 import { withStyles } from 'material-ui/styles';
-import { fade } from 'material-ui/styles/colorManipulator';
+import IconButton from 'material-ui/IconButton';
+import Tooltip from 'material-ui/Tooltip';
+
+import CloseIcon from 'material-ui-icons/Close';
 import SearchIcon from 'material-ui-icons/Search';
 
 const styles = theme =>  ({
@@ -23,17 +27,14 @@ const styles = theme =>  ({
     width: theme.spacing.unit * 9,
     height: '100%',
     position: 'absolute',
-    pointerEvents: 'none',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: 'none',
-    backgroundColor: 'transparent',
-    cursor: 'pointer'
+    border: 'none'
   },
   input: {
     font: 'inherit',
-    padding: `${theme.spacing.unit}px ${theme.spacing.unit}px ${theme.spacing.unit}px ${theme
+    padding: `${theme.spacing.unit}px ${theme.spacing.unit * 9}px ${theme.spacing.unit}px ${theme
       .spacing.unit * 9}px`,
     border: 0,
     flex: '1 1 auto',
@@ -44,7 +45,7 @@ const styles = theme =>  ({
     color: 'inherit',
     '&:focus': {
       outline: 0,
-    },
+    }
   }
 });
 
@@ -61,8 +62,12 @@ class Search extends Component {
 
   handleKeyDown = event => {
     if (event.keyCode === 13) {
-      this.props.submitSearch(this.state.search);
+      this.handleSearch();
     }
+  }
+
+  handleSearch = () => {
+    this.props.submitSearch(this.state.search);
   }
 
   handleFocus = () => {
@@ -77,17 +82,30 @@ class Search extends Component {
     this.setState({ search: newSearch });
   }
 
+  handleClear = () => {
+    this.setState({
+      search: {
+        searchText: '',
+        available: null,
+        location: null,
+        faculty: null
+      }
+    })
+  }
+
   render() {
     const { classes } = this.props;
-    const { searchText } = this.state;
+    const { searchText } = this.state.search;
 
     return (
       <div className={cx(classes.wrapper, {
         [classes.wrapperFocus]: this.state.focus
       })}>
-        <button className={classes.search}>
-          <SearchIcon />
-        </button>
+        <Tooltip title="Search" placement="bottom">
+          <IconButton className={classes.search} onClick={this.handleSearch}>
+            <SearchIcon />
+          </IconButton>
+        </Tooltip>
         <input
           className={classes.input}
           onBlur={this.handleFocus}
@@ -97,9 +115,23 @@ class Search extends Component {
           placeholder="Search Resources"
           value={searchText}
         />
+        { searchText.length > 0 ?
+          <Tooltip title="Clear search" placement="bottom">
+            <IconButton onClick={this.handleClear}>
+              <CloseIcon />
+            </IconButton>
+          </Tooltip> : null }
       </div>
     );
   }
 }
+
+Search.propTypes = {
+  submitSearch: PropTypes.func
+}
+
+Search.defaultProps = {
+  submitSearch: () => {}
+};
 
 export default withStyles(styles)(Search);
