@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux';
+
 import Button from 'material-ui/Button';
 import { MenuItem, MenuList } from 'material-ui/Menu';
-import Grow from 'material-ui/transitions/Grow';
-import Paper from 'material-ui/Paper';
-import { Manager, Target, Popper } from 'react-popper';
-import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
+import Popover from 'material-ui/Popover';
 
 import BulkDataImport from '../BulkDataInput';
 import DataImport from '../DataInput';
@@ -15,12 +14,19 @@ import DataImport from '../DataInput';
 import { resourceActions, resourceSelectors } from '../../modules/resources';
 
 class NewImport extends Component {
+  constructor(props) {
+    super(props);
+    this.button = null;
+  }
   state = {
     open: false
   };
 
   handleClick = () => {
-    this.setState({ open: true });
+    this.setState({
+      open: true,
+      anchorEl: findDOMNode(this.button)
+    });
   };
 
   handleRequestClose = () => {
@@ -46,35 +52,31 @@ class NewImport extends Component {
       submitBulkImport,
       submitDataImport
     } = this.props;
-    const { open } = this.state;
+    const { anchorEl, open } = this.state;
 
     return (
       <div>
-        <Manager>
-          <Target>
-            <Button
-              raised
-              aria-owns={open ? 'menu-list' : null}
-              aria-haspopup="true"
-              onClick={this.handleClick}
-              color="primary"
-            >
-              New
-            </Button>
-          </Target>
-          <Popper placement="bottom-start" eventsEnabled={open} style={{visibility: !open ? 'hidden': 'visible'}}>
-            <ClickAwayListener onClickAway={this.handleRequestClose}>
-              <Grow in={open} id="menu-list" style={{ transformOrigin: '0 0 0' }}>
-                <Paper>
-                  <MenuList role="menu">
-                    <MenuItem onClick={this.handleDataImport}>Data Import</MenuItem>
-                    <MenuItem onClick={this.handleBulkImport}>Bulk Data Import</MenuItem>
-                  </MenuList>
-                </Paper>
-              </Grow>
-            </ClickAwayListener>
-          </Popper>
-        </Manager>
+        <Button
+          ref={node => this.button = node}
+          raised
+          aria-owns={open ? 'menu-list' : null}
+          aria-haspopup="true"
+          onClick={this.handleClick}
+          color="primary"
+        >
+          New
+        </Button>
+        <Popover
+          open={open}
+          anchorEl={anchorEl}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          onRequestClose={this.handleRequestClose}
+        >
+          <MenuList role="menu">
+            <MenuItem onClick={this.handleDataImport}>Data Import</MenuItem>
+            <MenuItem onClick={this.handleBulkImport}>Bulk Data Import</MenuItem>
+          </MenuList>
+        </Popover>
         <DataImport
           open={isDataImportOpen}
           closeForm={showDataImport}
