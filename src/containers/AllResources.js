@@ -28,7 +28,7 @@ class AllResources extends Component {
 }
 
 const mapStateToProps = state => ({
-  resources: resourceSelectors.resources(state),
+  resources: resourceSelectors.filteredResources(state),
   detailResource: resourceSelectors.getDetailResource(state),
   isDetailResourceOpen: resourceSelectors.showDetailsResource(state)
 });

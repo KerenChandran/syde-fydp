@@ -1,8 +1,20 @@
-import React from 'react';
-import SearchView from '../views/Search';
+import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { searchActions } from '../modules/search';
 
-const Search = () => (
-  <SearchView />
-);
+import SearchBar from '../components/Search';
 
-export default Search;
+class Search extends Component {
+  render() {
+    return (
+      <SearchBar submitSearch={this.props.submitSearch} />
+    );
+  }
+}
+
+const mapDispatchToProps = dispatch => ({
+  submitSearch: bindActionCreators(searchActions.submitSearch, dispatch)
+});
+
+export default connect(null, mapDispatchToProps)(Search);

@@ -19,11 +19,11 @@ import { withStyles } from 'material-ui/styles';
 
 const styles = theme => ({
   twoColLeft: {
-    width: '40%',
+    width: '45%',
     marginRight: '5%'
   },
   twoColRight: {
-    width: '40%',
+    width: '45%',
     marginLeft: '5%'
   }
 });
@@ -125,7 +125,6 @@ class DataInput extends Component {
             <FormControl className={classes.twoColLeft}>
               <InputLabel htmlFor="incentive">Incentive Type</InputLabel>
               <Select
-                fullWidth
                 value={incentive}
                 onChange={this.handleChange('incentive')}
                 input={<Input id="incentive" />}
