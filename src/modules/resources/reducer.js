@@ -1,4 +1,4 @@
-import data from './data.json';
+import data from './data_modified.json';
 import * as ResourceConstants from './constants';
 
 const initialState = {
@@ -41,8 +41,8 @@ export default (state = initialState, { type, payload }) => {
       let { resources, ...others } = state;
       let foundIndex = -1;
 
-      resources.find((element, index) => {
-        if (index === payload.resource.id) {
+      resources.find((resource, index) => {
+        if (resource.id === payload.resource.id) {
           foundIndex = index;
           return true;
         }
@@ -76,7 +76,7 @@ export default (state = initialState, { type, payload }) => {
 
     case ResourceConstants.DELETE_RESOURCE: {
       const { resources, ...others } = state;
-      const newResources = resources.filter((element, index) => index !== payload.id);
+      const newResources = resources.filter((resource) => resource.id !== payload.id);
       return {
         resources: newResources,
         ...others

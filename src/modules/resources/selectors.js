@@ -9,12 +9,12 @@ export const currentUserResources = createSelector(resources, currentUserId, use
 
 export const editResourceId = state => state.resources.editResourceId;
 export const getEditResource = createSelector(resources, editResourceId, (resources, editResourceId) => (
-  resources.filter((resource, index) => index === editResourceId)[0]
+  resources.filter((resource) => resource.id === editResourceId)[0]
 ));
 
 export const detailResourceId = state => state.resources.detailResourceId;
 export const getDetailResource = createSelector(resources, detailResourceId, (resources, detailResourceId) => (
-  resources.filter((resource, index) => index === detailResourceId)[0]
+  resources.filter((resource) => resource.id === detailResourceId)[0]
 ));
 
 export const showBulkImport = state => state.resources.showBulkImport;

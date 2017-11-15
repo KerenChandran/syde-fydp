@@ -13,7 +13,7 @@ const styles = theme => ({
     overflowX: 'auto',
   },
   table: {
-    minWidth: 700
+    minWidth: 600
   },
 });
 
@@ -24,36 +24,36 @@ class MyResources extends Component {
 
   render() {
     const { classes, resources } = this.props;
-    let id = -1;
     return (
       <Paper className={classes.root}>
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell>Incentive</TableCell>
-              <TableCell>Avaialble</TableCell>
-              <TableCell>More Info</TableCell>
+            <TableCell padding='dense'>Category</TableCell>
+              <TableCell padding='dense'>Company</TableCell>
+              <TableCell padding='dense'>Model</TableCell>
+              <TableCell padding='dense'>Location</TableCell>
+              <TableCell padding='dense'>Incentive</TableCell>
+              <TableCell padding='dense'>Avaialble</TableCell>
+              <TableCell padding='none'>More Info</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {resources.map(resource => {
-              id++;
-              return (
-                <TableRow key={id}>
-                  <TableCell>{resource["Model"]} {resource["Category"]}</TableCell>
-                  <TableCell>{resource["location"]}</TableCell>
-                  <TableCell>{resource["incentive"]}</TableCell>
-                  <TableCell>{resource["available"] ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>
-                    <IconButton className={classes.button} aria-label="Details" onClick={this.handleDetails(id)}>
-                      <DetailsIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {resources.map(resource => (
+              <TableRow key={resource.id}>
+                <TableCell padding='dense'>{resource.category}</TableCell>
+                <TableCell padding='dense'>{resource.company}</TableCell>
+                <TableCell padding='dense'>{resource.model}</TableCell>
+                <TableCell padding='dense'>{resource.location}</TableCell>
+                <TableCell padding='dense'>{resource.incentive}</TableCell>
+                <TableCell padding='dense'>{resource.available ? 'Yes' : 'No'}</TableCell>
+                <TableCell>
+                  <IconButton className={classes.button} aria-label="Details" onClick={this.handleDetails(resource.id)}>
+                    <DetailsIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </Paper>
