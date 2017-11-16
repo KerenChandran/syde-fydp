@@ -22,7 +22,8 @@ const styles = theme =>  ({
     marginRight: 16,
     borderRadius: 2,
     width: '100%',
-    display: 'flex'
+    display: 'flex',
+    alignItems: 'center'
   },
   wrapperFocus: {
     border: '1px solid rgba(0,0,0,0.12)',
@@ -33,6 +34,7 @@ const styles = theme =>  ({
     width: theme.spacing.unit * 9,
     height: '100%',
     position: 'absolute',
+    top: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -65,6 +67,12 @@ class Search extends Component {
     }
   };
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.searchText !== nextProps.searchText) {
+      this.setState({ searchText: nextProps.searchText });
+    }
+  }
+
   handleKeyDown = event => {
     if (event.keyCode === 13) {
       this.handleSearch();
@@ -74,6 +82,13 @@ class Search extends Component {
   handleSearch = () => (
     this.props.submitSearch({ searchText: this.state.searchText })
   )
+
+  handleFilterSearch = (filters) => {
+    this.props.submitSearch({
+      searchText: this.state.searchText,
+      ...filters
+    });
+  }
 
   handleFocus = () => (
     this.setState({ focus: !this.state.focus })
@@ -99,7 +114,7 @@ class Search extends Component {
   };
 
   render() {
-    const { classes, filters, submitSearch } = this.props;
+    const { classes, filters } = this.props;
     const { anchorEl, open, searchText } = this.state;
 
     return (
@@ -131,7 +146,7 @@ class Search extends Component {
           </Tooltip> : null
         }
         <Tooltip title="Search options" placement="bottom">
-          <IconButton onClick={this.handleFilterClick}><ArrowDropDown /></IconButton>
+          <IconButton className={classes.filter} onClick={this.handleFilterClick}><ArrowDropDown /></IconButton>
         </Tooltip>
         <Popover
           open={open}
@@ -142,7 +157,7 @@ class Search extends Component {
         >
           <FilterControls
             handleClose={this.handleFilterRequestClose}
-            submitSearch={submitSearch}
+            submitSearch={this.handleFilterSearch}
             filters={filters}
           />
         </Popover>

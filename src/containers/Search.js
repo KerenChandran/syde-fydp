@@ -7,15 +7,16 @@ import SearchBar from '../components/Search';
 
 class Search extends Component {
   render() {
-    const { filters, submitSearch } = this.props;
+    const { search, submitSearch } = this.props;
+    const { searchText, ...filters } = search;
     return (
-      <SearchBar submitSearch={submitSearch} filters={filters} />
+      <SearchBar submitSearch={submitSearch} searchText={searchText} filters={filters} />
     );
   }
 }
 
 const mapStateToProps = state => ({
-  filters: searchSelectors.filters(state)
+  search: searchSelectors.search(state)
 });
 
 const mapDispatchToProps = dispatch => ({

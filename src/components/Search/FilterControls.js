@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 
+import { withStyles } from 'material-ui/styles';
 import Grid from 'material-ui/Grid';
 import Select from 'material-ui/Select';
 import { MenuItem } from 'material-ui/Menu';
@@ -10,6 +11,17 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 
 import Close from 'material-ui-icons/Close';
+
+const styles = () => ({
+  root: {
+    padding: 15
+  },
+  close: {
+    position: 'absolute',
+    right: 0,
+    top: 0
+  }
+})
 
 class FilterControls extends Component {
   constructor(props) {
@@ -43,9 +55,12 @@ class FilterControls extends Component {
 
   render() {
     const { available, mobile, incentive, fees, feesRange } = this.state;
-    const { handleClose } = this.props;
+    const { classes, handleClose } = this.props;
     return (
-      <div style={{ paddingTop: 20, paddingBottom: 10, paddingRight: 10, paddingLeft: 10 }}>
+      <div className={classes.root}>
+        <div className={classes.close}>
+          <IconButton onClick={handleClose}><Close /></IconButton>
+        </div>
         <Grid container alignContent="center" alignItems="center">
           <Grid item xs={3}>
             <Subheader>Avaialble</Subheader>
@@ -61,9 +76,6 @@ class FilterControls extends Component {
               <MenuItem value={true}>True</MenuItem>
               <MenuItem value={false}>False</MenuItem>
             </Select>
-          </Grid>
-          <Grid item>
-            <IconButton onClick={handleClose}><Close /></IconButton>
           </Grid>
         </Grid>
         <Grid container alignContent="center" alignItems="center">
@@ -152,4 +164,4 @@ FilterControls.defaultProps = {
   submitSearch: () => {}
 }
 
-export default FilterControls;
+export default withStyles(styles)(FilterControls);
