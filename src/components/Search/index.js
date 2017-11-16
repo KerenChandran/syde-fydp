@@ -88,6 +88,7 @@ class Search extends Component {
       searchText: this.state.searchText,
       ...filters
     });
+    this.handleFilterRequestClose();
   }
 
   handleFocus = () => (
