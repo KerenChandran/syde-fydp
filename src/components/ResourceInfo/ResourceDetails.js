@@ -52,7 +52,7 @@ const ResourceDetails = props => {
             </Subheader>
           </Grid>
           <Grid item xs={6}>
-            <div style={{ alignContent: "center", alignItems: "center", padding: 8 }}>{fine}</div>
+            <div style={{ alignContent: "center", alignItems: "center", padding: 8 }}>${fine.toFixed(2)}</div>
           </Grid>
         </div> : <Grid item xs={6} />
       }
