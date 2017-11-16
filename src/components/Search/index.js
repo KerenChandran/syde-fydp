@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 
 import { withStyles } from 'material-ui/styles';
 import IconButton from 'material-ui/IconButton';
 import Tooltip from 'material-ui/Tooltip';
+import Popover from 'material-ui/Popover';
+import Paper from 'material-ui/Paper';
 
+import ArrowDropDown from 'material-ui-icons/ArrowDropDown'
 import CloseIcon from 'material-ui-icons/Close';
 import SearchIcon from 'material-ui-icons/Search';
+
+import FilterControls from './FilterControls';
 
 const styles = theme =>  ({
   wrapper: {
@@ -51,13 +57,12 @@ const styles = theme =>  ({
 
 class Search extends Component {
   state = {
-    search: {
-      searchText: '',
-      available: null,
-      location: null,
-      faculty: null
-    },
-    focus: false
+    searchText: '',
+    focus: false,
+    open: false,
+    anchorEl: {
+      clientWidth: 0
+    }
   };
 
   handleKeyDown = event => {
@@ -66,41 +71,44 @@ class Search extends Component {
     }
   }
 
-  handleSearch = () => {
-    this.props.submitSearch(this.state.search);
-  }
+  handleSearch = () => (
+    this.props.submitSearch({ searchText: this.state.searchText })
+  )
 
-  handleFocus = () => {
-    this.setState({ focus: !this.state.focus });
-  }
+  handleFocus = () => (
+    this.setState({ focus: !this.state.focus })
+  )
 
-  handleChange = name => event => {
-    const newSearch = {
-      ...this.state.search,
-      [name]: event.target.value
-    }
-    this.setState({ search: newSearch });
-  }
+  handleChange = name => event => (
+    this.setState({ searchText: event.target.value })
+  )
 
-  handleClear = () => {
+  handleClear = () => (
+    this.setState({ searchText: '' })
+  )
+
+  handleFilterClick = () => {
     this.setState({
-      search: {
-        searchText: '',
-        available: null,
-        location: null,
-        faculty: null
-      }
-    })
-  }
+      open: true,
+      anchorEl: findDOMNode(this.wrapper)
+    });
+  };
+
+  handleFilterRequestClose = () => {
+    this.setState({ open: false });
+  };
 
   render() {
-    const { classes } = this.props;
-    const { searchText } = this.state.search;
+    const { classes, filters, submitSearch } = this.props;
+    const { anchorEl, open, searchText } = this.state;
 
     return (
-      <div className={cx(classes.wrapper, {
-        [classes.wrapperFocus]: this.state.focus
-      })}>
+      <div
+        className={cx(classes.wrapper, {
+          [classes.wrapperFocus]: this.state.focus
+        })}
+        ref={node => this.wrapper = node}
+      >
         <Tooltip title="Search" placement="bottom">
           <IconButton className={classes.search} onClick={this.handleSearch}>
             <SearchIcon />
@@ -120,7 +128,24 @@ class Search extends Component {
             <IconButton onClick={this.handleClear}>
               <CloseIcon />
             </IconButton>
-          </Tooltip> : null }
+          </Tooltip> : null
+        }
+        <Tooltip title="Search options" placement="bottom">
+          <IconButton onClick={this.handleFilterClick}><ArrowDropDown /></IconButton>
+        </Tooltip>
+        <Popover
+          open={open}
+          anchorEl={anchorEl}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          onRequestClose={this.handleFilterRequestClose}
+          PaperProps={{ style: { width: anchorEl.clientWidth }}}
+        >
+          <FilterControls
+            handleClose={this.handleFilterRequestClose}
+            submitSearch={submitSearch}
+            filters={filters}
+          />
+        </Popover>
       </div>
     );
   }
