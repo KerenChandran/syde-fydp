@@ -3,8 +3,10 @@ import * as SearchConstants from './constants';
 const initialState = {
   searchText: '',
   available: null,
-  location: null,
-  faculty: null,
+  mobile: null,
+  incentive: null,
+  fees: null,
+  feesRange: '='
 };
 
 export default (state = initialState, { type, payload }) => {
