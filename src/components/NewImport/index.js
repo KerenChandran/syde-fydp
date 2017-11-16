@@ -14,13 +14,7 @@ import DataImport from '../DataInput';
 import { resourceActions, resourceSelectors } from '../../modules/resources';
 
 class NewImport extends Component {
-  constructor(props) {
-    super(props);
-    this.button = null;
-  }
-  state = {
-    open: false
-  };
+  state = { open: false };
 
   handleClick = () => {
     this.setState({
