@@ -17,6 +17,9 @@ export default (state = initialState, { type, payload }) => {
         ...payload.search
       };
     }
+    case SearchConstants.RESET_SEARCH: {
+      return initialState;
+    }
     default:
       return state;
   }

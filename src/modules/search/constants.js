@@ -1,1 +1,2 @@
+export const RESET_SEARCH = 'RESET_SEARCH';
 export const SUBMIT_SEARCH = 'SUBMIT_SEARCH';
