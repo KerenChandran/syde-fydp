@@ -47,7 +47,7 @@ const Header = ({ classes }) => (
       <Search />
     </div>
     <div className={classes.appLinks}>
-      <Link to="/resources">My Resources</Link>
+      <Link to="/resources">Resources</Link>
       <Link to="/search">Account</Link>
     </div>
   </header>
