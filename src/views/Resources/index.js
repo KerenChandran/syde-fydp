@@ -4,7 +4,10 @@ import { withStyles } from 'material-ui/styles';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import Paper from 'material-ui/Paper';
 import IconButton from 'material-ui/IconButton';
+
 import DetailsIcon from 'material-ui-icons/Details';
+import DeleteIcon from 'material-ui-icons/Delete';
+import EditIcon from 'material-ui-icons/Edit';
 
 const styles = theme => ({
   root: {
@@ -22,8 +25,20 @@ class MyResources extends Component {
     this.props.showDetailsForm(id);
   }
 
+  handleEdit = id => () => {
+    this.props.showEditForm(id);
+  }
+
+  handleClose = () => {
+    this.props.toggleEditForm();
+  }
+
+  handleDelete = id => () => {
+    this.props.deleteResource(id);
+  }
+
   render() {
-    const { classes, resources } = this.props;
+    const { classes, currentUserId, resources } = this.props;
     return (
       <Paper className={classes.root}>
         <Table className={classes.table}>
@@ -35,7 +50,7 @@ class MyResources extends Component {
               <TableCell padding='dense'>Location</TableCell>
               <TableCell padding='dense'>Incentive</TableCell>
               <TableCell padding='dense'>Avaialble</TableCell>
-              <TableCell padding='none'>More Info</TableCell>
+              <TableCell padding='none'></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -47,11 +62,21 @@ class MyResources extends Component {
                 <TableCell padding='dense'>{resource.location}</TableCell>
                 <TableCell padding='dense'>{resource.incentive}</TableCell>
                 <TableCell padding='dense'>{resource.available ? 'Yes' : 'No'}</TableCell>
-                <TableCell>
-                  <IconButton className={classes.button} aria-label="Details" onClick={this.handleDetails(resource.id)}>
-                    <DetailsIcon />
-                  </IconButton>
-                </TableCell>
+                { resource.ownerId === currentUserId ?
+                  <TableCell padding='none'>
+                    <IconButton className={classes.button} aria-label="Edit" onClick={this.handleEdit(resource.id)}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton className={classes.button} aria-label="Delete" onClick={this.handleDelete(resource.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell> : 
+                  <TableCell padding='none'>
+                    <IconButton className={classes.button} aria-label="Details" onClick={this.handleDetails(resource.id)}>
+                      <DetailsIcon />
+                    </IconButton>
+                  </TableCell>
+                }
               </TableRow>
             ))}
           </TableBody>

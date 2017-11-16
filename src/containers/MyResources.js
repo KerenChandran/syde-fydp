@@ -3,16 +3,27 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { resourceActions, resourceSelectors } from '../modules/resources'; 
+import { userSelectors } from '../modules/users'; 
 
-import MyResourcesView from '../views/MyResources';
+import ResourcesView from '../views/Resources';
 import DataInput from '../components/DataInput';
 
 class MyResources extends Component {
   render() {
-    const { resources, deleteResource, editResource, showEditForm, isEditFormOpen, hideEditForm, updateResource } = this.props;
+    const {
+      currentUserId,
+      resources,
+      deleteResource,
+      editResource,
+      showEditForm,
+      isEditFormOpen,
+      hideEditForm,
+      updateResource
+    } = this.props;
     return (
       <div style={{width: '100%'}}>
-        <MyResourcesView
+        <ResourcesView
+          currentUserId={currentUserId}
           resources={resources}
           deleteResource={deleteResource}
           showEditForm={showEditForm}
@@ -26,7 +37,8 @@ class MyResources extends Component {
 const mapStateToProps = (state) => ({
   resources: resourceSelectors.currentUserResources(state),
   editResource: resourceSelectors.getEditResource(state),
-  isEditFormOpen: resourceSelectors.showDataImport(state)
+  isEditFormOpen: resourceSelectors.showDataImport(state),
+  currentUserId: userSelectors.currentUserId(state)
 });
 
 const mapDispatchToProps = (dispatch) => ({
