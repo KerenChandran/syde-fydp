@@ -41,6 +41,22 @@ const ResourceDetails = props => {
       </Grid>
       <Grid item xs={3}>{location}</Grid>
       <Grid item xs={3}>
+        <Subheader>Incentive Type</Subheader>
+      </Grid>
+      <Grid item xs={3}>{incentive}</Grid>
+      { incentive === 'User Fees' ?
+        <div style={{ display: 'flex', alignContent: "center", alignItems: "center", flex: '1 1 0', flexBasis: '50%'}}>
+          <Grid item xs={6}>
+            <Subheader>
+              <div style={{ padding: 8 }}>User Fees</div>
+            </Subheader>
+          </Grid>
+          <Grid item xs={6}>
+            <div style={{ alignContent: "center", alignItems: "center", padding: 8 }}>{fine}</div>
+          </Grid>
+        </div> : <Grid item xs={6} />
+      }
+      <Grid item xs={3}>
         <Subheader>Mobile</Subheader>
       </Grid>
       <Grid item xs={3}>{mobile ? 'Yes' : 'No'}</Grid>
@@ -48,22 +64,6 @@ const ResourceDetails = props => {
         <Subheader>Available</Subheader>
       </Grid>
       <Grid item xs={3}>{available ? 'Yes' : 'No'}</Grid>
-      <Grid item xs={3}>
-        <Subheader>Incentive Type</Subheader>
-      </Grid>
-      <Grid item xs={3}>{incentive}</Grid>
-      { incentive === 'User Fees' ?
-        <div style={{ display: 'flex', alignContent: "center", alignItems: "center", flex: '1 1 0', padding: 8}}>
-          <Grid item xs={6}>
-            <Subheader>User Fees</Subheader>
-          </Grid>
-          <Grid item xs={6}>
-            <div style={{ alignContent: "center", alignItems: "center", padding: 8 }}>
-              {fine}
-            </div>
-          </Grid>
-        </div> : <Grid item xs={6} />
-      }
       <Grid item xs={12}>
         <Subheader>Description</Subheader>
       </Grid>

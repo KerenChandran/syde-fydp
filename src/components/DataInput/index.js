@@ -88,6 +88,29 @@ class DataInput extends Component {
               <TextField className={classes.twoColLeft} label="Faculty" onChange={this.handleChange('faculty')} margin="normal" value={faculty} />
               <TextField className={classes.twoColRight} label="Location" onChange={this.handleChange('location')} margin="normal" value={location} />
             </FormGroup>
+            <FormControl className={classes.twoColLeft}>
+              <InputLabel htmlFor="incentive">Incentive Type</InputLabel>
+              <Select
+                value={incentive}
+                onChange={this.handleChange('incentive')}
+                input={<Input id="incentive" />}
+              >
+                <MenuItem value={'User Fees'}>User Fees</MenuItem>
+                <MenuItem value={'Co-Publishing'}>Co-Publishing</MenuItem>
+              </Select>
+            </FormControl>
+            { incentive === 'User Fees' ?
+              <FormControl className={classes.twoColRight}>
+                <InputLabel htmlFor="userFee">Amount</InputLabel>
+                <Input
+                  id="userFee"
+                  startAdornment={<InputAdornment component='span' position="start">$</InputAdornment>}
+                  onChange={this.handleChange('fine')}
+                  margin="normal"
+                  value={fine}
+                />
+              </FormControl> : null
+            }
             <FormGroup>
               <FormControlLabel
                 label="Mobile"
@@ -122,29 +145,6 @@ class DataInput extends Component {
               margin="normal"
               value={application}
             />
-            <FormControl className={classes.twoColLeft}>
-              <InputLabel htmlFor="incentive">Incentive Type</InputLabel>
-              <Select
-                value={incentive}
-                onChange={this.handleChange('incentive')}
-                input={<Input id="incentive" />}
-              >
-                <MenuItem value={'User Fees'}>User Fees</MenuItem>
-                <MenuItem value={'Co-Publishing'}>Co-Publishing</MenuItem>
-              </Select>
-            </FormControl>
-            { incentive === 'User Fees' ?
-              <FormControl className={classes.twoColRight}>
-                <InputLabel htmlFor="userFee">Amount</InputLabel>
-                <Input
-                  id="userFee"
-                  startAdornment={<InputAdornment component='span' position="start">$</InputAdornment>}
-                  onChange={this.handleChange('fine')}
-                  margin="normal"
-                  value={fine}
-                />
-              </FormControl> : null
-            }
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleRequestClose} color="primary">Cancel</Button>
