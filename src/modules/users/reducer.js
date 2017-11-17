@@ -13,6 +13,27 @@ const initialState = {
     email: 'emily@resourcesharing.com',
     privacy: false,
     preferredContact: 'email'
+  }, {
+    id: 3,
+    name: 'Sid',
+    phone: '647 555 1234',
+    email: 'sid@resourcesharing.com',
+    privacy: false,
+    preferredContact: 'email'
+  }, {
+    id: 4,
+    name: 'Julia',
+    phone: '416 987 4321',
+    email: 'julia@resourcesharing.com',
+    privacy: false,
+    preferredContact: 'phone'
+  }, {
+    id: 5,
+    name: 'Abbey',
+    phone: '905 203 5678',
+    email: 'abbey@resourcesharing.com',
+    privacy: false,
+    preferredContact: 'email'
   }],
   currentUserId: 1
 };

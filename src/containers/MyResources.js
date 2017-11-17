@@ -3,12 +3,17 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { resourceActions, resourceSelectors } from '../modules/resources'; 
-import { userSelectors } from '../modules/users'; 
+import { userSelectors } from '../modules/users';
+import { searchActions } from '../modules/search';
 
 import ResourcesView from '../views/Resources';
 import DataInput from '../components/DataInput';
 
 class MyResources extends Component {
+  componentDidMount() {
+    this.props.resetSearch();
+  }
+
   render() {
     const {
       currentUserId,
@@ -45,7 +50,8 @@ const mapDispatchToProps = (dispatch) => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
   showEditForm: bindActionCreators(resourceActions.setEditResource, dispatch),
   hideEditForm: bindActionCreators(resourceActions.toggleDataImportForm, dispatch),
-  updateResource: bindActionCreators(resourceActions.updateResource, dispatch)
+  updateResource: bindActionCreators(resourceActions.updateResource, dispatch),
+  resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyResources);
