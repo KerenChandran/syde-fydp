@@ -1,8 +1,26 @@
-import React from 'react';
-import SearchView from '../views/Search';
+import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { searchActions, searchSelectors } from '../modules/search';
 
-const Search = () => (
-  <SearchView />
-);
+import SearchBar from '../components/Search';
 
-export default Search;
+class Search extends Component {
+  render() {
+    const { search, submitSearch } = this.props;
+    const { searchText, ...filters } = search;
+    return (
+      <SearchBar submitSearch={submitSearch} searchText={searchText} filters={filters} />
+    );
+  }
+}
+
+const mapStateToProps = state => ({
+  search: searchSelectors.search(state)
+});
+
+const mapDispatchToProps = dispatch => ({
+  submitSearch: bindActionCreators(searchActions.submitSearch, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Search);
