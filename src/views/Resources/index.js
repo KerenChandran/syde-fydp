@@ -44,41 +44,46 @@ class MyResources extends Component {
         <Table className={classes.table}>
           <TableHead>
             <TableRow>
-            <TableCell padding='dense'>Category</TableCell>
+              <TableCell padding='dense'>Category</TableCell>
               <TableCell padding='dense'>Company</TableCell>
               <TableCell padding='dense'>Model</TableCell>
               <TableCell padding='dense'>Location</TableCell>
               <TableCell padding='dense'>Incentive</TableCell>
+              <TableCell padding='dense'>Fees</TableCell>
               <TableCell padding='dense'>Avaialble</TableCell>
               <TableCell padding='none'></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {resources.map(resource => (
-              <TableRow key={resource.id}>
-                <TableCell padding='dense'>{resource.category}</TableCell>
-                <TableCell padding='dense'>{resource.company}</TableCell>
-                <TableCell padding='dense'>{resource.model}</TableCell>
-                <TableCell padding='dense'>{resource.location}</TableCell>
-                <TableCell padding='dense'>{resource.incentive}</TableCell>
-                <TableCell padding='dense'>{resource.available ? 'Yes' : 'No'}</TableCell>
-                { resource.ownerId === currentUserId ?
-                  <TableCell padding='none'>
-                    <IconButton className={classes.button} aria-label="Edit" onClick={this.handleEdit(resource.id)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton className={classes.button} aria-label="Delete" onClick={this.handleDelete(resource.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell> : 
-                  <TableCell padding='none'>
-                    <IconButton className={classes.button} aria-label="Details" onClick={this.handleDetails(resource.id)}>
-                      <DetailsIcon />
-                    </IconButton>
-                  </TableCell>
-                }
-              </TableRow>
-            ))}
+            {resources.map(resource => {
+              const fees = resource.fine !== null ? `$${resource.fine.toFixed(2)}` : resource.fine;
+              return (
+                <TableRow key={resource.id}>
+                  <TableCell padding='dense'>{resource.category}</TableCell>
+                  <TableCell padding='dense'>{resource.company}</TableCell>
+                  <TableCell padding='dense'>{resource.model}</TableCell>
+                  <TableCell padding='dense'>{resource.location}</TableCell>
+                  <TableCell padding='dense'>{resource.incentive}</TableCell>
+                  <TableCell padding='dense'>{fees}</TableCell>
+                  <TableCell padding='dense'>{resource.available ? 'Yes' : 'No'}</TableCell>
+                  { resource.ownerId === currentUserId ?
+                    <TableCell padding='none'>
+                      <IconButton className={classes.button} aria-label="Edit" onClick={this.handleEdit(resource.id)}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton className={classes.button} aria-label="Delete" onClick={this.handleDelete(resource.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell> : 
+                    <TableCell padding='none'>
+                      <IconButton className={classes.button} aria-label="Details" onClick={this.handleDetails(resource.id)}>
+                        <DetailsIcon />
+                      </IconButton>
+                    </TableCell>
+                  }
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </Paper>
