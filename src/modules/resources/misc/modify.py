@@ -18,6 +18,41 @@ dynamic_map = {
 # iterative population
 iter_arr = ['id']
 
+# owner details
+owner_map = {
+    1: {
+        'name': 'John',
+        'phone': '519 888 4567 x123',
+        'email': 'john@resourcesharing.com',
+        'privacy': False,
+        'preferredContact': 'phone'
+    }, 2: {
+        'name': 'Emily',
+        'phone': '519 888 4567 x456',
+        'email': 'emily@resourcesharing.com',
+        'privacy': False,
+        'preferredContact': 'email'
+    }, 3: {
+        'name': 'Sid',
+        'phone': '647 555 1234',
+        'email': 'sid@resourcesharing.com',
+        'privacy': False,
+        'preferredContact': 'email'
+    }, 4: {
+        'name': 'Julia',
+        'phone': '416 987 4321',
+        'email': 'julia@resourcesharing.com',
+        'privacy': False,
+        'preferredContact': 'phone'
+    }, 5: {
+        'name': 'Abbey',
+        'phone': '905 203 5678',
+        'email': 'abbey@resourcesharing.com',
+        'privacy': False,
+        'preferredContact': 'email'
+    }
+}
+
 if __name__ == '__main__':
     data = json.load(open("../data.json"))
 
@@ -58,6 +93,10 @@ if __name__ == '__main__':
     # add index+1 as unique identifier
     for idx, res in enumerate(store):
         res["id"] = idx+1
+
+    # include owner details
+    for res in store:
+        res.update(owner_map[res["ownerId"]])
 
     # output to data_modified.json
     data = {
