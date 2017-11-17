@@ -63,7 +63,7 @@ class FilterControls extends Component {
         </div>
         <Grid container alignContent="center" alignItems="center">
           <Grid item xs={3}>
-            <Subheader>Avaialble</Subheader>
+            <Subheader>Available</Subheader>
           </Grid>
           <Grid item xs={6}>
             <Select
