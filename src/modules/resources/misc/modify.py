@@ -25,31 +25,36 @@ owner_map = {
         'phone': '519 888 4567 x123',
         'email': 'john@resourcesharing.com',
         'privacy': False,
-        'preferredContact': 'phone'
+        'emailPreferred': False,
+        'phonePreferred': True
     }, 2: {
         'name': 'Emily',
         'phone': '519 888 4567 x456',
         'email': 'emily@resourcesharing.com',
         'privacy': False,
-        'preferredContact': 'email'
+        'emailPreferred': True,
+        'phonePreferred': False
     }, 3: {
         'name': 'Sid',
         'phone': '647 555 1234',
         'email': 'sid@resourcesharing.com',
         'privacy': False,
-        'preferredContact': 'email'
+        'emailPreferred': True,
+        'phonePreferred': False
     }, 4: {
         'name': 'Julia',
         'phone': '416 987 4321',
         'email': 'julia@resourcesharing.com',
         'privacy': False,
-        'preferredContact': 'phone'
+        'emailPreferred': False,
+        'phonePreferred': True
     }, 5: {
         'name': 'Abbey',
         'phone': '905 203 5678',
         'email': 'abbey@resourcesharing.com',
         'privacy': False,
-        'preferredContact': 'email'
+        'emailPreferred': True,
+        'phonePreferred': False
     }
 }
 
