@@ -12,7 +12,8 @@ dynamic_map = {
     "location": ["Engineering 5", "Engineering 2", "M3", "DWE"],
     "incentive": "User Fees",
     "available": [False, True],
-    "ownerId": [1,2,3,4,5]
+    "ownerId": [1,2,3,4,5],
+    "mobile": [False, True]
 }
 
 # iterative population
