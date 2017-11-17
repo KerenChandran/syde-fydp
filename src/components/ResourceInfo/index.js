@@ -11,36 +11,29 @@ import Dialog, {
 import Button from 'material-ui/Button';
 
 import ResourceDetails from './ResourceDetails';
+import ContactInfo from './ContactInfo';
 
 class ResourceInfo extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { ...this.props.resource }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState(nextProps.resource)
-  }
+  state = {
+    showContactInfo: false
+  };
 
   handleRequestClose = () => {
+    this.setState({ showContactInfo: false });
     this.props.closeForm();
   };
 
-  handleSubmit = () => {
-    this.props.submitForm(this.state);
-    this.handleRequestClose();
+  toggleShowContactInfo = () => {
+    this.setState({ showContactInfo: !this.state.showContactInfo });
   }
-
-  handleChange = (name) => (event) => (
-    this.setState({ [name]: event.target.value })
-  )
-
-  handleSwitchChange = (name) => (event, checked) => (
-    this.setState({ [name]: checked })
-  )
 
   render() {
     const { fullScreen, open, resource } = this.props;
+    const { showContactInfo } = this.state;
+    const { name, email, phone, emailPreferred, phonePreferred, ...resouceProperties } = resource;
+
+
+    const buttonLabel = showContactInfo ? 'Resource Info' : 'Contact Info'
     return (
       <div>
         <Dialog
@@ -50,11 +43,20 @@ class ResourceInfo extends Component {
         >
           <DialogTitle>{[resource.company, resource.model].join(' - ')}</DialogTitle>
           <DialogContent>
-            <ResourceDetails {...resource} />
+            { showContactInfo ?
+              <ContactInfo
+                name={name}
+                email={email}
+                phone={phone}
+                emailPreferred={emailPreferred}
+                phonePreferred={phonePreferred}
+              /> :
+              <ResourceDetails {...resouceProperties} />
+            }
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleRequestClose} color="primary">Close</Button>
-            <Button onClick={this.handleContactInfo} raised color="primary" autoFocus>Contact Info</Button>
+            <Button onClick={this.toggleShowContactInfo} raised color="primary" autoFocus>{buttonLabel}</Button>
           </DialogActions>
         </Dialog>
       </div>
