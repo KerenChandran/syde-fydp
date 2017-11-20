@@ -124,7 +124,7 @@ class FilterControls extends Component {
               >
                 <MenuItem value={'='}>=</MenuItem>
                 <MenuItem value={'>='}>{'>='}</MenuItem>
-                <MenuItem value={'<= '}>{'<='}</MenuItem>
+                <MenuItem value={'<='}>{'<='}</MenuItem>
               </Select>
             </Grid>
             <Grid item xs={6}>
