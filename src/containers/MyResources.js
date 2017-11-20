@@ -23,6 +23,7 @@ class MyResources extends Component {
       showEditForm,
       isEditFormOpen,
       hideEditForm,
+      addResource,
       updateResource
     } = this.props;
     return (
@@ -33,7 +34,7 @@ class MyResources extends Component {
           deleteResource={deleteResource}
           showEditForm={showEditForm}
         />
-        <DataInput open={isEditFormOpen} resource={editResource} submitForm={updateResource} closeForm={hideEditForm}/>
+        <DataInput open={isEditFormOpen} resource={editResource} addResource={addResource} updateResource={updateResource} closeForm={hideEditForm}/>
       </div>
     );
   }
@@ -50,6 +51,7 @@ const mapDispatchToProps = (dispatch) => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
   showEditForm: bindActionCreators(resourceActions.setEditResource, dispatch),
   hideEditForm: bindActionCreators(resourceActions.toggleDataImportForm, dispatch),
+  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
   updateResource: bindActionCreators(resourceActions.updateResource, dispatch),
   resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
 });

@@ -71,11 +71,6 @@ class NewImport extends Component {
             <MenuItem onClick={this.handleBulkImport}>Bulk Data Import</MenuItem>
           </MenuList>
         </Popover>
-        <DataImport
-          open={isDataImportOpen}
-          closeForm={showDataImport}
-          submitForm={submitDataImport}
-        />
         <BulkDataImport
           open={isBulkImportOpen}
           closeForm={showBulkImport}

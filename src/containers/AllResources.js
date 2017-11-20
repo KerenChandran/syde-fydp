@@ -29,6 +29,7 @@ class AllResources extends Component {
       showEditForm,
       isEditFormOpen,
       hideEditForm,
+      addResource,
       updateResource
     } = this.props;
 
@@ -42,14 +43,14 @@ class AllResources extends Component {
           currentUserId={currentUserId}
         />
         <ResourceInfo open={isDetailResourceOpen} resource={detailResource} closeForm={toggleResourceDetail}/>
-        <DataInput open={isEditFormOpen} resource={editResource} submitForm={updateResource} closeForm={hideEditForm}/>
+        <DataInput open={isEditFormOpen} resource={editResource} addResource={addResource} updateResource={updateResource} closeForm={hideEditForm}/>
       </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  resources: resourceSelectors.filteredResources(state),
+  resources: resourceSelectors.filteredResources(state).slice(0, 50),
   detailResource: resourceSelectors.getDetailResource(state),
   isDetailResourceOpen: resourceSelectors.showDetailsResource(state),
   editResource: resourceSelectors.getEditResource(state),
@@ -63,6 +64,7 @@ const mapDispatchToProps = dispatch => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
   showEditForm: bindActionCreators(resourceActions.setEditResource, dispatch),
   hideEditForm: bindActionCreators(resourceActions.toggleDataImportForm, dispatch),
+  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
   updateResource: bindActionCreators(resourceActions.updateResource, dispatch),
   resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
 });

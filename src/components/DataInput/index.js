@@ -43,12 +43,20 @@ class DataInput extends Component {
   };
 
   handleSubmit = () => {
-    this.props.submitForm(this.state);
+    if (this.state.id === -1) {
+      this.props.addResource(this.state);
+    } else {
+      this.props.updateResource(this.state);
+    }
     this.handleRequestClose();
   }
 
   handleChange = (name) => (event) => (
     this.setState({ [name]: event.target.value })
+  )
+
+  handleNumberChange = (name) => event => (
+    this.setState({ [name]: parseInt(event.target.value, 10) })
   )
 
   handleSwitchChange = (name) => (event, checked) => (
@@ -103,9 +111,10 @@ class DataInput extends Component {
               <FormControl className={classes.twoColRight}>
                 <InputLabel htmlFor="userFee">Amount</InputLabel>
                 <Input
+                  type="number"
                   id="userFee"
                   startAdornment={<InputAdornment component='span' position="start">$</InputAdornment>}
-                  onChange={this.handleChange('fine')}
+                  onChange={this.handleNumberChange('fine')}
                   margin="normal"
                   value={fine}
                 />
@@ -158,7 +167,7 @@ class DataInput extends Component {
 
 DataInput.defaultProps = {
   resource: {
-    id: '-1',
+    id: -1,
     category: '',
     model: '',
     company: '',
@@ -170,7 +179,15 @@ DataInput.defaultProps = {
     date: Date.now(),
     incentive: '',
     mobile: false,
-    application: ''
+    application: '',
+    phonePreferred: true,
+    emailPreferred: false,
+    privacy: false,
+    email: "john@resourcesharing.com",
+    phone: "519 888 4567 x123",
+    ownerId: 1,
+    fine: null,
+    name: "John"
   }
 }
 

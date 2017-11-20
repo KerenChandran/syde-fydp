@@ -11,7 +11,7 @@ export const filteredResources = createSelector(resources, search, (resources, s
       mobile === null &&
       incentive === null &&
       fees === null) {
-    return resources.slice(0, 50);
+    return resources;
   }
 
   const operator = {
@@ -33,7 +33,7 @@ export const filteredResources = createSelector(resources, search, (resources, s
     const feesCheck = fees === null || (incentive === 'User Fees' && operator[feesRange](resource.fine, fees));
 
     return searchTextCheck && availableCheck && mobileCheck && incentiveCheck && feesCheck;
-  }).slice(0, 50);
+  });
 })
 
 export const userResources = (resources, userId) => (
@@ -43,12 +43,12 @@ export const currentUserResources = createSelector(filteredResources, currentUse
 
 export const editResourceId = state => state.resources.editResourceId;
 export const getEditResource = createSelector(resources, editResourceId, (resources, editResourceId) => (
-  resources.filter((resource) => resource.id === editResourceId)[0]
+  resources.find((resource) => resource.id === editResourceId)
 ));
 
 export const detailResourceId = state => state.resources.detailResourceId;
 export const getDetailResource = createSelector(resources, detailResourceId, (resources, detailResourceId) => (
-  resources.filter((resource) => resource.id === detailResourceId)[0]
+  resources.find((resource) => resource.id === detailResourceId)
 ));
 
 export const showBulkImport = state => state.resources.showBulkImport;

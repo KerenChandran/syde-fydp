@@ -26,7 +26,7 @@ export default (state = initialState, { type, payload }) => {
 
     case ResourceConstants.ADD_DATA_IMPORT: {
       let { resources, ...others } = state;
-      payload.resource.id = resources.length;
+      payload.resource.id = resources.length + 1;
       let newResources = [
         ...resources,
         payload.resource
