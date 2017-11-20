@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import logo from '../../logo.svg';
 import Search from '../../containers/Search';
@@ -41,7 +42,7 @@ const styles = {
 
 const Header = ({ classes }) => (
   <header className={classes.appHeader}>
-    <img src={logo} className={classes.appLogo} alt="logo" />
+    <Link to="/"><img src={logo} className={classes.appLogo} alt="logo" /></Link>
     <div className={classes.appSearch}>
       <Search />
     </div>
