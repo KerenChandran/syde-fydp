@@ -14,7 +14,7 @@ export default (props) => (
       <div className="App">
         <Sidebar />
         <div className="App-content">
-          <Route exact path="/" component={MyResources} />
+          <Route exact path="/" component={AllResources} />
           <Route exact path="/resources" component={AllResources} />
           <Route exact path="/resources/myresources" component={MyResources} />
         </div>

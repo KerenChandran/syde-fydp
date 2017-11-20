@@ -3,8 +3,7 @@ import { currentUserId } from '../users/selectors';
 import { search } from '../search/selectors';
 
 export const resources = state => state.resources.resources;
-export const filteredResources = createSelector(resources, search, (allResources, search) => {
-  const resources = allResources.slice(0, 50);
+export const filteredResources = createSelector(resources, search, (resources, search) => {
   const { searchText, available, mobile, incentive, fees, feesRange } = search;
   const lowerSearchText = searchText.toLowerCase();
   if ((searchText === '' || searchText === null) &&
@@ -12,11 +11,11 @@ export const filteredResources = createSelector(resources, search, (allResources
       mobile === null &&
       incentive === null &&
       fees === null) {
-    return resources;
+    return resources.slice(0, 50);
   }
 
   const operator = {
-    '=': (x, y) => x == y,
+    '=': (x, y) => x === y,
     '<=': (x, y) => x <= y,
     '>=': (x, y) => x >= y 
   };
@@ -34,7 +33,7 @@ export const filteredResources = createSelector(resources, search, (allResources
     const feesCheck = fees === null || (incentive === 'User Fees' && operator[feesRange](resource.fine, fees));
 
     return searchTextCheck && availableCheck && mobileCheck && incentiveCheck && feesCheck;
-  });
+  }).slice(0, 50);
 })
 
 export const userResources = (resources, userId) => (
