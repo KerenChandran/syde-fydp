@@ -9,7 +9,6 @@ import { MenuItem, MenuList } from 'material-ui/Menu';
 import Popover from 'material-ui/Popover';
 
 import BulkDataImport from '../BulkDataInput';
-import DataImport from '../DataInput';
 
 import { resourceActions, resourceSelectors } from '../../modules/resources';
 
@@ -40,11 +39,8 @@ class NewImport extends Component {
   render() {
     const {
       isBulkImportOpen,
-      isDataImportOpen,
       showBulkImport,
-      showDataImport,
-      submitBulkImport,
-      submitDataImport
+      submitBulkImport
     } = this.props;
     const { anchorEl, open } = this.state;
 
@@ -83,7 +79,6 @@ class NewImport extends Component {
 
 NewImport.defaultProps = {
   isBulkImportOpen: false,
-  isDataImportOpen: false,
   showBulkImport: () => {},
   showDataImport: () => {}
 };
@@ -94,15 +89,13 @@ NewImport.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  isBulkImportOpen: resourceSelectors.showBulkImport(state),
-  isDataImportOpen: resourceSelectors.showDataImport(state)
+  isBulkImportOpen: resourceSelectors.showBulkImport(state)
 })
 
 const mapDispatchToProps = (dispatch) => ({
   showBulkImport: bindActionCreators(resourceActions.toggleBulkImportForm, dispatch),
   showDataImport: bindActionCreators(resourceActions.toggleDataImportForm, dispatch),
-  submitBulkImport: bindActionCreators(resourceActions.addBulkImport, dispatch),
-  submitDataImport: bindActionCreators(resourceActions.addDataImport, dispatch)
+  submitBulkImport: bindActionCreators(resourceActions.addBulkImport, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewImport);

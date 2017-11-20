@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 
 import { resourceActions, resourceSelectors } from '../modules/resources';
 import { userSelectors } from '../modules/users';
-import { toggleResourceDetail } from '../modules/resources/actions';
 import { searchActions } from '../modules/search';
 
 import ResourcesView from '../views/Resources';

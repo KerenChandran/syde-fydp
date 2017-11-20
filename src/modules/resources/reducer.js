@@ -46,6 +46,7 @@ export default (state = initialState, { type, payload }) => {
           foundIndex = index;
           return true;
         }
+        return false;
       });
 
       let newResources = [

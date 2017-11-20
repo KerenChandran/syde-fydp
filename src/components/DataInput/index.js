@@ -9,7 +9,6 @@ import { FormControl, FormControlLabel, FormGroup } from 'material-ui/Form';
 import Dialog, {
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   withMobileDialog,
 } from 'material-ui/Dialog';

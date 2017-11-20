@@ -7,7 +7,6 @@ import { withStyles } from 'material-ui/styles';
 import IconButton from 'material-ui/IconButton';
 import Tooltip from 'material-ui/Tooltip';
 import Popover from 'material-ui/Popover';
-import Paper from 'material-ui/Paper';
 
 import ArrowDropDown from 'material-ui-icons/ArrowDropDown'
 import CloseIcon from 'material-ui-icons/Close';
