@@ -1,5 +1,5 @@
 # convenience script to build client container and run instance
 
-docker build --tag syde-fydp .
+docker build --tag client-image .
 
 bash run-container.sh
