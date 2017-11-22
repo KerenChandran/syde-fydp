@@ -2,4 +2,4 @@
 
 docker build --tag syde-fydp .
 
-bash run.sh
+bash run-container.sh
