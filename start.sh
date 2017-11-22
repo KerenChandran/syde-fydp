@@ -12,6 +12,12 @@ docker rm client
 docker stop server
 docker rm server
 
+# remove network if it exists
+docker network rm application-network
+
+# create network for containers
+docker network create application-network
+
 # start database
 cd database
 bash run-container.sh 
