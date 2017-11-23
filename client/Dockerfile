@@ -1,8 +1,5 @@
-FROM node:6-alpine
+FROM node:9.2.0
 ENV NODE_ENV production
-WORKDIR /usr/src/app
-COPY ["package.json", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && npm install -g react-scripts --silent && mv node_modules ../
-COPY . .
+ADD package.json /package.json
+RUN npm install --production --silent && npm install -g react-scripts --silent
 EXPOSE 3000
-CMD npm start
