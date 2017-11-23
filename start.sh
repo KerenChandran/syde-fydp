@@ -2,19 +2,6 @@
 # linkage is abstracted by run commands in other shell scripts
 # usage: bash start.sh
 
-# stop containers if present
-docker stop db
-docker rm db
-
-docker stop client
-docker rm client
-
-docker stop server
-docker rm server
-
-# remove network if it exists
-docker network rm application-network
-
 # create network for containers
 docker network create application-network
 
