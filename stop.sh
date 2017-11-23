@@ -5,6 +5,9 @@
 docker stop db
 docker rm db
 
+docker stop es
+docker rm es
+
 docker stop client
 docker rm client
 
