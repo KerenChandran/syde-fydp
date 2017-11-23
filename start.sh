@@ -13,6 +13,9 @@ bash run-container.sh
 cd ../elasticsearch
 bash run-container.sh
 
+# exec into es container and build index
+docker exec -d -it es bash es_util/create_index.sh
+
 # start backend server
 cd ../server
 bash build-image.sh
