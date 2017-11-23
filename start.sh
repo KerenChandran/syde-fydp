@@ -15,10 +15,12 @@ bash run-container.sh
 
 # start backend server
 cd ../server
+bash build-image.sh
 bash run-container.sh
 
 # start client
 cd ../client
+bash build-image.sh
 bash run-container.sh
 
 # KNOWN CAVEAT: container linking is not instantaneous so we enable a 1
