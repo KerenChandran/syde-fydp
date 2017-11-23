@@ -1,0 +1,44 @@
+{
+    "mappings": {
+        "resource": {
+           "properties": {
+                "category": {
+                    "type": "text"
+                },
+                "company": {
+                    "type": "text"
+                },
+                "model": {
+                    "type": "text"
+                },
+                "faculty": {
+                    "type": "keyword"
+                },
+                "location": {
+                    "type": "keyword"
+                },
+                "incentive_type": {
+                    "type": "keyword"
+                },
+                "fee_amount": {
+                    "type": "float"
+                },
+                "mobile": {
+                    "type": "boolean"
+                },
+                "available": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "text"
+                },
+                "rules_restrictions": {
+                    "type": "text"
+                },
+                "application": {
+                    "type": "text"
+                }
+            }
+        }
+    }
+}
