@@ -28,7 +28,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # root URL
 @app.route("/")
 def root():
-    return "Flask application base."
+    return jsonify({"message": "Flask application base."})
 
 # file upload URL
 @app.route("/file_upload", methods=['POST'])

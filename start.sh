@@ -8,7 +8,7 @@ docker network create application-network
 # start database
 echo "database"
 cd database
-bash run-container.sh 
+bash run-container.sh
 
 # start elasticsearch server
 echo "elasticsearch"
@@ -37,6 +37,10 @@ echo "building indices..."
 # exec into es container and build indices
 docker exec -it es bash es_util/setup.sh
 
+echo "creating database tables..."
+cd ../database
+bash exec.sh scripts/2017_23_11/release.sql # relative file path from database directory
+
 echo "starting app server..."
 
 # dynamically create static folder for file uploads
@@ -52,11 +56,12 @@ sleep 1
 # client
 curl localhost:3000
 
-# ignore database - no curl capabilities
-
 # elasticsearch indices
 curl localhost:9200/equipment?pretty
 curl localhost:9200/lab?pretty
 
 # flask server
 curl localhost:5000
+
+# database - local psql dependency
+# psql -h localhost -U postgres -w -c "SELECT * FROM platform_user;"
