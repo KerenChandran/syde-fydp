@@ -1,22 +1,11 @@
-# Setup elasticsearch with mobz head interface plugin
+# Setup elasticsearch indices
 
-# install git
-yum install -y git
+# create and test equipment index
+cd es_util
 
-# retrieve repository
-git clone https://github.com/mobz/elasticsearch-head.git
+cd equipment
+bash create_index.sh
 
-# install node+npm
-yum install -y gcc-c++ make
-
-curl -sL https://rpm.nodesource.com/setup_6.x | bash -
-
-yum install -y nodejs
-
-# install node dependencies 
-
-cd elasticsearch-head
-
-npm install
-
-npm run start
+# create and test lab index
+cd ../lab
+bash create_index.sh

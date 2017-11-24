@@ -3,6 +3,7 @@
     "company": "Battery Tender",
     "model": "021-0123",
     "faculty": "Science",
+    "department": "Chemistry",
     "location": "DWE",
     "incentive_type": "user_fees",
     "fee_amount": "40.00",

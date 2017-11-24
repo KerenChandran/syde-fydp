@@ -1,0 +1,26 @@
+{
+    "mappings": {
+        "lab": {
+           "properties": {
+                "name": {
+                    "type": "text"
+                },
+                "description": {
+                    "type": "text"
+                },
+                "applications": {
+                    "type": "text"
+                },
+                "faculty": {
+                    "type": "keyword"
+                },
+                "department": {
+                    "type": "keyword"
+                },
+                "location": {
+                    "type": "keyword"
+                }
+            }
+        }
+    }
+}
