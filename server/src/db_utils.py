@@ -11,7 +11,7 @@ def connect():
     # TODO: username and password passed as environment variables
     conn = pg.connect(host="db", user="postgres", password="sydefydp")
 
-    return conn.cursor()
+    return conn
 
 
 if __name__ == '__main__':
