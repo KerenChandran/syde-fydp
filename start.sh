@@ -31,5 +31,13 @@ bash run-container.sh
 echo "Time delay to allow for container linking..."
 sleep 10
 
+# dynamically create static folder for file uploads
+docker exec -d server mkdir App/src/static
+
 # exec into server container and start python application
 docker exec -d server python App/src/app.py
+
+sleep 1
+
+# test flask server
+curl localhost:5000
