@@ -49,11 +49,7 @@ export const addBulkImport = (data) => async dispatch => {
   try {
     let formData = new FormData();
     formData.append('resources', data.file);
-    formData.append('location', data.location);
-
-    // console.log('data', data, formData);
-
-    // console.log('json', );
+    formData.append('location', JSON.stringify(data.location));
 
     let response = await fetch('http://localhost:3000/api/bulk_resource_upload', {
       method: 'post',
