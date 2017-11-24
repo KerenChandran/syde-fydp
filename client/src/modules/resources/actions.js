@@ -8,9 +8,39 @@ export const toggleResourceDetail = createAction(ResourceConstants.TOGGLE_RESOUR
 
 // Add to Database
 export const addBulkImport = createAction(ResourceConstants.ADD_BULK_IMPORT);
-export const addDataImport = createAction(ResourceConstants.ADD_DATA_IMPORT, resource => ({ resource }));
+export const addResourceSuccess = createAction(ResourceConstants.ADD_DATA_IMPORT, resource => ({ resource }));
 export const updateResource = createAction(ResourceConstants.UPDATE_DATA_IMPORT, resource => ({ resource }));
 
 export const setEditResource = createAction(ResourceConstants.SET_EDIT_RESOURCE, id => ({ id }));
 export const deleteResource = createAction(ResourceConstants.DELETE_RESOURCE, id => ({ id }));
 export const setDetailResource = createAction(ResourceConstants.SET_DETAIL_RESOURCE, id => ({ id }));
+
+export const fetchResourcesSuccess = createAction(ResourceConstants.FETCH_RESOURCES, resources => ({ resources }));
+
+export const fetchResources = () => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/');
+    let data = await response.json();
+    return dispatch(fetchResourcesSuccess(data));
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const addDataImport = (resource) => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/resource_upload', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ resource: resource })
+    });
+    let data = await response.json();
+    resource.id = data.resource_id;
+    return dispatch(addResourceSuccess(resource));
+  } catch (error) {
+    throw new Error(error);
+  }
+}

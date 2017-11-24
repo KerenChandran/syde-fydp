@@ -17,6 +17,7 @@
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
+    "redux-thunk": "^2.2.0",
     "reselect": "^3.0.1"
   },
   "scripts": {
@@ -24,5 +25,13 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "proxy": {
+    "/api": {
+      "target": "http://server:5000",
+      "pathRewrite": {
+        "^/api": ""
+      }
+    }
   }
 }

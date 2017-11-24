@@ -182,7 +182,6 @@ DataInput.defaultProps = {
     description: '',
     rules: '',
     available: false,
-    date: Date.now(),
     incentive: '',
     mobile: false,
     application: '',
