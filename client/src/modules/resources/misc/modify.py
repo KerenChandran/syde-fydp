@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
     # add index+1 as unique identifier
     for idx, res in enumerate(store):
-        res["id"] = idx+1
+        res["id"] = idx+1000+1
 
     # include owner details
     for res in store:
