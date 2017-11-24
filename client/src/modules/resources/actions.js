@@ -7,7 +7,7 @@ export const toggleDataImportForm = createAction(ResourceConstants.TOGGLE_DATA_I
 export const toggleResourceDetail = createAction(ResourceConstants.TOGGLE_RESOURCE_DETAIL);
 
 // Add to Database
-export const addBulkImport = createAction(ResourceConstants.ADD_BULK_IMPORT);
+export const addBulkResourceSuccess = createAction(ResourceConstants.ADD_BULK_IMPORT, resources => ({ resources }));
 export const addResourceSuccess = createAction(ResourceConstants.ADD_DATA_IMPORT, resource => ({ resource }));
 export const updateResource = createAction(ResourceConstants.UPDATE_DATA_IMPORT, resource => ({ resource }));
 
@@ -40,6 +40,37 @@ export const addDataImport = (resource) => async dispatch => {
     let data = await response.json();
     resource.id = data.resource_id;
     return dispatch(addResourceSuccess(resource));
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+export const addBulkImport = (data) => async dispatch => {
+  try {
+    // let formData = new FormData();
+    // formData.append('resources', data.file);
+
+    // debugger;
+
+    // console.log('data', data, formData);
+
+    // console.log('json', JSON.stringify({
+    //   data: {
+    //     location: data.location,
+    //     resources: formData
+    //   }
+    // }));
+
+    let response = await fetch('http://localhost:3000/api/bulk_resource_upload', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ data })
+    });
+    let info = await response.json();
+    return dispatch(addBulkResourceSuccess(info.resources));
   } catch (error) {
     throw new Error(error);
   }

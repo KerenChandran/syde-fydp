@@ -12,6 +12,8 @@ import Dialog, {
   withMobileDialog,
 } from 'material-ui/Dialog';
 
+import LocationSearch from '../LocationSearch';
+
 const styles = theme => ({
   button: {
     marginTop: theme.spacing.unit
@@ -23,7 +25,8 @@ const styles = theme => ({
 
 class BulkDataImport extends Component {
   static state = {
-    file: null
+    file: null,
+    location: ''
   };
 
   handleRequestClose = () => {
@@ -35,9 +38,13 @@ class BulkDataImport extends Component {
       file: event.target.files[0]
     })
   )
+  
+  handleLocation = (location) => (
+    this.setState({ location: location })
+  )
 
   handleSubmit = () => {
-    console.log('Submit Form');
+    this.props.submitForm(this.state);
     this.handleRequestClose();
   }
 
@@ -53,8 +60,9 @@ class BulkDataImport extends Component {
         >
           <DialogTitle>Bulk Data Import</DialogTitle>
           <DialogContent>
+            <LocationSearch updateLocation={this.handleLocation} />
             <DialogContentText>Download template here</DialogContentText>
-            <input accept="*" id="file" type="file" style={{ display: 'none' }}/>
+            <input accept="*" id="file" type="file" style={{ display: 'none' }} onChange={this.handleFileUpload}/>
             <label htmlFor="file">
               <Button raised color="primary" component="span" className={classes.button}>
                 Upload
