@@ -47,27 +47,17 @@ export const addDataImport = (resource) => async dispatch => {
 
 export const addBulkImport = (data) => async dispatch => {
   try {
-    // let formData = new FormData();
-    // formData.append('resources', data.file);
-
-    // debugger;
+    let formData = new FormData();
+    formData.append('resources', data.file);
+    formData.append('location', data.location);
 
     // console.log('data', data, formData);
 
-    // console.log('json', JSON.stringify({
-    //   data: {
-    //     location: data.location,
-    //     resources: formData
-    //   }
-    // }));
+    // console.log('json', );
 
     let response = await fetch('http://localhost:3000/api/bulk_resource_upload', {
       method: 'post',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ data })
+      body: formData
     });
     let info = await response.json();
     return dispatch(addBulkResourceSuccess(info.resources));
