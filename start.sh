@@ -6,22 +6,23 @@
 docker network create application-network
 
 # start database
+echo "database"
 cd database
 bash run-container.sh 
 
 # start elasticsearch server
+echo "elasticsearch"
 cd ../elasticsearch
 bash run-container.sh
 
-# exec into es container and build index
-docker exec -d -it es bash es_util/create_index.sh
-
 # start backend server
+echo "server"
 cd ../server
 bash build-image.sh
 bash run-container.sh
 
 # start client
+echo "client"
 cd ../client
 bash build-image.sh
 bash run-container.sh
@@ -29,7 +30,33 @@ bash run-container.sh
 # KNOWN CAVEAT: container linking is not instantaneous so we enable a 1
 # second delay such that server connects to db and es
 echo "Time delay to allow for container linking..."
-sleep 10
+sleep 15
+
+echo "building indices..."
+
+# exec into es container and build indices
+docker exec -it es bash es_util/setup.sh
+
+echo "starting app server..."
+
+# dynamically create static folder for file uploads
+docker exec -d server mkdir App/src/static
 
 # exec into server container and start python application
 docker exec -d server python App/src/app.py
+
+sleep 1
+
+# test all running containers
+
+# client
+curl localhost:3000
+
+# ignore database - no curl capabilities
+
+# elasticsearch indices
+curl localhost:9200/equipment?pretty
+curl localhost:9200/lab?pretty
+
+# flask server
+curl localhost:5000

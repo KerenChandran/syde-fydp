@@ -23,5 +23,8 @@ yarn-error.log*
 # python ignores
 *.pyc
 
-# stupid pycharm stuff
+# pycharm
 .idea/*
+
+# ignore static directory on server
+server/src/static

@@ -1,0 +1,8 @@
+{
+    "name": "Vision and Image Processing Lab",
+    "description": "The VIP lab is dedicated to understanding visual processes and finding solutions for the outstanding problems in image and video processing and intelligent systems.",
+    "applications": ["image processing", "intelligent systems"],
+    "faculty": "Engineering",
+    "department": "Systems Design Engineering",
+    "location": "Engineering 2"
+}

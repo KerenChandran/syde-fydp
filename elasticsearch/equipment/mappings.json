@@ -11,12 +11,6 @@
                 "model": {
                     "type": "text"
                 },
-                "faculty": {
-                    "type": "keyword"
-                },
-                "location": {
-                    "type": "keyword"
-                },
                 "incentive_type": {
                     "type": "keyword"
                 },
@@ -35,8 +29,14 @@
                 "rules_restrictions": {
                     "type": "text"
                 },
-                "application": {
-                    "type": "text"
+                "faculty": {
+                    "type": "keyword"
+                },
+                "department": {
+                    "type": "keyword"
+                },
+                "location": {
+                    "type": "keyword"
                 }
             }
         }
