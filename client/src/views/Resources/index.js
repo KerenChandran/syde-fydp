@@ -57,12 +57,13 @@ class MyResources extends Component {
           <TableBody>
             {resources.map(resource => {
               const fees = resource.fine !== null ? `$${resource.fine.toFixed(2)}` : resource.fine;
+              const location = resource.location.name != null ? resource.location.name : resource.location;
               return (
                 <TableRow key={resource.id}>
                   <TableCell padding='dense'>{resource.category}</TableCell>
                   <TableCell padding='dense'>{resource.company}</TableCell>
                   <TableCell padding='dense'>{resource.model}</TableCell>
-                  <TableCell padding='dense'>{resource.location}</TableCell>
+                  <TableCell padding='dense'>{location}</TableCell>
                   <TableCell padding='dense'>{resource.incentive}</TableCell>
                   <TableCell padding='dense'>{fees}</TableCell>
                   <TableCell padding='dense'>{resource.available ? 'Yes' : 'No'}</TableCell>
