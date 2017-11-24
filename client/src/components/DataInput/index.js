@@ -16,6 +16,8 @@ import Select from 'material-ui/Select';
 import { MenuItem } from 'material-ui/Menu';
 import { withStyles } from 'material-ui/styles';
 
+import LocationSearchBox from '../LocationSearch';
+
 const styles = theme => ({
   twoColLeft: {
     width: '45%',
@@ -23,7 +25,8 @@ const styles = theme => ({
   },
   twoColRight: {
     width: '45%',
-    marginLeft: '5%'
+    marginLeft: '5%',
+    zIndex: 1000
   }
 });
 
@@ -62,6 +65,10 @@ class DataInput extends Component {
     this.setState({ [name]: checked })
   )
 
+  handleLocationChange = (location) => {
+    this.setState({ location: location });
+  }
+
   render() {
     const { classes, fullScreen, open } = this.props;
     const {
@@ -93,7 +100,7 @@ class DataInput extends Component {
             <TextField fullWidth label="Model" onChange={this.handleChange('model')} value={model} margin="normal" />
             <FormGroup row>
               <TextField className={classes.twoColLeft} label="Faculty" onChange={this.handleChange('faculty')} margin="normal" value={faculty} />
-              <TextField className={classes.twoColRight} label="Location" onChange={this.handleChange('location')} margin="normal" value={location} />
+              <div className={classes.twoColRight}><LocationSearchBox updateLocation={this.handleLocationChange} /></div>
             </FormGroup>
             <FormControl className={classes.twoColLeft}>
               <InputLabel htmlFor="incentive">Incentive Type</InputLabel>

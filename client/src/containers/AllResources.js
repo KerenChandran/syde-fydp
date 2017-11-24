@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import IconButton from 'material-ui/IconButton';
 
 import { resourceActions, resourceSelectors } from '../modules/resources';
 import { userSelectors } from '../modules/users';
@@ -9,10 +10,23 @@ import { searchActions } from '../modules/search';
 import ResourcesView from '../views/Resources';
 import ResourceInfo from '../components/ResourceInfo';
 import DataInput from '../components/DataInput';
+import LocationMap from '../components/LocationMap';
+
+import ListIcon from 'material-ui-icons/List';
+import MapIcon from 'material-ui-icons/Map';
+
+const LIST = 'list';
+const MAP = 'map';
 
 class AllResources extends Component {
   componentDidMount() {
     this.props.resetSearch();
+  }
+
+  state = { view: LIST };
+
+  handleViewToggle = (view) => () => {
+    this.setState({ view });
   }
 
   render() {
@@ -32,15 +46,40 @@ class AllResources extends Component {
       updateResource
     } = this.props;
 
+    const { view } = this.state;
+
+    console.log('isDetailResourceOpen', isDetailResourceOpen);
+    console.log('isEditFormOpen', isEditFormOpen);
+
     return (
       <div style={{ width: '100%' }}>
-        <ResourcesView
-          resources={resources}
-          deleteResource={deleteResource}
-          showEditForm={showEditForm}
-          showDetailsForm={setDetailResource}
-          currentUserId={currentUserId}
-        />
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <IconButton aria-label="List View" onClick={this.handleViewToggle(LIST)}>
+            <ListIcon />
+          </IconButton>
+          <IconButton aria-label="Map View" onClick={this.handleViewToggle(MAP)}>
+            <MapIcon />
+          </IconButton>
+        </div>
+        {
+          view === LIST ? (
+            <ResourcesView
+              resources={resources}
+              deleteResource={deleteResource}
+              showEditForm={showEditForm}
+              showDetailsForm={setDetailResource}
+              currentUserId={currentUserId}
+            />
+          ) : (
+            <LocationMap
+              resources={resources}
+              deleteResource={deleteResource}
+              showEditForm={showEditForm}
+              showDetailsForm={setDetailResource}
+              currentUserId={currentUserId}
+            />
+          )
+        }
         <ResourceInfo open={isDetailResourceOpen} resource={detailResource} closeForm={toggleResourceDetail}/>
         <DataInput open={isEditFormOpen} resource={editResource} addResource={addResource} updateResource={updateResource} closeForm={hideEditForm}/>
       </div>

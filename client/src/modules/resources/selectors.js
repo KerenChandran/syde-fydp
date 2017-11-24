@@ -24,8 +24,7 @@ export const filteredResources = createSelector(resources, search, (resources, s
     const searchTextCheck = (lowerSearchText === '' || lowerSearchText === null) ||
                             resource.category.toLowerCase().indexOf(lowerSearchText) > -1 ||
                             resource.company.toLowerCase().indexOf(lowerSearchText) > -1 ||
-                            resource.model.toLowerCase().indexOf(lowerSearchText) > -1 ||
-                            resource.location.toLowerCase().indexOf(lowerSearchText) > -1;
+                            resource.model.toLowerCase().indexOf(lowerSearchText) > -1;
     
     const availableCheck = available === null || resource.available === available;
     const mobileCheck = mobile === null || resource.mobile === mobile;
