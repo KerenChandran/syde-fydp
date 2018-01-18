@@ -7,8 +7,8 @@ import csv
 import json
 
 from flask import Flask, jsonify, request
-from db_utils import connect
-from elasticsearch import Elasticsearch
+from db_utils import Cursor
+# from elasticsearch import Elasticsearch
 
 import pdb
 
@@ -16,13 +16,12 @@ import pdb
 app = Flask(__name__, static_url_path='')
 
 # global database connection
-db_conn = connect()
-crs = db_conn.cursor()
+db_conn = Cursor()
 
 # global elasticsearch connection
-es = Elasticsearch([
-    {'host':'es', 'port':9200}
-])
+# es = Elasticsearch([
+#     {'host':'es', 'port':9200}
+# ])
 
 # define upload folder
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -322,6 +321,41 @@ def upload_file():
     }
 
     return jsonify(ret_val)
+
+
+@app.route("/create_account", methods=['POST'])
+def create_account():
+    data = request.get_json()
+    email = data['email']
+    first_name = data['firstName']
+    last_name = data['lastName']
+    phone = data['phone']
+    # TODO: need to hash before stored ? or hash it before it is sent
+    pw = data['password']
+
+    # check if account already exists (by email)
+    crs.execute("""
+        SELECT email
+        FROM platform_user
+        WHERE email = '{email}'
+    """.format(email=email))
+
+    # account already exists
+    if len(crs.fetchall()) != 0:
+        return "False"
+
+    # add into database, id is auto incremented
+    crs.execute("""
+        INSERT INTO platform_user (email, first_name, last_name, phone, pw)
+        VALUES({email}, {first_name}, {last_name}, {phone}, {pw})
+    """.format(email=email, first_name=first_name, last_name=last_name, phone=phone, pw=pw))
+
+    result = crs.fetchall()
+
+    account_id = result[0][0]
+
+    return
+
 
 
 if __name__ == "__main__":

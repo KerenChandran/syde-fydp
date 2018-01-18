@@ -27,7 +27,7 @@ class Cursor:
         except:
             self.conn = None
 
-        self.crs = conn.cursor() if self.conn is not None else None
+        self.crs = self.conn.cursor() if self.conn is not None else None
 
 
     def get_cols(self):

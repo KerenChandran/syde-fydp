@@ -32,10 +32,10 @@ bash run-container.sh
 echo "Time delay to allow for container linking..."
 sleep 15
 
-echo "building indices..."
+# echo "building indices..."
 
 # exec into es container and build indices
-docker exec -it es bash es_util/setup.sh
+# docker exec -it es bash es_util/setup.sh
 
 echo "creating database tables..."
 cd ../database
@@ -57,8 +57,8 @@ sleep 1
 curl localhost:3000
 
 # elasticsearch indices
-curl localhost:9200/equipment?pretty
-curl localhost:9200/lab?pretty
+# curl localhost:9200/equipment?pretty
+# curl localhost:9200/lab?pretty
 
 # flask server
 curl localhost:5000

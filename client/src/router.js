@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import Login from './containers/Login';
+import NewAccount from './containers/NewAccount'
 
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -19,7 +21,8 @@ class ApplicationRouter extends Component {
     return (
       <Router {...this.props}>
         <div>
-          <Header />
+          <NewAccount />
+            {/*<Header />
           <div className="App">
             <Sidebar />
             <div className="App-content">
@@ -27,7 +30,7 @@ class ApplicationRouter extends Component {
               <Route exact path="/resources" component={AllResources} />
               <Route exact path="/resources/myresources" component={MyResources} />
             </div>
-          </div>
+          </div>*/}
         </div>
       </Router>
     );
