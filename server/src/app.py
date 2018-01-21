@@ -333,6 +333,9 @@ def create_account():
     # TODO: need to hash before stored ? or hash it before it is sent
     pw = data['password']
 
+    print(data)
+    print(email)
+
     # check if account already exists (by email)
     crs.execute("""
         SELECT email
@@ -354,7 +357,11 @@ def create_account():
 
     account_id = result[0][0]
 
-    return
+    return jsonify({'account_id': account_id})
+
+@app.route("/login_user", methods=['POST'])
+def login_user():
+    return "True"
 
 
 
