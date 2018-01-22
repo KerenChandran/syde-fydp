@@ -1,5 +1,5 @@
 """
-    Database utility functions.
+    Database utility functions and classes.
 """
 import os
 
@@ -27,7 +27,7 @@ class Cursor:
         except:
             self.conn = None
 
-        self.crs = conn.cursor() if self.conn is not None else None
+        self.crs = self.conn.cursor() if self.conn is not None else None
 
 
     def get_cols(self):
@@ -35,6 +35,55 @@ class Cursor:
             Helper function to get resultant columns from an executed query.
         """
         return [desc[0] for desc in self.crs.description]
+
+
+    def sanitize(self, record):
+        """
+            Helper method used to sanitize a given data point (i.e. make
+            postgres compatible in terms of data types).
+
+            Parameters
+            ----------
+            record : {dict}
+                Data point with fields (columns) and values.
+        """
+        cols = [col for col in record.keys()]
+
+        data = []
+
+        for col in cols:
+            value = record[col]
+
+            if isinstance(value, str):
+                if value == 'NULL':
+                    data.append(value)
+                else:
+                    data.append("'%s'" % value)
+
+                continue
+
+            data.append(str(value))
+
+        return cols, data
+
+
+    def commit(self):
+        """
+            Wrapper to commit executed changes to database.
+        """
+        self.conn.commit()
+
+
+    def execute(self, query):
+        """
+            Simple method to execute passed query.
+
+            Parameters
+            ----------
+            query : {str}
+                SQL-compatible query string
+        """
+        self.crs.execute(query)
 
 
     def check_record_present(self, query):

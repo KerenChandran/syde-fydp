@@ -1,0 +1,67 @@
+{
+    "mappings": {
+        "category": {
+            "data_type": "text"
+        },
+        "model": {
+            "data_type": "text"
+        },
+        "company": {
+            "data_type": "text"
+        },
+        "location": {
+            "data_type": "dictionary",
+            "dictionary_fields": {
+                "placeId": {
+                    "data_type": "text"
+                },
+                "name": {
+                    "data_type": "text"
+                },
+                "latitude": {
+                    "data_type": "float"
+                },
+                "longitude": {
+                    "data_type": "float"
+                }
+            }
+        },
+        "faculty": {
+            "data_type": "text"
+        },
+        "description": {
+            "data_type": "text"
+        },
+        "rules_restrictions": {
+            "data_type": "text"
+        },
+        "available": {
+            "data_type": "boolean"
+        },
+        "incentive_type": {
+            "data_type": "text"
+        },
+        "mobile": {
+            "data_type": "boolean"
+        },
+        "application": {
+            "data_type": "text"
+        },
+        "fee_amount": {
+            "data_type": "float"
+        },
+        "fee_cadence": {
+            "data_type": "text"
+        },
+        "ownerId": {
+            "data_type": "integer"
+        },
+        "resource_id": {
+            "data_type": "integer"
+        }
+    },
+    "database_fields": {
+        "resource": ["category", "model", "company", "description", "mobile", "available", "rules_restrictions"],
+        "location": ["placeId", "name", "latitude", "longitude"]
+    }
+}
