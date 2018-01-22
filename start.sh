@@ -47,7 +47,8 @@ echo "starting app server..."
 docker exec -d server mkdir App/src/static
 
 # exec into server container and start python application
-docker exec -d server python App/src/app.py
+#docker exec -d server python App/src/app.py
+
 
 sleep 1
 

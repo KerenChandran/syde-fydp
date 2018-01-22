@@ -4,11 +4,11 @@ CREATE TABLE platform_user (
     id SERIAL PRIMARY KEY,
     first_name TEXT,
     last_name TEXT,
-    email TEXT,
+    email VARCHAR(50),
     phone VARCHAR(15),
     preferred VARCHAR(20),
     private BOOLEAN,
-    pw VARCHAR
+    pw VARCHAR(100)
 );
 
 CREATE TABLE lab (

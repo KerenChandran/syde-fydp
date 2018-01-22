@@ -7,6 +7,7 @@ import csv
 import json
 
 from flask import Flask, jsonify, request
+from flask_bcrypt import Bcrypt
 from db_utils import Cursor
 # from elasticsearch import Elasticsearch
 
@@ -14,9 +15,11 @@ import pdb
 
 # global application instance
 app = Flask(__name__, static_url_path='')
+bcrypt = Bcrypt(app)
 
 # global database connection
 db_conn = Cursor()
+crs = db_conn.crs
 
 # global elasticsearch connection
 # es = Elasticsearch([
@@ -330,38 +333,53 @@ def create_account():
     first_name = data['firstName']
     last_name = data['lastName']
     phone = data['phone']
-    # TODO: need to hash before stored ? or hash it before it is sent
-    pw = data['password']
-
-    print(data)
-    print(email)
+    pw = bcrypt.generate_password_hash(data['password'])
 
     # check if account already exists (by email)
     crs.execute("""
-        SELECT email
+        SELECT *
         FROM platform_user
         WHERE email = '{email}'
     """.format(email=email))
 
+    result = crs.fetchall()
+
     # account already exists
-    if len(crs.fetchall()) != 0:
-        return "False"
+    if len(result) != 0:
+        return jsonify({'success': False})
 
     # add into database, id is auto incremented
     crs.execute("""
         INSERT INTO platform_user (email, first_name, last_name, phone, pw)
-        VALUES({email}, {first_name}, {last_name}, {phone}, {pw})
+        VALUES('{email}', '{first_name}', '{last_name}', '{phone}', '{pw}')
+        RETURNING id
     """.format(email=email, first_name=first_name, last_name=last_name, phone=phone, pw=pw))
 
     result = crs.fetchall()
-
     account_id = result[0][0]
 
-    return jsonify({'account_id': account_id})
+    db_conn.conn.commit()
+
+    return jsonify({'success': True,
+                    'account_id': account_id})
 
 @app.route("/login_user", methods=['POST'])
 def login_user():
-    return "True"
+    data = request.get_json()
+    email = data['email']
+    pw = data['password']
+
+    crs.execute("""
+        SELECT pw
+        FROM platform_user
+        WHERE email = '{email}'
+    """.format(email=email))
+
+    result = crs.fetchall()[0][0]
+
+    validate_pw = bcrypt.check_password_hash(result, pw)
+
+    return jsonify({'success': validate_pw})
 
 
 
