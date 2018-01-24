@@ -7,12 +7,15 @@ import csv
 import json
 
 from flask import Flask, jsonify, request
+from flask_bcrypt import Bcrypt
 
 from pipelines.upload import UploadPipeline
+from pipelines.profile import ProfilePipeline
 
 
 # global application instance
 app = Flask(__name__, static_url_path='')
+bcrypt = Bcrypt(app)
 
 # define upload folder
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -122,6 +125,30 @@ def upload_file():
     }
 
     return jsonify(ret_val)
+
+
+@app.route("/new_user", methods=['POST'])
+def new_user():
+    data = request.form
+    email = data['email']
+    password_hash = bcrypt.generate_password_hash(data['password'])
+    return
+
+@app.route("/edit_user", methods=['POST'])
+def edit_profile():
+    return
+
+@app.route("/login", methods=['POST'])
+def login_user():
+    data = request.form
+    email = data['email']
+
+    # get login info from db
+
+    # compare password
+    # validation = bcrypt.check_password_hash(pw_hash, given_pw)
+
+    return
 
 
 if __name__ == "__main__":

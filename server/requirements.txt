@@ -2,3 +2,5 @@ Flask
 psycopg2
 elasticsearch
 pandas
+Flask-Bcrypt
+Flask-Login

@@ -1,0 +1,19 @@
+{
+    "mappings": {
+        "first_name": {
+            "data_type": "text"
+        },
+        "last_name": {
+            "data_type": "text"
+        },
+        "email": {
+            "data_type": "text"
+        }
+        "password_hash": {
+            "data_type": "text"
+        }
+    },
+    "database_fields": {
+        "platform_user": ["first_name", "last_name", "email", "password_hash"]
+    }
+}
