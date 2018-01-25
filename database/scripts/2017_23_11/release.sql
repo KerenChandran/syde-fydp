@@ -5,7 +5,6 @@ CREATE TABLE platform_user (
     first_name TEXT,
     last_name TEXT,
     email TEXT,
-    password_hash VARCHAR(100),
     phone VARCHAR(15),
     preferred VARCHAR(20),
     private BOOLEAN
@@ -58,16 +57,16 @@ CREATE TABLE file (
     filename TEXT
 );
 
-CREATE TABLE account (
-    id VARCHAR(50) PRIMARY KEY,
-    type TEXT
-);
-
 -- relationship tables
 
 CREATE TABLE resource_user (
     resource_id SERIAL REFERENCES resource (id),
     user_id SERIAL REFERENCES platform_user (id)
+);
+
+CREATE TABLE user_password (
+    user_id SERIAL REFERENCES platform_user (id),
+    password_hash VARCHAR(100)
 );
 
 CREATE TABLE resource_location (
@@ -99,9 +98,4 @@ CREATE TABLE lab_user (
 CREATE TABLE lab_application (
     lab_id SERIAL REFERENCES lab (id),
     application_id SERIAL REFERENCES application (id)
-);
-
-CREATE TABLE user_accounts (
-    user_id SERIAL REFERENCES platform_user (id),
-    account_id VARCHAR(50) REFERENCES account (id)
 );

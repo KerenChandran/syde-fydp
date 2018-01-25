@@ -8,19 +8,40 @@ import json
 
 from flask import Flask, jsonify, request
 from flask_bcrypt import Bcrypt
+from flask_httpauth import HTTPBasicAuth
 
 from pipelines.upload import UploadPipeline
 from pipelines.profile import ProfilePipeline
+from pipelines.user import User
 
 
 # global application instance
 app = Flask(__name__, static_url_path='')
+# bcrypt for encryption
 bcrypt = Bcrypt(app)
+# authentication / login stuff
+auth = HTTPBasicAuth()
 
 # define upload folder
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# function for authentication
+@auth.verify_password
+def verify_password(username_or_token, password = None):
+    user = User()
+    # try verifying by token first
+    user_info = user.verify_token(username_or_token)
+    if not user_info:
+        if not password:
+            return False
+        # now verify by token
+        pw_hash = user.get_password_hash(username_or_token)
+        verify = bcrypt.check_password_hash(pw_hash, password)
+        return verify
+    else:
+        return True
 
 # root URL
 @app.route("/")
@@ -132,11 +153,43 @@ def new_user():
     data = request.form
     email = data['email']
     password_hash = bcrypt.generate_password_hash(data['password'])
-    return
+
+    # save user in database
+    save_user = User()
+    user_id = save_user.save(email, password_hash)
+
+    # login user
+    if user_id is None:
+        auth_token = None
+        user = None
+    # return token
+    else:
+        auth_token = save_user.generate_auth_token(user_id)
+        user = save_user.get_user_from_id(user_id)
+
+    ret_val = {
+        "token": auth_token,
+        "user": user
+    }
+
+    return ret_val
 
 @app.route("/edit_user", methods=['POST'])
 def edit_profile():
-    return
+    data = request.form
+    # needs token
+    # TODO: check with KC if this is how to get token from client
+    try:
+        token = data['token']
+        user = User()
+        user.verify_token(token)
+    except:
+        user = None
+
+    ret_val = {
+        "user": user
+    }
+    return ret_val
 
 @app.route("/login", methods=['POST'])
 def login_user():
