@@ -19,6 +19,14 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# HELPER METHODS
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+
 # root URL
 @app.route("/")
 def root():
@@ -121,6 +129,18 @@ def upload_file():
 
     ret_val = {
         "success": success
+    }
+
+    return jsonify(ret_val)
+
+
+# remote server termination for tests
+@app.route("/shutdown", methods=['POST'])
+def shutdown():
+    shutdown_server()
+
+    ret_val = {
+        'message': 'Server shutting down ...'
     }
 
     return jsonify(ret_val)
