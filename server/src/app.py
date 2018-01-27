@@ -24,6 +24,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def root():
     return jsonify({"message": "Flask application base."})
 
+
 # single resource upload
 @app.route("/resource_upload", methods=['POST'])
 def upload_resource():
@@ -48,6 +49,7 @@ def upload_resource():
     }
 
     return jsonify(ret_val)
+
 
 # bulk resource upload
 @app.route("/bulk_resource_upload", methods=['POST'])
