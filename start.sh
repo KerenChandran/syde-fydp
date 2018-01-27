@@ -10,9 +10,20 @@ echo "database"
 cd database
 bash run-container.sh
 
+# start transaction database
+echo "transaction database"
+cd ../trxn_db
+bash run-container.sh
+
 # start elasticsearch server
 echo "elasticsearch"
 cd ../elasticsearch
+bash run-container.sh
+
+# start transaction server
+echo "transaction server"
+cd ../trxn_server
+bash build-image.sh
 bash run-container.sh
 
 # start backend server
@@ -39,7 +50,13 @@ docker exec -it es bash es_util/setup.sh
 
 echo "creating database tables..."
 cd ../database
-bash exec.sh scripts/2017_23_11/release.sql # relative file path from database directory
+# relative file paths from database directory
+bash exec.sh scripts/2017_23_11/release.sql
+bash exec.sh scripts/2018_24_01/release.sql
+
+echo "creating transaction database tables..."
+cd ../trxn_db
+bash exec.sh scripts/2018_22_01/release.sql
 
 echo "starting app server..."
 
@@ -49,19 +66,26 @@ docker exec -d server mkdir App/src/static
 # exec into server container and start python application
 docker exec -d server python App/src/app.py
 
+echo "starting trxn server..."
+docker exec -d trxn_server python App/src/app.py
+
 sleep 1
 
 # test all running containers
 
 # client
-curl localhost:3000
+# curl localhost:3000
 
 # elasticsearch indices
 curl localhost:9200/equipment?pretty
 curl localhost:9200/lab?pretty
 
 # flask server
+# sometimes empty reply is expected
 curl localhost:5000
 
 # database - local psql dependency
 # psql -h localhost -U postgres -w -c "SELECT * FROM platform_user;"
+
+# trxn server
+curl localhost:5001
