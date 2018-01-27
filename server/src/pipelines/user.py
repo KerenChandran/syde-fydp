@@ -9,7 +9,9 @@ class User:
 
     def __init__(self):
         self.crs = Cursor()
-        return
+        self.id = None
+        self.email = None
+        self.user_dict = None
 
     def get_user_from_id(self, user_id):
         """
@@ -67,7 +69,7 @@ class User:
         except BadSignature:
             return None
 
-        user_info = self.get_user_from_id(data['id'])
+        user_info = self.get_user_from_id(data['id'][0])
         return user_info
 
     def get_password_hash(self, email):
@@ -77,50 +79,66 @@ class User:
         """
         query = """
             SELECT user_password.password_hash
-            FROM user_password
-            LEFT JOIN platform_user ON user_password.user_id = platform_user.id
+            FROM user_password LEFT JOIN platform_user
+            ON user_password .user_id = platform_user.id
             WHERE platform_user.email = '{email}'
         """.format(email=email)
 
         password_hash = self.crs.fetch_first(query)
+
         return password_hash
 
     def save(self, email, password_hash):
 
+        """
+        Given a username and hashed password, saves a new user into the database
+        or updates the existing user's password
+        Returns the user_id if successful, otherwise returns None
+        """
+
         # check if data is empty
         if (email is None) or (password_hash is None):
-            return
+            return None
 
         # check if user with email already exists
         self.crs.execute("""
-            SELECT email
+            SELECT id, email
             FROM platform_user
             WHERE email = '{email}'
         """.format(email=email))
 
         result = self.crs.fetch_all()
+        print(result)
 
         # account already exists
+        # update password
         if len(result) != 0:
-            # error
-            return
+            self.id = result[0][0]
+            query = """
+            UPDATE user_password
+            SET password_hash = '{pw_hash}'
+            WHERE user_id = {id}
+            """.format(pw_hash=password_hash, id=self.id)
+            self.crs.execute(query)
+            return self.id
 
         # save into platform_user
         query = """
             INSERT INTO platform_user (email)
-            VALUES '{email}'
+            VALUES ('{email}')
             RETURNING id
         """.format(email=email)
 
-        user_id = self.crs.fetch_first(query)
+        self.id = self.crs.fetch_first(query)
 
         # save into password table
         query = """
-            INSERT INTO user_password (id, password_hash)
+            INSERT INTO user_password (user_id, password_hash)
             VALUES ({id}, '{password_hash}')
-        """.format(id=user_id, password_hash=password_hash)
+        """.format(id=self.id, password_hash=password_hash)
 
         self.crs.execute(query)
+        self.crs.commit()
 
         # successful
-        return user_id
+        return self.id

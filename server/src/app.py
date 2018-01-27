@@ -11,7 +11,6 @@ from flask_bcrypt import Bcrypt
 from flask_httpauth import HTTPBasicAuth
 
 from pipelines.upload import UploadPipeline
-from pipelines.profile import ProfilePipeline
 from pipelines.user import User
 
 
@@ -174,7 +173,8 @@ def new_user():
 
     return ret_val
 
-@app.route("/edit_user", methods=['POST'])
+@app.route("/edit_profile", methods=['POST'])
+@auth.login_required
 def edit_profile():
     data = request.form
     # needs token
@@ -182,27 +182,32 @@ def edit_profile():
     try:
         token = data['token']
         user = User()
-        user.verify_token(token)
+        user_info = user.verify_token(token)
     except:
-        user = None
+        user_info = None
 
     ret_val = {
-        "user": user
+        "user": user_info
     }
-    return ret_val
+    return jsonify(ret_val)
 
 @app.route("/login", methods=['POST'])
 def login_user():
     data = request.form
-    email = data['email']
 
-    # get login info from db
+    user = User()
+    pw_hash = user.get_password_hash(data['email'])
+    validate = bcrypt.check_password_hash(pw_hash, data['password'])
+    user_info = user.get_user_from_email(data['email'])
+    token = user.generate_auth_token(user_info['id'])
 
-    # compare password
-    # validation = bcrypt.check_password_hash(pw_hash, given_pw)
+    ret_val = {
+        "success": validate,
+        "token": token,
+        "user": user_info
+    }
 
-    return
-
+    return ret_val
 
 if __name__ == "__main__":
     # start application server

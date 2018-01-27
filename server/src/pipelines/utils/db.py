@@ -125,7 +125,6 @@ class Cursor:
         self.crs.execute(query)
 
         result = self.crs.fetchall()
-
         return result[0][0]
 
 
