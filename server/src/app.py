@@ -199,7 +199,7 @@ def login_user():
     pw_hash = user.get_password_hash(data['email'])
     validate = bcrypt.check_password_hash(pw_hash, data['password'])
     user_info = user.get_user_from_email(data['email'])
-    token = user.generate_auth_token(user_info['id'])
+    token = user.generate_auth_token(user_info[0]['id'])
 
     ret_val = {
         "success": validate,

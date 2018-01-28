@@ -69,7 +69,7 @@ class User:
         except BadSignature:
             return None
 
-        user_info = self.get_user_from_id(data['id'][0])
+        user_info = self.get_user_from_id(data['id'])
         return user_info
 
     def get_password_hash(self, email):
@@ -89,7 +89,6 @@ class User:
         return password_hash
 
     def save(self, email, password_hash):
-
         """
         Given a username and hashed password, saves a new user into the database
         or updates the existing user's password

@@ -142,9 +142,7 @@ class Cursor:
 
         cols = self.get_cols()
 
-        result = self.crs.fetchall()
-
-        return dict(zip(cols, result))
+        return [dict(zip(cols, res)) for res in self.crs.fetchall()]
 
 
 if __name__ == '__main__':
