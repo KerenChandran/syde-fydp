@@ -13,41 +13,70 @@ class User:
         self.email = None
         self.user_dict = None
 
+    # Properties and functions for Flask-Login stuff
+    # @property
+    # def is_active(self):
+    #     return True
+    #
+    # @property
+    # def is_authenticated(self):
+    #     return True
+    #
+    # @property
+    # def is_anonymouse(self):
+    #     return False
+    #
+    # def get_id(self):
+    #     # Flask-Login requires this to be unicode value
+    #     return str(self.id).encode("utf-8").decode("utf-8")
+
     def get_user_from_id(self, user_id):
         """
         Given the user id, returns a dictionary of the record
         """
+        self.id = user_id
+
         query = """
             SELECT *
             FROM platform_user
             WHERE id = {id}
         """.format(id=user_id)
 
-        return self.crs.fetch_dict(query)
+        self.user_dict = self.crs.fetch_dict(query)
+
+        return self.user_dict
 
     def get_user_from_email(self, email):
         """
         Given the email, returns a dictionary of the record
         """
+        self.email = email
+
         query = """
             SELECT *
             FROM platform_user
             WHERE email = '{email}'
         """.format(email=email)
 
-        return self.crs.fetch_dict(query)
+        self.user_dict = self.crs.fetch_dict(query)
+
+        return self.user_dict
 
     def get_id_from_email(self, email):
         """
         Given the email, return the id
         """
+        self.email = email
+
         query = """
             SELECT id
             FROM platform_user
             WHERE email='{email}'
         """.format(email=email)
 
-        return self.crs.fetch_first(query)
+        self.id = self.crs.fetch_first(query)
+
+        return self.id
 
     def generate_auth_token(self, user_id):
         """
@@ -69,8 +98,10 @@ class User:
         except BadSignature:
             return None
 
-        user_info = self.get_user_from_id(data['id'])
-        return user_info
+        self.user_dict = self.get_user_from_id(data['id'])
+        self.id = data['id']
+
+        return self.user_dict
 
     def get_password_hash(self, email):
         """

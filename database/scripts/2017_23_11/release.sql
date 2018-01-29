@@ -6,8 +6,8 @@ CREATE TABLE platform_user (
     last_name TEXT,
     email TEXT,
     phone VARCHAR(15),
-    preferred VARCHAR(20),
-    private BOOLEAN
+    faculty TEXT,
+    department TEXT
 );
 
 CREATE TABLE lab (

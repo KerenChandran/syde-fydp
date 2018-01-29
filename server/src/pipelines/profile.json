@@ -8,12 +8,18 @@
         },
         "email": {
             "data_type": "text"
-        }
-        "password_hash": {
+        },
+        "phone": {
+            "data_type": "text"
+        },
+        "faculty": {
+            "data_type": "text"
+        },
+        "department": {
             "data_type": "text"
         }
     },
     "database_fields": {
-        "platform_user": ["first_name", "last_name", "email", "password_hash"]
+        "platform_user": ["first_name", "last_name", "email", "phone", "faculty", "department"]
     }
 }

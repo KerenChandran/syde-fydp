@@ -6,9 +6,10 @@ import io
 import csv
 import json
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, g
 from flask_bcrypt import Bcrypt
 from flask_httpauth import HTTPBasicAuth
+from flask_login import LoginManager
 
 from pipelines.upload import UploadPipeline
 from pipelines.user import User
@@ -20,6 +21,8 @@ app = Flask(__name__, static_url_path='')
 bcrypt = Bcrypt(app)
 # authentication / login stuff
 auth = HTTPBasicAuth()
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 # define upload folder
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -27,6 +30,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # function for authentication
+# TODO: Need to verify that token is passed through properly here
 @auth.verify_password
 def verify_password(username_or_token, password = None):
     user = User()
@@ -38,9 +42,28 @@ def verify_password(username_or_token, password = None):
         # now verify by token
         pw_hash = user.get_password_hash(username_or_token)
         verify = bcrypt.check_password_hash(pw_hash, password)
+        if verify is True:
+            g.user = user
         return verify
     else:
         return True
+
+# @login_manager.request_loader
+# def load_user_from_request(request):
+#     # login using Basic Auth
+#     data = request.get_json()
+#     # again check if this is how you get tokens
+#     token = data['token']
+#     user = User()
+#     user_info = user.verify_token(token)
+#     if user_info:
+#         return user_info
+#     return None
+#
+# @login_manager.user_loader
+# def load_user(user_id):
+#     user = User()
+#     return user.get_user_from_id(user_id)
 
 # root URL
 @app.route("/")
