@@ -6,18 +6,64 @@ import io
 import csv
 import json
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, g
+from flask_bcrypt import Bcrypt
+from flask_httpauth import HTTPBasicAuth
+from flask_login import LoginManager
 
 from lib.upload import UploadPipeline
+from lib.user import User
 
 
 # global application instance
 app = Flask(__name__, static_url_path='')
+# bcrypt for encryption
+bcrypt = Bcrypt(app)
+# authentication / login stuff
+auth = HTTPBasicAuth()
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 # define upload folder
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# function for authentication
+# TODO: Need to verify that token is passed through properly here
+@auth.verify_password
+def verify_password(username_or_token, password = None):
+    user = User()
+    # try verifying by token first
+    user_info = user.verify_token(username_or_token)
+    if not user_info:
+        if not password:
+            return False
+        # now verify by token
+        pw_hash = user.get_password_hash(username_or_token)
+        verify = bcrypt.check_password_hash(pw_hash, password)
+        if verify is True:
+            g.user = user
+        return verify
+    else:
+        return True
+
+# @login_manager.request_loader
+# def load_user_from_request(request):
+#     # login using Basic Auth
+#     data = request.get_json()
+#     # again check if this is how you get tokens
+#     token = data['token']
+#     user = User()
+#     user_info = user.verify_token(token)
+#     if user_info:
+#         return user_info
+#     return None
+#
+# @login_manager.user_loader
+# def load_user(user_id):
+#     user = User()
+#     return user.get_user_from_id(user_id)
 
 # HELPER METHODS
 def shutdown_server():
@@ -25,7 +71,6 @@ def shutdown_server():
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
-
 
 # root URL
 @app.route("/")
@@ -134,6 +179,68 @@ def upload_file():
     return jsonify(ret_val)
 
 
+@app.route("/new_user", methods=['POST'])
+def new_user():
+    data = request.form
+    email = data['email']
+    password_hash = bcrypt.generate_password_hash(data['password'])
+
+    # save user in database
+    save_user = User()
+    user_id = save_user.save(email, password_hash)
+
+    # login user
+    if user_id is None:
+        auth_token = None
+        user = None
+    # return token
+    else:
+        auth_token = save_user.generate_auth_token(user_id)
+        user = save_user.get_user_from_id(user_id)
+
+    ret_val = {
+        "token": auth_token,
+        "user": user
+    }
+
+    return ret_val
+
+@app.route("/edit_profile", methods=['POST'])
+@auth.login_required
+def edit_profile():
+    data = request.form
+    # needs token
+    # TODO: check with KC if this is how to get token from client
+    try:
+        token = data['token']
+        user = User()
+        user_info = user.verify_token(token)
+    except:
+        user_info = None
+
+    ret_val = {
+        "user": user_info
+    }
+    return jsonify(ret_val)
+
+@app.route("/login", methods=['POST'])
+def login_user():
+    data = request.form
+
+    user = User()
+    pw_hash = user.get_password_hash(data['email'])
+    validate = bcrypt.check_password_hash(pw_hash, data['password'])
+    user_info = user.get_user_from_email(data['email'])
+    token = user.generate_auth_token(user_info[0]['id'])
+
+    ret_val = {
+        "success": validate,
+        "token": token,
+        "user": user_info
+    }
+
+    return ret_val
+
 # remote server termination for tests
 @app.route("/shutdown", methods=['POST'])
 def shutdown():
@@ -144,7 +251,6 @@ def shutdown():
     }
 
     return jsonify(ret_val)
-
 
 if __name__ == "__main__":
     # start application server

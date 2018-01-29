@@ -9,6 +9,9 @@ import Sidebar from './components/Sidebar';
 import AllResources from './containers/AllResources';
 import MyResources from './containers/MyResources';
 
+import EditProfile from './containers/EditProfile';
+import Login from './containers/Login';
+
 import { resourceActions } from './modules/resources';
 
 class ApplicationRouter extends Component {
@@ -26,6 +29,8 @@ class ApplicationRouter extends Component {
               <Route exact path="/" component={AllResources} />
               <Route exact path="/resources" component={AllResources} />
               <Route exact path="/resources/myresources" component={MyResources} />
+              <Route exact path="/profile/edit" component={EditProfile} />
+              <Route exact path="/login" component={Login} />
             </div>
           </div>
         </div>

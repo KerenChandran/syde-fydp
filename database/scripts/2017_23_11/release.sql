@@ -2,11 +2,12 @@
 
 CREATE TABLE platform_user (
     id SERIAL PRIMARY KEY,
-    name TEXT,
+    first_name TEXT,
+    last_name TEXT,
     email TEXT,
     phone VARCHAR(15),
-    preferred VARCHAR(20),
-    private BOOLEAN
+    faculty TEXT,
+    department TEXT
 );
 
 CREATE TABLE lab (
@@ -61,6 +62,11 @@ CREATE TABLE file (
 CREATE TABLE resource_user (
     resource_id SERIAL REFERENCES resource (id),
     user_id SERIAL REFERENCES platform_user (id)
+);
+
+CREATE TABLE user_password (
+    user_id SERIAL REFERENCES platform_user (id),
+    password_hash VARCHAR(100)
 );
 
 CREATE TABLE resource_location (

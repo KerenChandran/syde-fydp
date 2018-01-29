@@ -107,6 +107,11 @@ class Cursor:
         return len(result) > 0
 
 
+    def fetch_all(self):
+
+        return self.crs.fetchall()
+
+
     def fetch_first(self, query):
         """
             Function which executes designated query and fetches the first
@@ -120,7 +125,6 @@ class Cursor:
         self.crs.execute(query)
 
         result = self.crs.fetchall()
-
         return result[0][0]
 
 
@@ -138,9 +142,13 @@ class Cursor:
 
         cols = self.get_cols()
 
+<<<<<<< HEAD:server/src/pipelines/utils/db.py
+        return [dict(zip(cols, res)) for res in self.crs.fetchall()]
+=======
         result = self.crs.fetchall()
 
         return [dict(zip(cols, res)) for res in result]
+>>>>>>> master:trxn_server/src/utils/db.py
 
 
 if __name__ == '__main__':
