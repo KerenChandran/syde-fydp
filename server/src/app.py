@@ -8,7 +8,7 @@ import json
 
 from flask import Flask, jsonify, request
 
-from pipelines.upload import UploadPipeline
+from lib.upload import UploadPipeline
 
 
 # global application instance
