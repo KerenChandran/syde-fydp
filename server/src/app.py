@@ -11,8 +11,8 @@ from flask_bcrypt import Bcrypt
 from flask_httpauth import HTTPBasicAuth
 from flask_login import LoginManager
 
-from pipelines.upload import UploadPipeline
-from pipelines.user import User
+from lib.upload import UploadPipeline
+from lib.user import User
 
 
 # global application instance
@@ -65,10 +65,18 @@ def verify_password(username_or_token, password = None):
 #     user = User()
 #     return user.get_user_from_id(user_id)
 
+# HELPER METHODS
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
 # root URL
 @app.route("/")
 def root():
     return jsonify({"message": "Flask application base."})
+
 
 # single resource upload
 @app.route("/resource_upload", methods=['POST'])
@@ -94,6 +102,7 @@ def upload_resource():
     }
 
     return jsonify(ret_val)
+
 
 # bulk resource upload
 @app.route("/bulk_resource_upload", methods=['POST'])
@@ -231,6 +240,17 @@ def login_user():
     }
 
     return ret_val
+
+# remote server termination for tests
+@app.route("/shutdown", methods=['POST'])
+def shutdown():
+    shutdown_server()
+
+    ret_val = {
+        'message': 'Server shutting down ...'
+    }
+
+    return jsonify(ret_val)
 
 if __name__ == "__main__":
     # start application server

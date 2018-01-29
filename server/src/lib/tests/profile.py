@@ -1,4 +1,4 @@
-from ..profile import ProfilePipeline
+from server.src.pipelines.profile import ProfilePipeline
 
 def main():
 

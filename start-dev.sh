@@ -1,6 +1,6 @@
 # start all relevant containers
 # linkage is abstracted by run commands in other shell scripts
-# different from main as we do not run server container as daemon
+# different from main as we do not run server containers as daemon
 # usage: bash start.sh
 
 # create network for containers
@@ -11,9 +11,20 @@ echo "database"
 cd database
 bash run-container.sh
 
+# start transaction database
+echo "transaction database"
+cd ../trxn_db
+bash run-container.sh
+
 # start elasticsearch server
 echo "elasticsearch"
 cd ../elasticsearch
+bash run-container.sh
+
+# start transaction server
+echo "transaction server"
+cd ../trxn_server
+bash build-image.sh
 bash run-container.sh
 
 # start backend server
@@ -40,7 +51,13 @@ docker exec -it es bash es_util/setup.sh
 
 echo "creating database tables..."
 cd ../database
-bash exec.sh scripts/2017_23_11/release.sql # relative file path from database directory
+# relative file paths from database directory
+bash exec.sh scripts/2017_23_11/release.sql
+bash exec.sh scripts/2018_24_01/release.sql
+
+echo "creating transaction database tables..."
+cd ../trxn_db
+bash exec.sh scripts/2018_22_01/release.sql
 
 echo "starting app server..."
 
@@ -48,3 +65,5 @@ echo "starting app server..."
 docker exec -d server mkdir App/src/static
 
 # execute this command in terminal: docker exec -it server python App/src/app.py
+
+# execute ths command in terminal: docker exec -it trxn_server python App/src/app.py

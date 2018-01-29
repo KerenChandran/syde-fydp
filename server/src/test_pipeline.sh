@@ -2,4 +2,4 @@
 # workaround to fix relative imports issues
 # usage: bash test_pipeline.sh <module_name>
 
-python -m pipelines.tests.$1
+python -m lib.tests.$1

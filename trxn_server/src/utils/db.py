@@ -130,8 +130,8 @@ class Cursor:
 
     def fetch_dict(self, query):
         """
-            Function to get query result as a dictionary. Combines query
-            execution and result fetching.
+            Function to get query result as a list of dictionaries. Combines 
+            query execution and result fetching.
 
             Parameters
             ----------
@@ -142,7 +142,13 @@ class Cursor:
 
         cols = self.get_cols()
 
+<<<<<<< HEAD:server/src/pipelines/utils/db.py
         return [dict(zip(cols, res)) for res in self.crs.fetchall()]
+=======
+        result = self.crs.fetchall()
+
+        return [dict(zip(cols, res)) for res in result]
+>>>>>>> master:trxn_server/src/utils/db.py
 
 
 if __name__ == '__main__':
