@@ -2,3 +2,36 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  height: 40px;
+  margin: 20px;
+  color: #222;
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 40px;
+  margin-right: 60px;
+}
+
+.app-search {
+  display: flex;
+  justify-content: flex-start;
+  flex: 1 0 auto;
+  min-width: 500px;
+  z-index: 1400;
+}
+
+.app-links {
+  display: flex;
+  justify-content: flex-end;
+  flex: 1 0 auto;
+  margin-right: 10;
+}
+

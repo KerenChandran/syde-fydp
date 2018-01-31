@@ -1,40 +1,43 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 
 import { resourceActions, resourceSelectors } from '../modules/resources'; 
 import { userSelectors } from '../modules/users';
 import { searchActions } from '../modules/search';
 
-import ResourcesView from '../views/Resources';
-import DataInput from '../components/DataInput';
+import ResourcesView from '../views/ResourcesDataTable';
+import Sidebar from '../components/ResourceSidebar';
 
 class MyResources extends Component {
   componentDidMount() {
     this.props.resetSearch();
   }
 
+  detailResource = (id) => {
+    this.props.history.push(`/resources/view/${id}`);
+  }
+
+  // editResource = (id) => {
+  //   this.props.history.push(`/resources/edit/${id}`);
+  // }
+
   render() {
     const {
       currentUserId,
-      resources,
-      deleteResource,
-      editResource,
-      showEditForm,
-      isEditFormOpen,
-      hideEditForm,
-      addResource,
-      updateResource
+      resources
     } = this.props;
     return (
-      <div style={{width: '100%'}}>
-        <ResourcesView
-          currentUserId={currentUserId}
-          resources={resources}
-          deleteResource={deleteResource}
-          showEditForm={showEditForm}
-        />
-        <DataInput open={isEditFormOpen} resource={editResource} addResource={addResource} updateResource={updateResource} closeForm={hideEditForm}/>
+      <div style={{ display: 'flex' }}>
+        <Sidebar />
+        <div style={{width: '100%'}}>
+          <ResourcesView
+            currentUserId={currentUserId}
+            resources={resources}
+            showDetailsForm={this.detailResource}
+          />
+        </div>
       </div>
     );
   }
@@ -42,18 +45,11 @@ class MyResources extends Component {
 
 const mapStateToProps = (state) => ({
   resources: resourceSelectors.currentUserResources(state),
-  editResource: resourceSelectors.getEditResource(state),
-  isEditFormOpen: resourceSelectors.showDataImport(state),
   currentUserId: userSelectors.currentUserId(state)
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
-  showEditForm: bindActionCreators(resourceActions.setEditResource, dispatch),
-  hideEditForm: bindActionCreators(resourceActions.toggleDataImportForm, dispatch),
-  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
-  updateResource: bindActionCreators(resourceActions.updateResource, dispatch),
   resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MyResources);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MyResources));

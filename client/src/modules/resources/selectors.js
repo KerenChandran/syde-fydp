@@ -1,54 +1,60 @@
 import { createSelector } from 'reselect';
 import { currentUserId } from '../users/selectors';
-import { search } from '../search/selectors';
+import { resourceSearch } from '../search/selectors';
 
 export const resources = state => state.resources.resources;
-export const filteredResources = createSelector(resources, search, (resources, search) => {
-  const { searchText, available, mobile, incentive, fees, feesRange } = search;
-  const lowerSearchText = searchText.toLowerCase();
+export const filteredResources = createSelector(resources, resourceSearch, (resources, search) => {
+  const { searchText, category, company, mobile, model } = search;
   if ((searchText === '' || searchText === null) &&
-      available === null &&
-      mobile === null &&
-      incentive === null &&
-      fees === null) {
+      category === '' &&
+      company === '' &&
+      mobile === '' &&
+      model === '') {
     return resources;
   }
 
-  const operator = {
-    '=': (x, y) => x === y,
-    '<=': (x, y) => x <= y,
-    '>=': (x, y) => x >= y 
-  };
+  const lowerSearchText = searchText.toLowerCase();
+  const lowerCategoryText = category.toLowerCase();
+  const lowerCompanyText = company.toLowerCase();
+  const lowerModelText = model.toLowerCase();
+  const mobileValue = mobile === 'true';
 
   return resources.filter(resource => {
     const searchTextCheck = (lowerSearchText === '' || lowerSearchText === null) ||
                             resource.category.toLowerCase().indexOf(lowerSearchText) > -1 ||
                             resource.company.toLowerCase().indexOf(lowerSearchText) > -1 ||
                             resource.model.toLowerCase().indexOf(lowerSearchText) > -1;
-    
-    const availableCheck = available === null || resource.available === available;
-    const mobileCheck = mobile === null || resource.mobile === mobile;
-    const incentiveCheck = incentive === null || resource.incentive === incentive;
-    const feesCheck = fees === null || (incentive === 'User Fees' && operator[feesRange](resource.fine, fees));
 
-    return searchTextCheck && availableCheck && mobileCheck && incentiveCheck && feesCheck;
+    const categoryCheck = (lowerCategoryText === '' || lowerCategoryText === null) ||
+                          resource.category.toLowerCase().indexOf(lowerCategoryText) > -1;
+    
+    const companyCheck = (lowerCompanyText === '' || lowerCompanyText === null) ||
+                          resource.company.toLowerCase().indexOf(lowerCompanyText) > -1;
+    
+    const mobileCheck = mobile === '' || resource.mobile == mobileValue;
+
+    const modelCheck = (lowerModelText === '' || lowerModelText === null) ||
+                          resource.model.toLowerCase().indexOf(lowerModelText) > -1;
+
+    return searchTextCheck && categoryCheck && companyCheck && mobileCheck && modelCheck;
   });
-})
+});
 
 export const userResources = (resources, userId) => (
   resources.filter(resource => resource.ownerId === userId)
 );
 export const currentUserResources = createSelector(filteredResources, currentUserId, userResources);
 
-export const editResourceId = state => state.resources.editResourceId;
-export const getEditResource = createSelector(resources, editResourceId, (resources, editResourceId) => (
-  resources.find((resource) => resource.id === editResourceId)
-));
 
-export const detailResourceId = state => state.resources.detailResourceId;
-export const getDetailResource = createSelector(resources, detailResourceId, (resources, detailResourceId) => (
-  resources.find((resource) => resource.id === detailResourceId)
-));
+export const getEditResource = (state, id) => {
+  let allResources = resources(state);
+  return allResources.find((resource) => resource.id == id);
+}
+
+export const getDetailResource = (state, id) => {
+  let allResources = resources(state);
+  return allResources.find((resource) => resource.id == id);
+}
 
 export const showBulkImport = state => state.resources.showBulkImport;
 export const showDataImport = state => state.resources.showDataImport;

@@ -1,20 +1,26 @@
 import * as SearchConstants from './constants';
 
 const initialState = {
-  searchText: '',
-  available: null,
-  mobile: null,
-  incentive: null,
-  fees: null,
-  feesRange: '='
+  resources: {
+    searchText: '',
+    category: '',
+    company: '',
+    mobile: '',
+    model: ''
+  }
 };
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
-    case SearchConstants.SUBMIT_SEARCH: {
+    case SearchConstants.SUBMIT_RESOURCE_SEARCH: {
+      const { resources } = state;
+      const updatedResources = {
+        ...resources,
+        ...payload.search
+      }
       return {
         ...state,
-        ...payload.search
+        resources: updatedResources
       };
     }
     case SearchConstants.RESET_SEARCH: {

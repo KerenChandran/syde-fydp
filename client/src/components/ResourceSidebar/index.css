@@ -1,0 +1,30 @@
+.active-link .list-group-item {
+  text-decoration: none;
+  background-color: beige;
+  font-weight: bold;
+}
+
+.resource-link:hover {
+  text-decoration: none;
+}
+
+.resource-link .list-group-item {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.resource-link .list-group-item:hover {
+  cursor: pointer;
+  background-color: blanchedalmond;
+}
+
+.new-resource-btn {
+  margin-left: 20px;
+  margin-bottom: 40px;
+  z-index: 1400;
+}
+
+.new-resource-btn .dropdown-toggle, .new-resource-btn .dropdown-menu {
+  margin-left: 0px;
+  margin-bottom: 0px;
+}
