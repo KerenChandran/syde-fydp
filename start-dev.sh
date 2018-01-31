@@ -1,5 +1,6 @@
 # start all relevant containers
 # linkage is abstracted by run commands in other shell scripts
+# different from main as we do not run server containers as daemon
 # usage: bash start.sh
 
 # create network for containers
@@ -63,29 +64,6 @@ echo "starting app server..."
 # dynamically create static folder for file uploads
 docker exec -d server mkdir App/src/static
 
-# exec into server container and start python application
-docker exec -d server python App/src/app.py
+# execute this command in terminal: docker exec -it server python App/src/app.py
 
-echo "starting trxn server..."
-docker exec -d trxn_server python App/src/app.py
-
-sleep 1
-
-# test all running containers
-
-# client
-# curl localhost:3000
-
-# elasticsearch indices
-curl localhost:9200/equipment?pretty
-curl localhost:9200/lab?pretty
-
-# flask server
-# sometimes empty reply is expected
-curl localhost:5000
-
-# database - local psql dependency
-# psql -h localhost -U postgres -w -c "SELECT * FROM platform_user;"
-
-# trxn server
-curl localhost:5001
+# execute ths command in terminal: docker exec -it trxn_server python App/src/app.py

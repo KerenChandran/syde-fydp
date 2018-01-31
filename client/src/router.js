@@ -10,6 +10,9 @@ import MyResources from './containers/MyResources';
 import ResourceInfoEdit from './containers/ResourceInfoEdit';
 import ResourceInfo from './containers/ResourceInfo';
 
+import EditProfile from './containers/EditProfile';
+import Login from './containers/Login';
+
 import { resourceActions } from './modules/resources';
 
 class ApplicationRouter extends Component {
@@ -29,6 +32,8 @@ class ApplicationRouter extends Component {
             <Route path="/resources/edit/:id" component={ResourceInfoEdit} />
             <Route path="/resources/new" component={ResourceInfoEdit} />
             <Route exact path="/resources/myresources" component={MyResources} />
+            <Route exact path="/profile/edit" component={EditProfile} />
+            <Route exact path="/login" component={Login} />
           </div>
         </div>
       </Router>

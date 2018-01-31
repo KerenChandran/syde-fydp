@@ -2,11 +2,12 @@
 
 CREATE TABLE platform_user (
     id SERIAL PRIMARY KEY,
-    name TEXT,
+    first_name TEXT,
+    last_name TEXT,
     email TEXT,
     phone VARCHAR(15),
-    preferred VARCHAR(20),
-    private BOOLEAN
+    faculty TEXT,
+    department TEXT
 );
 
 CREATE TABLE lab (
@@ -27,7 +28,7 @@ CREATE TABLE resource (
 );
 
 CREATE TABLE location (
-    place_id TEXT PRIMARY KEY,
+    placeId TEXT PRIMARY KEY,
     name TEXT,
     latitude NUMERIC,
     longitude NUMERIC
@@ -63,9 +64,14 @@ CREATE TABLE resource_user (
     user_id SERIAL REFERENCES platform_user (id)
 );
 
+CREATE TABLE user_password (
+    user_id SERIAL REFERENCES platform_user (id),
+    password_hash VARCHAR(100)
+);
+
 CREATE TABLE resource_location (
     resource_id SERIAL REFERENCES resource (id),
-    location_id TEXT REFERENCES location (place_id)
+    location_id TEXT REFERENCES location (placeId)
 );
 
 CREATE TABLE resource_incentive (
