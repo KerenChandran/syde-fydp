@@ -1,3 +1,5 @@
+import * as UserConstants from './constants';
+
 const initialState = {
   users: [{
     id: 1,
@@ -40,6 +42,12 @@ const initialState = {
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
+      case UserConstants.ADD_NEW_USER: {
+        let currentUser = payload.user;
+        return {
+            ...state, currentUser
+        }
+      };
     default:
       return state;
   }

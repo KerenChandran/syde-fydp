@@ -14,6 +14,8 @@ from flask_login import LoginManager
 from lib.upload import UploadPipeline
 from lib.user import User
 
+import pdb
+
 
 # global application instance
 app = Flask(__name__, static_url_path='')
@@ -181,7 +183,11 @@ def upload_file():
 
 @app.route("/new_user", methods=['POST'])
 def new_user():
-    data = request.form
+    #pdb.set_trace()
+
+    data = request.get_json()
+    print(data)
+    data = data['user']
     email = data['email']
     password_hash = bcrypt.generate_password_hash(data['password'])
 
@@ -203,12 +209,13 @@ def new_user():
         "user": user
     }
 
-    return ret_val
+    return jsonify(ret_val)
 
 @app.route("/edit_profile", methods=['POST'])
 @auth.login_required
 def edit_profile():
-    data = request.form
+    data = request.get_json()
+    data = data['user']
     # needs token
     # TODO: check with KC if this is how to get token from client
     try:
@@ -239,7 +246,7 @@ def login_user():
         "user": user_info
     }
 
-    return ret_val
+    return jsonify(ret_val)
 
 # remote server termination for tests
 @app.route("/shutdown", methods=['POST'])
