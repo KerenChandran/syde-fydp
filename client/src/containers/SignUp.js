@@ -26,7 +26,7 @@ class SignUp extends React.Component {
         } = this.state;
 
         return (
-            <Form horizontal>
+            <div>
                 <FormGroup controlId="formHorizontalEmail">
                     <Col componentClass={ControlLabel} sm={2}>
                         Email
@@ -50,8 +50,7 @@ class SignUp extends React.Component {
                         <Button type="submit" onClick={this.handleSubmit}>Sign in</Button>
                     </Col>
                 </FormGroup>
-            </Form>
-
+            </div>
         )
     }
 }
