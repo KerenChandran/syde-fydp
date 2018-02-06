@@ -11,6 +11,7 @@
         },
         "location": {
             "data_type": "dictionary",
+            "flatten": true,
             "dictionary_fields": {
                 "placeId": {
                     "data_type": "text"

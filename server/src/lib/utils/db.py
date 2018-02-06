@@ -44,7 +44,7 @@ class Cursor:
 
             Parameters
             ----------
-            record : {dict}
+            record : {dict or pandas.Series}
                 Data point with fields (columns) and values.
         """
         cols = [col for col in record.keys()]

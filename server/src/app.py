@@ -29,6 +29,14 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# HELPER METHODS
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+
 # function for authentication
 # TODO: Need to verify that token is passed through properly here
 @auth.verify_password
@@ -48,29 +56,6 @@ def verify_password(username_or_token, password = None):
     else:
         return True
 
-# @login_manager.request_loader
-# def load_user_from_request(request):
-#     # login using Basic Auth
-#     data = request.get_json()
-#     # again check if this is how you get tokens
-#     token = data['token']
-#     user = User()
-#     user_info = user.verify_token(token)
-#     if user_info:
-#         return user_info
-#     return None
-#
-# @login_manager.user_loader
-# def load_user(user_id):
-#     user = User()
-#     return user.get_user_from_id(user_id)
-
-# HELPER METHODS
-def shutdown_server():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
 
 # root URL
 @app.route("/")
@@ -205,6 +190,7 @@ def new_user():
 
     return ret_val
 
+
 @app.route("/edit_profile", methods=['POST'])
 @auth.login_required
 def edit_profile():
@@ -223,6 +209,7 @@ def edit_profile():
     }
     return jsonify(ret_val)
 
+
 @app.route("/login", methods=['POST'])
 def login_user():
     data = request.form
@@ -240,6 +227,7 @@ def login_user():
     }
 
     return ret_val
+
 
 # remote server termination for tests
 @app.route("/shutdown", methods=['POST'])

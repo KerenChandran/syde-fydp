@@ -1,4 +1,41 @@
 {
     "mappings": {
+        "resource_id": {
+            "data_type": "integer"
+        },
+        "user_id": {
+            "data_type": "integer"
+        },
+        "availability_start": {
+            "data_type": "date"
+        },
+        "availability_end": {
+            "data_type": "date"
+        },
+        "block_start": {
+            "data_type": "datetime"
+        },
+        "block_end": {
+            "data_type": "datetime"
+        },
+        "block_recurring": {
+            "data_type": "dictionary",
+            "flatten": false,
+            "dictionary_fields": {
+                "cadence": {
+                    "data_type": "text"
+                },
+                "start": {
+                    "data_type": "date"
+                },
+                "end": {
+                    "data_type": "date"
+                }
+            }
+        }
+    },
+    "database_fields": {
+        "resource_availability": ["resource_id", "availability_start", "availability_end"],
+        "resource_schedule_blocks": ["resource_id", "block_start", "block_end"]
     }
 }

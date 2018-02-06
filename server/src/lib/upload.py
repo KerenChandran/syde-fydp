@@ -42,13 +42,14 @@ class UploadPipeline(Pipeline):
 
         if update:
             update_cols = zip(flds, resource_data)
-            update_cols = ["%s=%s" % (tup[0], tup[1]) for tup in update_cols]
+            update_cols = ["%s=%s" % tup for tup in update_cols]
 
             update_query = \
             """
                 UPDATE resource
                 SET {update_cols}
                 WHERE id = {rid}
+                RETURNING id;
             """.format(update_cols=",".join(update_cols), 
                        rid=kwargs['resource_id'])
 
