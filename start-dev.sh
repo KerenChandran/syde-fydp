@@ -54,6 +54,7 @@ cd ../database
 # relative file paths from database directory
 bash exec.sh scripts/2017_23_11/release.sql
 bash exec.sh scripts/2018_24_01/release.sql
+bash exec.sh scripts/2018_28_01/release.sql
 
 echo "creating transaction database tables..."
 cd ../trxn_db

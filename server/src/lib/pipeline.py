@@ -1,5 +1,6 @@
 import os
 import json
+import datetime as dt
 
 import pandas as pd
 
@@ -19,10 +20,12 @@ class Pipeline(object):
         json_content = json.load(open(json_filepath))
 
         # field mappings
-        self.mappings = json_content['mappings']
+        self.mappings = \
+            json_content['mappings'] if 'mappings' in json_content else None
 
         # database table and field mappings
-        self.database_fields = json_content['database_fields']
+        self.database_fields = json_content['database_fields'] if \
+            'database_fields' in json_content else None
 
         self.parse_mappings()
 
@@ -54,7 +57,8 @@ class Pipeline(object):
             """
 
             for elem in mapping_dict:
-                if mapping_dict[elem]['data_type'] == 'dictionary':
+                if mapping_dict[elem]['data_type'] == 'dictionary' and \
+                    mapping_dict[elem]['flatten']:
                     nested_fields.append(elem)
 
                     parse_mappings_recurse(
@@ -76,6 +80,25 @@ class Pipeline(object):
 
                 elif mapping_dict[elem]['data_type'] == 'boolean':
                     new_mappings[prefix + elem] = bool
+
+                elif mapping_dict[elem]['data_type'] == 'date':
+                    # convert to date object and SQL-compatible date string
+                    expected_date_format = '%Y-%m-%d'
+
+                    new_mappings[prefix + elem] = \
+                        lambda x: dt.datetime.strptime(x, 
+                            expected_date_format).strftime(expected_date_format)
+
+                elif mapping_dict[elem]['data_type'] == 'datetime':
+                    # convert to datetime object and SQL-compatible date string
+                    expected_dt_format = '%Y-%m-%d %H:%M'
+
+                    new_mappings[prefix + elem] = \
+                        lambda x: dt.datetime.strptime(x, 
+                            expected_dt_format).strftime(expected_dt_format)
+
+                elif mapping_dict[elem]['data_type'] == 'dictionary':
+                    new_mappings[prefix + elem] = dict
 
                 else:
                     # default text data type
@@ -104,7 +127,8 @@ class Pipeline(object):
                 Value to be casted based on passed datatype.
 
             datatype : {ambiguous}
-                Datatype to cast passed value to.
+                Datatype to cast passed value to. This can be a function that
+                takes in a value and returns it as a new type.
         """
         try:
             val = datatype(value)
