@@ -1,5 +1,5 @@
-export const search = state => state.search;
-export const filters = state => {
-  const { searchText, ...others } = state.search;
+export const resourceSearch = state => state.search.resources;
+export const resourceFilters = state => {
+  const { searchText, ...others } = state.search.resources
   return others;
-}
+};

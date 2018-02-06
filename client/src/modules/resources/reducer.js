@@ -5,9 +5,7 @@ const initialState = {
   resources: data.resources,
   showDataImport: false,
   showBulkImport: false,
-  editResourceId: null,
-  detailResourceId: null,
-  showDetailsResource: false
+  editResourceId: null
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -89,21 +87,6 @@ export default (state = initialState, { type, payload }) => {
         showDataImport: true,
         editResourceId: payload.id
       };
-    }
-
-    case ResourceConstants.TOGGLE_RESOURCE_DETAIL: {
-      return {
-        ...state,
-        showDetailsResource: !state.showDetailsResource
-      }
-    }
-
-    case ResourceConstants.SET_DETAIL_RESOURCE: {
-      return {
-        ...state,
-        showDetailsResource: true,
-        detailResourceId: payload.id
-      }
     }
 
     case ResourceConstants.FETCH_RESOURCES: {

@@ -1,22 +1,19 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import IconButton from 'material-ui/IconButton';
+import { ButtonGroup, Button, Glyphicon } from 'react-bootstrap';
 
 import { resourceActions, resourceSelectors } from '../modules/resources';
 import { userSelectors } from '../modules/users';
 import { searchActions } from '../modules/search';
 
-import ResourcesView from '../views/Resources';
-import ResourceInfo from '../components/ResourceInfo';
-import DataInput from '../components/DataInput';
+import ResourcesView from '../views/ResourcesDataTable';
 import LocationMap from '../components/LocationMap';
-
-import ListIcon from 'material-ui-icons/List';
-import MapIcon from 'material-ui-icons/Map';
+import Sidebar from '../components/ResourceSidebar';
 
 const LIST = 'list';
 const MAP = 'map';
+const GRID = 'grid';
 
 class AllResources extends Component {
   componentDidMount() {
@@ -29,79 +26,65 @@ class AllResources extends Component {
     this.setState({ view });
   }
 
+  detailResource = (id) => {
+    this.props.history.push(`/resources/view/${id}`);
+  }
+
   render() {
     const {
       currentUserId,
-      detailResource,
       resources,
-      isDetailResourceOpen,
-      setDetailResource,
-      toggleResourceDetail,
       deleteResource,
-      editResource,
-      showEditForm,
-      isEditFormOpen,
-      hideEditForm,
       addResource,
       updateResource
     } = this.props;
 
     const { view } = this.state;
 
-    console.log('isDetailResourceOpen', isDetailResourceOpen);
-    console.log('isEditFormOpen', isEditFormOpen);
-
     return (
-      <div style={{ width: '100%' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <IconButton aria-label="List View" onClick={this.handleViewToggle(LIST)}>
-            <ListIcon />
-          </IconButton>
-          <IconButton aria-label="Map View" onClick={this.handleViewToggle(MAP)}>
-            <MapIcon />
-          </IconButton>
+      <div style={{ display: 'flex', flexGrow: 1 }}>
+        <Sidebar />
+        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <ButtonGroup>
+              <Button bsStyle={view === LIST ? 'primary' : 'default'} onClick={this.handleViewToggle(LIST)}>
+                <Glyphicon glyph="list" />
+              </Button>
+              <Button bsStyle={view === MAP ? 'primary' : 'default'} onClick={this.handleViewToggle(MAP)}>
+                <Glyphicon glyph="map-marker" />
+              </Button>
+            </ButtonGroup>
+          </div>
+          {
+            view === LIST ? (
+              <ResourcesView
+                resources={resources}
+                showDetailsForm={this.detailResource}
+                currentUserId={currentUserId}
+              />
+            ) : (
+              <LocationMap
+                resources={resources}
+                deleteResource={deleteResource}
+                showEditForm={this.editResource}
+                showDetailsForm={this.detailResource}
+                currentUserId={currentUserId}
+              />
+            )
+          }
         </div>
-        {
-          view === LIST ? (
-            <ResourcesView
-              resources={resources}
-              deleteResource={deleteResource}
-              showEditForm={showEditForm}
-              showDetailsForm={setDetailResource}
-              currentUserId={currentUserId}
-            />
-          ) : (
-            <LocationMap
-              resources={resources}
-              deleteResource={deleteResource}
-              showEditForm={showEditForm}
-              showDetailsForm={setDetailResource}
-              currentUserId={currentUserId}
-            />
-          )
-        }
-        <ResourceInfo open={isDetailResourceOpen} resource={detailResource} closeForm={toggleResourceDetail}/>
-        <DataInput open={isEditFormOpen} resource={editResource} addResource={addResource} updateResource={updateResource} closeForm={hideEditForm}/>
       </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  resources: resourceSelectors.filteredResources(state).slice(0, 50),
-  detailResource: resourceSelectors.getDetailResource(state),
-  isDetailResourceOpen: resourceSelectors.showDetailsResource(state),
-  editResource: resourceSelectors.getEditResource(state),
-  isEditFormOpen: resourceSelectors.showDataImport(state),
+  resources: resourceSelectors.filteredResources(state),
   currentUserId: userSelectors.currentUserId(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-  setDetailResource: bindActionCreators(resourceActions.setDetailResource, dispatch),
-  toggleResourceDetail: bindActionCreators(resourceActions.toggleResourceDetail, dispatch),
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
-  showEditForm: bindActionCreators(resourceActions.setEditResource, dispatch),
-  hideEditForm: bindActionCreators(resourceActions.toggleDataImportForm, dispatch),
   addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
   updateResource: bindActionCreators(resourceActions.updateResource, dispatch),
   resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
