@@ -15,6 +15,8 @@ DROP TABLE lab_application;
 
 DROP TABLE resource_file;
 
+DROP TABLE user_password;
+
 -- entity tables
 DROP TABLE platform_user;
 
