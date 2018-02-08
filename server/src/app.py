@@ -8,11 +8,12 @@ import json
 
 from flask import Flask, jsonify, request, g
 from flask_bcrypt import Bcrypt
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPTokenAuth
 from flask_login import LoginManager
 
 from lib.upload import UploadPipeline
 from lib.user import User
+from lib.profile import ProfilePipeline
 
 import pdb
 
@@ -22,7 +23,7 @@ app = Flask(__name__, static_url_path='')
 # bcrypt for encryption
 bcrypt = Bcrypt(app)
 # authentication / login stuff
-auth = HTTPBasicAuth()
+auth = HTTPTokenAuth('Bearer')
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -33,39 +34,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # function for authentication
 # TODO: Need to verify that token is passed through properly here
-@auth.verify_password
-def verify_password(username_or_token, password = None):
+@auth.verify_token
+def verify_token(token):
     user = User()
-    # try verifying by token first
-    user_info = user.verify_token(username_or_token)
-    if not user_info:
-        if not password:
-            return False
-        # now verify by token
-        pw_hash = user.get_password_hash(username_or_token)
-        verify = bcrypt.check_password_hash(pw_hash, password)
-        if verify is True:
-            g.user = user
-        return verify
-    else:
+    user_info = user.verify_token(token)
+    if user_info:
+        g.user = user_info[0]
         return True
-
-# @login_manager.request_loader
-# def load_user_from_request(request):
-#     # login using Basic Auth
-#     data = request.get_json()
-#     # again check if this is how you get tokens
-#     token = data['token']
-#     user = User()
-#     user_info = user.verify_token(token)
-#     if user_info:
-#         return user_info
-#     return None
-#
-# @login_manager.user_loader
-# def load_user(user_id):
-#     user = User()
-#     return user.get_user_from_id(user_id)
+    else:
+        return False
 
 # HELPER METHODS
 def shutdown_server():
@@ -186,7 +163,6 @@ def new_user():
     #pdb.set_trace()
 
     data = request.get_json()
-    print(data)
     data = data['user']
     email = data['email']
     password_hash = bcrypt.generate_password_hash(data['password'])
@@ -215,24 +191,21 @@ def new_user():
 @auth.login_required
 def edit_profile():
     data = request.get_json()
-    data = data['user']
-    # needs token
-    # TODO: check with KC if this is how to get token from client
-    try:
-        token = data['token']
-        user = User()
-        user_info = user.verify_token(token)
-    except:
-        user_info = None
+    data = data['profile']
+
+    profile = ProfilePipeline()
+    test = profile.run(data)
+    print(test)
 
     ret_val = {
-        "user": user_info
+        "user": "info"
     }
     return jsonify(ret_val)
 
 @app.route("/login", methods=['POST'])
 def login_user():
-    data = request.form
+    data = request.get_json()
+    data = data['user']
 
     user = User()
     pw_hash = user.get_password_hash(data['email'])
@@ -245,6 +218,8 @@ def login_user():
         "token": token,
         "user": user_info
     }
+
+    print(ret_val)
 
     return jsonify(ret_val)
 

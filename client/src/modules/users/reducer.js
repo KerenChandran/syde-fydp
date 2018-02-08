@@ -42,11 +42,11 @@ const initialState = {
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
-      case UserConstants.ADD_NEW_USER: {
+      case UserConstants.LOGIN_USER: {
         let currentUser = payload.user;
         return {
             ...state, currentUser
-        }
+        };
       };
     default:
       return state;
