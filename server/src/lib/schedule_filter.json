@@ -1,0 +1,18 @@
+{
+    "mappings": {
+        "window_start": {
+            "data_type": "date"
+        },
+        "window_end": {
+            "data_type": "date"
+        },
+        "duration_type": {
+            "data_type": "text"
+        },
+        "duration_quantity": {
+            "data_type": "integer"
+        }
+    },
+    "database_fields": {
+    }
+}

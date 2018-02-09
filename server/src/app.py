@@ -10,9 +10,12 @@ from flask import Flask, jsonify, request, g
 from flask_bcrypt import Bcrypt
 from flask_httpauth import HTTPBasicAuth
 from flask_login import LoginManager
+import requests as rq
 
 from lib.upload import UploadPipeline
 from lib.user import User
+from lib.schedule import SchedulePipeline, ScheduleFilter
+from lib.accounts import TransactionUtil
 
 
 # global application instance
@@ -188,7 +191,7 @@ def new_user():
         "user": user
     }
 
-    return ret_val
+    return jsonify(ret_val)
 
 
 @app.route("/edit_profile", methods=['POST'])
@@ -226,7 +229,123 @@ def login_user():
         "user": user_info
     }
 
-    return ret_val
+    return jsonify(ret_val)
+
+
+# scheduling endpoints
+@app.route("/submit_initial_availability", methods=['POST'])
+def submit_initial_availability():
+    data = request.get_json()
+
+    user_id = g.user['id']
+
+    pipeline = SchedulePipeline(user_id=user_id)
+
+    success, errors = pipeline.run([data], block_scheduling=False)
+
+    ret_val = {
+        "success": success,
+        "errors": errors
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/submit_schedule_blocks", methods=['POST'])
+def submit_schedule_blocks():
+    data = request.get_json()
+
+    user_id = g.user['id']
+
+    pipeline = SchedulePipeline(user_id=user_id)
+
+    success, errors = pipeline.run([data], init_availability=False)
+
+    ret_val = {
+        "success": success,
+        "errors": errors
+    }
+
+    return jsonify(ret_val)
+
+@app.route("/submit_schedule_filter", methods=['POST'])
+def submit_schedule_filter():
+    data = request.get_json()
+
+    window_start = data['window_start']
+
+    window_end = data['window_end']
+
+    initial_window = (window_start, window_end)
+
+    preferred_duration = data['preferred_duration']
+
+    filter_engine = ScheduleFilter()
+
+    success, resource_list, errors = \
+        filter_engine.filter(initial_window, preferred_duration)
+
+    ret_val = {
+        "success": success,
+        "errors": errors,
+        "resources": resource_list
+    }
+
+    return jsonify(ret_val)
+
+
+# transaction endpoints
+@app.route("/create_basic_profile", methods=['POST'])
+def create_basic_profile():
+    """
+        Non-primary method used to create a basic trxn profile for a given user.
+    """
+    user_id = g.user['id']
+
+    trxn = TransactionUtil(user_id)
+
+    success = trxn.create_basic_profile()
+
+    ret_val = {
+        'success': success
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/get_accounts", methods=['GET'])
+def get_trxn_accounts():
+    user_id = g.user['id']
+
+    trxn = TransactionUtil(user_id)
+
+    account_information = trxn.get_account_information()
+
+    ret_val = {
+        'account_information': account_information
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/specify_account_use", methods=['POST'])
+def specify_account_types():
+    data = request.get_json()
+
+    account_id = data['account_id']
+
+    account_use = data['account_use']
+
+    trxn = TransactionUtil(user_id)
+
+    success, errors = trxn.specify_account_usage(account_id, account_use)
+
+    ret_val = {
+        'success': success,
+        'errors': errors
+    }
+
+    return jsonify(ret_val)
 
 
 # remote server termination for tests

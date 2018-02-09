@@ -4,6 +4,7 @@
 import os
 
 import psycopg2 as pg
+import pandas as pd
 
 class Cursor:
     """
@@ -44,7 +45,7 @@ class Cursor:
 
             Parameters
             ----------
-            record : {dict}
+            record : {dict or pandas.Series}
                 Data point with fields (columns) and values.
         """
         cols = [col for col in record.keys()]
@@ -107,11 +108,6 @@ class Cursor:
         return len(result) > 0
 
 
-    def fetch_all(self):
-
-        return self.crs.fetchall()
-
-
     def fetch_first(self, query):
         """
             Function which executes designated query and fetches the first
@@ -125,6 +121,7 @@ class Cursor:
         self.crs.execute(query)
 
         result = self.crs.fetchall()
+
         return result[0][0]
 
 
@@ -145,6 +142,19 @@ class Cursor:
         result = self.crs.fetchall()
 
         return [dict(zip(cols, res)) for res in result]
+
+
+    def fetch_dataframe(self, query):
+        """
+            Function to get query results as a dataframe. Makes use of 
+            fetch_dict method to undergo query execution and result fetching.
+
+            Parameters
+            ----------
+            query : {str}
+                SQL-compatible query string
+        """
+        return pd.DataFrame(self.fetch_dict(query))
 
 
 if __name__ == '__main__':

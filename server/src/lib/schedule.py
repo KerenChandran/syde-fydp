@@ -7,8 +7,8 @@ from dateutil.relativedelta import relativedelta
 import pandas as pd
 
 from pipeline import Pipeline
+from utils.db import Cursor
 
-import pdb
 
 class SchedulePipeline(Pipeline):
     def __init__(self, user_id=None):
@@ -334,5 +334,209 @@ class SchedulePipeline(Pipeline):
         return (True, self.error_logs)
 
 
+class ScheduleFilter:
+    """
+        Engine class used for main schedule filtering tasks.
+    """
+    def __init__(self):
+        # use pipeline super class for transformation utils.
+        super(SchedulePipeline, self).__init__("schedule_filter.json")
+
+        self.timedelta_map = {
+            'hours': lambda x: relativedelta(hours=x),
+            'days': lambda x: relativedelta(days=x),
+            'weeks': lambda x: relativedelta(weeks=x)
+        }
+
+    def _window_filter(self):
+        """
+            Helper method used to get the resulting resource dataframe after
+            applying the window criterion.
+        """
+        
+        resource_fetch_query = \
+        """
+            SELECT DISTINCT resource_id
+            FROM resource_availability
+            WHERE availability_start <= '{window_start}'
+                AND availability_end >= '{window_end}'
+        """.format(window_start=self.start, window_end=self.end)
+
+        self.resource_df = self.crs.fetch_dataframe(resource_fetch_query)
+
+    def _duration_filter(self):
+        """
+            Helper method used to retrieve resources for which the
+            duration criterion is met. For an hourly duration constraint, there
+            must exist x hours within the time frame of 8AM - 8PM.
+        """
+        resource_list = self.resource_df['resource_id'].tolist()
+        resource_list = [str(x) for x in resource_list]
+
+        retrieve_block_query = \
+        """
+            SELECT resource_id, block_start, block_end
+            FROM resource_schedule_blocks
+            WHERE resource_id IN ({resource_list})
+        """.format(",".join(resource_list))
+
+        resource_blocks = self.crs.fetch_dict(retrieve_block_query)
+            
+        # flatten retrieved resource blocks
+        resource_store = {}
+
+        for elem in resource_blocks:
+            if elem['resource_id'] not in resource_store:
+                resource_store[elem['resource_id']] = \
+                    [elem['block_start'], elem['block_end']]
+
+                continue
+
+            resource_store[elem['resource_id']] += \
+                [elem['block_start'], elem['block_end']]
+
+        # convert all block elements into datetime objects and sort
+        for res, dt_list in resource_store.iteritems():
+            resource_store[res] = \
+                sorted([dt.datetime.strptime(x) for x in dt_list])
+        
+            # sanity check
+            assert(len(resource_store[res]) % 2 == 0)
+
+        # block overlaps cannot exist so all block start and ends are adjacent
+        # iterate through each resource and check to see if there exists
+        # at least one contiguous block that matches the filtering criterion
+        # only interested in the timedelta between block_end and block_start
+        resource_flags = {res: (False, None) for res in resource_store}
+
+        for res in resource_store:
+            for idx in range(1, len(resource_store[res]), 2):
+                if idx == len(resource_store[res]) - 1:
+                    # last element so we skip
+                    continue
+                elif resource_flags[res][0]:
+                    # move to next resource
+                    break
+
+                # check to see if the timedelta between current block_end
+                # and next block_start matches filtering criterion
+                # use strictly less than conditional to allow for small buffers
+                if res[idx] + self.timedelta_map[self.dtype] < res[idx+1]:
+                    resource_flags[res][0] = True
+                    resource_flags[res][1] = res[idx]
+
+        # retrieve all resources that match the criterion
+        self.final_resources = \
+            [res for res in resource_flags if resource_flags[res][0]]
+
+        # sort final resources by availability
+        self.final_resources = \
+            sorted(self.final_resources, key=lambda x: x[1])
+
+        expected_datetime_format = '%Y-%m-%d %H:%M'
+
+        self.final_resources = \
+            [(tup[0], dt.datetime.strftime(tup[1])) for tup in 
+             self.final_resources]
+
+    def _filter(self):
+        """
+            Private method containing all of the filtering logic given
+            the criterion parameters as passed to filter().
+        """
+        record = self.df_transform.iloc[0]
+
+        self.start = record['window_start']
+
+        self.end = record['window_end']
+
+        self.dtype = record['duration_type']
+
+        self.dquantity = record['duration_quantity']
+
+        self._window_filter()
+
+        self._duration_filter()
+
+        return
+
+    def filter(self, init_window, preferred_duration):
+        """
+            Main function used to obtain a set of resources which match a very
+            specific filtering criterion. The filtering criterion is composed of
+            two parts:
+
+            1. Initial Window - a min/max date spec denoting an initial window 
+            in which the user wishes to borrow the resource. This component is 
+            pit against the initial availability of the resource as specified by
+            the resource owner.
+
+            2. Duration - a contiguous block of specified type for which the 
+            user wishes to block the resource. The method does not currently 
+            support the specification of recurrence.
+
+            Parameters
+            ----------
+            init_window : {tuple}
+                Tuple containing information about the initial window for which 
+                the user wishes to borrow the resource. Each tuple element must
+                contain strings compatible with the python date.date type.
+
+            preferred_duration : {dict}
+                Data object containing information about the requested duration
+                for which the user intends to use/block the resource. This 
+                object contains strictly two properties:
+                    1. type: hours, days, weeks {str}. 
+                        If an hourly type is selected then it is recommended
+                        that the duration is less than 12 (i.e. 8AM - 8PM
+                        block). For durations that exceed 12 hours, it is
+                        recommended that the daily type is selected.
+                    2. quantity: length of contiguous block {int}
+                        The minimum block length must be one for any of the
+                        duration types.
+        """
+        if not isinstance(init_window, tuple) or len(tuple) != 2:
+            self.error_logs.append("Incorrect initial window specification.")
+            return (False, self.error_logs)
+        elif not isinstance(preferred_duration, dict) or \
+            len(preferred_duration) == 0:
+            self.error_logs.append(
+                "Incorrect preferred duration specification.")
+            return (False, self.error_logs)
+
+        window_start, window_end = init_window
+
+        duration_type = preferred_duration["type"]
+
+        duration_quantity = preferred_duration["quantity"]
+
+        if duration_quantity < 1:
+            self.error_logs.append("Minimum block length must be 1.")
+            return (False, self.error_logs)
+
+        elif duration_type == 'hours' and duration_quantity > 12:
+            self.error_logs.append(
+                "Hourly duration cannot exceed 12 units. Please use daily type."
+            )
+            return (False, self.error_logs)
+
+        data_obj = {
+            "window_start": init_window[0],
+            "window_end": init_window[1],
+            "duration_type": preferred_duration["type"],
+            "duration_quantity": preferred_duration["quantity"]
+        }
+
+        self.data = [data_obj]
+
+        self.transform()
+
+        self._filter()
+
+        return (True, self.final_resources, self.error_logs)
+
+
 if __name__ == '__main__':
     schedpipe = SchedulePipeline()
+
+    schedfilt = ScheduleFilter()
