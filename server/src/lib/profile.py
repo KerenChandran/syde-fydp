@@ -1,5 +1,6 @@
 from pipeline import Pipeline
 from flask import g
+import pdb
 
 class ProfilePipeline(Pipeline):
 
@@ -13,24 +14,32 @@ class ProfilePipeline(Pipeline):
             update_cols = ["%s=%s" % (tup[0], tup[1]) for tup in update_cols]
             query = """
                 UPDATE platform_user
-                SET ({update_cols})
+                SET {update_cols}
                 WHERE id={user_id}
             """.format(update_cols=",".join(update_cols),
-                       user_id=g.user.id)
+                       user_id=g.user['id'])
             self.crs.execute(query)
             return True
-        except:
+        except Exception as e:
+            print(e)
             return False
 
     def run(self, data):
 
-        self.data = data
+        try:
+            self.data = data
 
-        self.transform()
+            self.transform()
 
-        profile_fields = self.database_fields['platform_user']
-        df_input = self.df_transform[profile_fields]
+            profile_fields = self.database_fields['platform_user']
 
-        update = df_input.apply(lambda x: self.load(x), axis=1)
+            df_input = self.df_transform[profile_fields]
 
-        return update
+            df_input.apply(lambda x: self.load(x), axis=1)
+
+            self.crs.commit()
+            return True
+
+        except Exception as e:
+            print(e)
+            return False

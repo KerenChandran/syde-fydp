@@ -39,7 +39,7 @@ def verify_token(token):
     user = User()
     user_info = user.verify_token(token)
     if user_info:
-        g.user = user_info[0]
+        g.user = user_info
         return True
     else:
         return False
@@ -194,12 +194,17 @@ def edit_profile():
     data = data['profile']
 
     profile = ProfilePipeline()
-    test = profile.run(data)
-    print(test)
+    save = profile.run([data])
+
+    user = User()
+    user_info = user.get_user_from_id(g.user['id'])
+    g.user = user_info
 
     ret_val = {
-        "user": "info"
+        "success": save,
+        "user": user_info
     }
+
     return jsonify(ret_val)
 
 @app.route("/login", methods=['POST'])
@@ -211,15 +216,13 @@ def login_user():
     pw_hash = user.get_password_hash(data['email'])
     validate = bcrypt.check_password_hash(pw_hash, data['password'])
     user_info = user.get_user_from_email(data['email'])
-    token = user.generate_auth_token(user_info[0]['id'])
+    token = user.generate_auth_token(user_info['id'])
 
     ret_val = {
         "success": validate,
         "token": token,
         "user": user_info
     }
-
-    print(ret_val)
 
     return jsonify(ret_val)
 

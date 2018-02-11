@@ -7,8 +7,9 @@ import {userActions, userSelectors} from '../modules/users'
 class EditProfile extends React.Component {
 
     state = {
-        firstName: "",
-        lastName: "",
+        first_name: "",
+        last_name: "",
+        phone: "",
         department: "",
         faculty: "",
     };
@@ -23,21 +24,21 @@ class EditProfile extends React.Component {
 
     render() {
         const {
-            firstName,
-            lastName,
+            first_name,
+            last_name,
+            phone,
             department,
             faculty
         } = this.state;
 
         return (
             <div>
-            <Form horizontal>
                 <FormGroup controlId="formHorizontalFirstName">
                     <Col componentClass={ControlLabel} sm={2}>
                         First Name
                     </Col>
                     <Col sm={10}>
-                        <FormControl type="firstName" placeholder="First Name" value={firstName} onChange={this.handleChange('firstName')} />
+                        <FormControl type="firstName" placeholder="First Name" value={first_name} onChange={this.handleChange('first_name')} />
                     </Col>
                 </FormGroup>
 
@@ -46,7 +47,16 @@ class EditProfile extends React.Component {
                         Last Name
                     </Col>
                     <Col sm={10}>
-                        <FormControl type="lastName" placeholder="Last Name" value={lastName} onChange={this.handleChange('lastName')} />
+                        <FormControl type="lastName" placeholder="Last Name" value={last_name} onChange={this.handleChange('last_name')} />
+                    </Col>
+                </FormGroup>
+
+                <FormGroup controlId="formHorizontalLastName">
+                    <Col componentClass={ControlLabel} sm={2}>
+                        Phone Number
+                    </Col>
+                    <Col sm={10}>
+                        <FormControl type="phone" placeholder="Phone Number" value={phone} onChange={this.handleChange('phone')} />
                     </Col>
                 </FormGroup>
 
@@ -73,8 +83,6 @@ class EditProfile extends React.Component {
                         <Button type="submit" onClick={this.handleSubmit}>Save</Button>
                     </Col>
                 </FormGroup>
-
-            </Form>
             </div>
         )
     }

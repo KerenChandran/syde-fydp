@@ -44,7 +44,7 @@ class User:
 
         self.user_dict = self.crs.fetch_dict(query)
 
-        return self.user_dict
+        return self.user_dict[0]
 
     def get_user_from_email(self, email):
         """
@@ -60,7 +60,7 @@ class User:
 
         self.user_dict = self.crs.fetch_dict(query)
 
-        return self.user_dict
+        return self.user_dict[0]
 
     def get_id_from_email(self, email):
         """

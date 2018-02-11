@@ -42,9 +42,7 @@ export const login = (user) => async dispatch => {
 };
 
 export const editProfile = (profile) => async dispatch => {
-  // TODO: also need to send in user token with this
   try {
-    console.log(localStorage.getItem('id_token'));
     let response = await fetch('http://localhost:3000/api/edit_profile', {
       method: 'post',
       headers: {
