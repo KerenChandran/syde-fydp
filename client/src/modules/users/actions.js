@@ -15,8 +15,10 @@ export const signUp = (user) => async dispatch => {
       body: JSON.stringify({ user: user })
     });
     let data = await response.json();
-    console.log("Data: " + data);
-    return dispatch(addLoginSuccess(data));
+    localStorage.setItem('id_token', data.token);
+    console.log(data);
+    dispatch(addLoginSuccess(data));
+    return true;
   } catch (error) {
     throw new Error(error);
   }

@@ -3,12 +3,14 @@ import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import {Form, FormGroup, FormControl, ControlLabel, Col, Button} from 'react-bootstrap'
 import {userActions} from '../modules/users'
+import {Redirect} from 'react-router-dom'
 
 class SignUp extends React.Component {
 
     state = {
         email: "",
         password: "",
+        redirect: false
     };
 
     handleChange = name => event => {
@@ -16,14 +18,22 @@ class SignUp extends React.Component {
     };
 
     handleSubmit = () => {
-        this.props.signUp(this.state)
+        let success = this.props.signUp(this.state);
+        if (success) {
+            this.setState({redirect: true});
+        }
     };
 
     render() {
         const {
             email,
-            password
+            password,
+            redirect
         } = this.state;
+
+        if (redirect) {
+            return <Redirect to='../profile/edit' />;
+        }
 
         return (
             <div>

@@ -15,8 +15,6 @@ from lib.upload import UploadPipeline
 from lib.user import User
 from lib.profile import ProfilePipeline
 
-import pdb
-
 
 # global application instance
 app = Flask(__name__, static_url_path='')
@@ -160,7 +158,6 @@ def upload_file():
 
 @app.route("/new_user", methods=['POST'])
 def new_user():
-    #pdb.set_trace()
 
     data = request.get_json()
     data = data['user']
@@ -175,12 +172,15 @@ def new_user():
     if user_id is None:
         auth_token = None
         user = None
+        success = False
     # return token
     else:
         auth_token = save_user.generate_auth_token(user_id)
         user = save_user.get_user_from_id(user_id)
+        success = True
 
     ret_val = {
+        "success": success,
         "token": auth_token,
         "user": user
     }
