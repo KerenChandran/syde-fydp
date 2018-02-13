@@ -55,7 +55,7 @@ class ResourceInfoEditView extends Component {
 
     return (
       <div style={{ display: 'block', width: '100%'}}>
-        <Form>
+        <Form horizontal>
           <FormGroup>
             <Col smOffset={10} sm={2}>
               <Button type="button" onClick={this.props.onBackClick}>Go Back</Button>
@@ -63,48 +63,60 @@ class ResourceInfoEditView extends Component {
             </Col>
           </FormGroup>
           <FormGroup controlId="formCategory">
-            <ControlLabel>Category</ControlLabel>
-            <FormControl
-              type="text"
-              value={category}
-              placeholder="Category"
-              onChange={this.handleChange('category')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>
+              Category
+            </Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={category}
+                placeholder="Category"
+                onChange={this.handleChange('category')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formCompany">
-            <ControlLabel>Company</ControlLabel>
-            <FormControl
-              type="text"
-              value={company}
-              placeholder="Company"
-              onChange={this.handleChange('company')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Company</Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={company}
+                placeholder="Company"
+                onChange={this.handleChange('company')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formFaculty">
-            <ControlLabel>Faculty</ControlLabel>
-            <FormControl
-              type="text"
-              value={faculty}
-              placeholder="Faculty"
-              onChange={this.handleChange('faculty')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={faculty}
+                placeholder="Faculty"
+                onChange={this.handleChange('faculty')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formLocation">
-            <ControlLabel>Location</ControlLabel>
-            <LocationSearch onChange={this.handleLocationChange} value={location}/>
+            <Col componentClass={ControlLabel} sm={2}>Location</Col>
+            <Col sm={10}>
+              <LocationSearch onChange={this.handleLocationChange} value={location}/>
+            </Col>            
           </FormGroup>
 
           <FormGroup controlId="formModel">
-            <ControlLabel>Model</ControlLabel>
-            <FormControl
-              type="text"
-              value={model}
-              placeholder="Model"
-              onChange={this.handleChange('model')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Model</Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={model}
+                placeholder="Model"
+                onChange={this.handleChange('model')}
+              />
+            </Col>
           </FormGroup>
 
 
@@ -120,33 +132,39 @@ class ResourceInfoEditView extends Component {
 
 
           <FormGroup controlId="formDescription">
-            <ControlLabel>Description</ControlLabel>
-            <FormControl
-              componentClass="textarea"
-              value={description}
-              placeholder="Description"
-              onChange={this.handleChange('description')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Description</Col>
+            <Col sm={10}>
+              <FormControl
+                componentClass="textarea"
+                value={description}
+                placeholder="Description"
+                onChange={this.handleChange('description')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formRules">
-            <ControlLabel>Rules</ControlLabel>
-            <FormControl
-              componentClass="textarea"
-              value={rules}
-              placeholder="Rules"
-              onChange={this.handleChange('rules')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Rules</Col>
+            <Col sm={10}>
+              <FormControl
+                componentClass="textarea"
+                value={rules}
+                placeholder="Rules"
+                onChange={this.handleChange('rules')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formApplication">
-            <ControlLabel>Application</ControlLabel>
-            <FormControl
-              componentClass="textarea"
-              value={application}
-              placeholder="Application"
-              onChange={this.handleChange('application')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Application</Col>
+            <Col sm={10}>
+              <FormControl
+                componentClass="textarea"
+                value={application}
+                placeholder="Application"
+                onChange={this.handleChange('application')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formIncentive">
@@ -155,13 +173,15 @@ class ResourceInfoEditView extends Component {
           </FormGroup>
 
           <FormGroup controlId="formFees">
-            <ControlLabel>User Fee</ControlLabel>
-            <FormControl
-              type="number"
-              value={fine}
-              placeholder="User Fee"
-              onChange={this.handleChange('fine')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>User Fee</Col>
+            <Col sm={10}>
+              <FormControl
+                type="number"
+                value={fine}
+                placeholder="User Fee"
+                onChange={this.handleChange('fine')}
+              />
+            </Col>
           </FormGroup>
         </Form>
       </div>
