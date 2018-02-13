@@ -12,3 +12,13 @@ body {
   display: flex;
   flex-grow: 10;
 }
+
+.App-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.rbc-calendar {
+  width: 100%;
+}
