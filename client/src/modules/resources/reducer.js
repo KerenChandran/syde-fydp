@@ -1,8 +1,7 @@
-import data from './data_modified.json';
 import * as ResourceConstants from './constants';
 
 const initialState = {
-  resources: data.resources,
+  resources: [],
   showDataImport: false,
   showBulkImport: false,
   editResourceId: null
