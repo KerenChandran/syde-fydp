@@ -9,6 +9,7 @@ export const toggleResourceDetail = createAction(ResourceConstants.TOGGLE_RESOUR
 // Add to Database
 export const addBulkResourceSuccess = createAction(ResourceConstants.ADD_BULK_IMPORT, resources => ({ resources }));
 export const addResourceSuccess = createAction(ResourceConstants.ADD_DATA_IMPORT, resource => ({ resource }));
+export const updateResourceSucesses = createAction(ResourceConstants.UPDATE_DATA_IMPORT, resource => ({ resource }));
 
 export const setEditResource = createAction(ResourceConstants.SET_EDIT_RESOURCE, id => ({ id }));
 export const deleteResource = createAction(ResourceConstants.DELETE_RESOURCE, id => ({ id }));
@@ -28,8 +29,10 @@ export const fetchResources = () => async dispatch => {
 
 export const addDataImport = (resource) => async dispatch => {
   try {
-    if (resource.resource_id < 0) {
+    let updateFlag = true;
+    if (resource.resource_id === undefined) {
       delete resource['resource_id'];
+      updateFlag = false;
     }
     let response = await fetch('http://localhost:3000/api/resource_upload', {
       method: 'post',
@@ -41,7 +44,7 @@ export const addDataImport = (resource) => async dispatch => {
     });
     let data = await response.json();
     resource.resource_id = data.resource_id;
-    return dispatch(addResourceSuccess(resource));
+    return updateFlag ? dispatch(updateResourceSucesses(resource)) : dispatch(addResourceSuccess(resource));
   } catch (error) {
     throw new Error(error);
   }
