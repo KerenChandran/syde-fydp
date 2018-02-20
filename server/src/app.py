@@ -70,9 +70,13 @@ def root():
 @app.route("/resource_upload", methods=['POST'])
 def upload_resource():
     # get request parameters
-    # assumption: record has ownerId data point
     data = request.get_json()
     data = data['resource']
+
+    user_id = g.user['id']
+
+    # update data point with ownerId
+    data['ownerId'] = user_id
 
     # create list of single dictionary
     data = [data]
@@ -99,6 +103,9 @@ def bulk_resource_upload():
     data = request.form
 
     location = json.loads(data['location'])
+
+    # get single owner id for all resources
+    user_id = g.user['id']
 
     # parse csv input and generate data points
     f = request.files['resources']
@@ -130,6 +137,9 @@ def bulk_resource_upload():
     for idx, dp in enumerate(body):
         # add location data to each record
         body[idx]['location'] = location
+        
+        # add owner data to each record
+        body[idx]['ownerId'] = user_id
 
     # run upload pipeline
     pipeline = UploadPipeline()
