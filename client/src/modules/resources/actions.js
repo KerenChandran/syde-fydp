@@ -19,9 +19,33 @@ export const fetchResourcesSuccess = createAction(ResourceConstants.FETCH_RESOUR
 
 export const fetchResources = () => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/');
+    let response = await fetch('http://localhost:3000/api/get_resources', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ resource_list: [] })
+    });
     let data = await response.json();
     return dispatch(fetchResourcesSuccess(data));
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const fetchResource = (id) => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/get_resources', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ resource_list: [id] })
+    });
+    let data = await response.json();
+    return dispatch(updateResourceSucesses(data));
   } catch (error) {
     throw new Error(error);
   }
