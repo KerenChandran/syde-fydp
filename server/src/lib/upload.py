@@ -23,11 +23,6 @@ class UploadPipeline(Pipeline):
 
             update : {boolean}
                 Flag which explicitly states whether update is taking place.
-
-            Keyword-Arguments
-            -----------------
-            resource_id : {int}
-                Identifier or resource for which values are being updated.
         """
         flds, resource_data = self.crs.sanitize(record)
 
@@ -42,7 +37,10 @@ class UploadPipeline(Pipeline):
 
         if update:
             update_cols = zip(flds, resource_data)
-            update_cols = ["%s=%s" % tup for tup in update_cols]
+
+            # ignore resource_id column
+            update_cols = ["%s=%s" % tup for tup in update_cols 
+                           if tup[0] != 'resource_id']
 
             update_query = \
             """
@@ -51,7 +49,7 @@ class UploadPipeline(Pipeline):
                 WHERE id = {rid}
                 RETURNING id;
             """.format(update_cols=",".join(update_cols), 
-                       rid=kwargs['resource_id'])
+                       rid=record['resource_id'])
 
             execution_query = update_query
 
@@ -111,7 +109,10 @@ class UploadPipeline(Pipeline):
         # handle resource data
         resource_fields = self.database_fields['resource']
 
-        df_resource = self.df_transform[resource_fields]
+        if update_flag:
+            df_resource = self.df_transform[resource_fields + ['resource_id']]
+        else:
+            df_resource = self.df_transform[resource_fields]
 
         self.df_transform['resource_id'] = df_resource.apply(
             lambda x: self.resource_load(x, update=update_flag), axis=1)
