@@ -17,6 +17,8 @@ from lib.user import User
 from lib.schedule import SchedulePipeline, ScheduleFilter
 from lib.accounts import TransactionUtil
 
+import pdb
+
 
 # global application instance
 app = Flask(__name__, static_url_path='')
@@ -73,7 +75,10 @@ def upload_resource():
     data = request.get_json()
     data = data['resource']
 
-    user_id = g.user['id']
+    # user_id = g.user['id']
+
+    # temporarily hard code user id until profiles are working
+    user_id = 1
 
     # update data point with ownerId
     data['ownerId'] = user_id
