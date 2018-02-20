@@ -47,10 +47,11 @@ class ResourceInfoEditView extends Component {
       mobile,
       available,
       description,
-      rules,
+      rules_restrictions,
       application,
-      incentive,
-      fine
+      incentive_type,
+      fee_amount,
+      fee_cadence
     } = this.state;
 
     return (
@@ -122,12 +123,24 @@ class ResourceInfoEditView extends Component {
 
           <FormGroup controlId="formMobile">
             <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
-            <Col sm={10}><FormControl.Static>{mobile ? 'Yes' : 'No'}</FormControl.Static></Col>
+            <Col sm={10}>
+              <FormControl componentClass="select" onChange={this.handleChange('mobile')} value={mobile}>
+                <option value="">N/A</option>
+                <option value={false}>False</option>
+                <option value={true}>True</option>
+              </FormControl>
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formAvailable">
             <Col componentClass={ControlLabel} sm={2}>Available</Col>
-            <Col sm={10}><FormControl.Static>{available ? 'Yes' : 'No'}</FormControl.Static></Col>
+            <Col sm={10}>
+              <FormControl componentClass="select" onChange={this.handleChange('available')} value={available}>
+                <option value="">N/A</option>
+                <option value={false}>False</option>
+                <option value={true}>True</option>
+              </FormControl>
+            </Col>
           </FormGroup>
 
 
@@ -148,9 +161,9 @@ class ResourceInfoEditView extends Component {
             <Col sm={10}>
               <FormControl
                 componentClass="textarea"
-                value={rules}
+                value={rules_restrictions}
                 placeholder="Rules"
-                onChange={this.handleChange('rules')}
+                onChange={this.handleChange('rules_restrictions')}
               />
             </Col>
           </FormGroup>
@@ -169,20 +182,41 @@ class ResourceInfoEditView extends Component {
 
           <FormGroup controlId="formIncentive">
             <Col componentClass={ControlLabel} sm={2}>Incentive</Col>
-            <Col sm={10}><FormControl.Static>{incentive}</FormControl.Static></Col>
-          </FormGroup>
-
-          <FormGroup controlId="formFees">
-            <Col componentClass={ControlLabel} sm={2}>User Fee</Col>
             <Col sm={10}>
-              <FormControl
-                type="number"
-                value={fine}
-                placeholder="User Fee"
-                onChange={this.handleChange('fine')}
-              />
+              <FormControl componentClass="select" placeholder="user_fee" onChange={this.handleChange('incentive_type')} value={incentive_type}>
+                <option value="">N/A</option>
+                <option value="user_fee">User Fee</option>
+              </FormControl>
             </Col>
           </FormGroup>
+
+          { 
+            incentive_type === 'user_fee' && 
+            <div>
+              <FormGroup controlId="formFees">
+                <Col componentClass={ControlLabel} sm={2}>Fee Amount</Col>
+                <Col sm={10}>
+                  <FormControl
+                    type="number"
+                    value={fee_amount}
+                    placeholder="Free"
+                    onChange={this.handleChange('fee_amount')}
+                  />
+                </Col>
+              </FormGroup>
+
+              <FormGroup controlId="formCadence">
+                <Col componentClass={ControlLabel} sm={2}>Fee Cadence</Col>
+                <Col sm={10}>
+                  <FormControl componentClass="select" placeholder="Fee Cadence" onChange={this.handleChange('fee_cadence')} value={fee_cadence}>
+                    <option value="">N/A</option>
+                    <option value="hourly">Hourly</option>
+                    <option value="daily">Daily</option>
+                  </FormControl>
+                </Col>
+              </FormGroup>
+            </div>
+          }
         </Form>
       </div>
     );
