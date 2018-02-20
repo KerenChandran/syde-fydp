@@ -10,7 +10,7 @@ class ResourcesDataTable extends Component {
   // }
 
   handleRowDoubleClick = (row) => {
-    this.props.showDetailsForm(row.id);
+    this.props.showDetailsForm(row.resource_id);
   }
 
   // handleEdit = id => () => {
@@ -100,7 +100,7 @@ class ResourcesDataTable extends Component {
         options={options}
         selectRow={selectRowOptions}
       >
-        <TableHeaderColumn dataField='id' isKey hidden>ID</TableHeaderColumn>
+        <TableHeaderColumn dataField='resource_id' isKey hidden>ID</TableHeaderColumn>
         <TableHeaderColumn dataField='category' dataSort caretRender={this.caretRender}>Category</TableHeaderColumn>
         <TableHeaderColumn dataField='company' dataSort caretRender={this.caretRender}>Company</TableHeaderColumn>
         <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>

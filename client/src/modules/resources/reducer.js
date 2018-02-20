@@ -25,7 +25,10 @@ export default (state = initialState, { type, payload }) => {
       let { resources, ...others } = state;
       let newResources = [
         ...resources,
-        payload.resource
+        {
+          ...payload.resource,
+          ownerId: 1
+        }
       ];
       return {
         resources: newResources,

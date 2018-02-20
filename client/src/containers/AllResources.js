@@ -35,8 +35,6 @@ class AllResources extends Component {
       currentUserId,
       resources,
       deleteResource,
-      addResource,
-      updateResource
     } = this.props;
 
     const { view } = this.state;
@@ -85,8 +83,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
-  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
-  updateResource: bindActionCreators(resourceActions.updateResource, dispatch),
   resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
 });
 

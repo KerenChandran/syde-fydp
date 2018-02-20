@@ -14,16 +14,16 @@ class ResourceInfo extends Component {
   )
 
   handleEditClick = () => {
-    const { currentUserId, history, resource: { id, ownerId }} = this.props;
+    const { currentUserId, history, resource: { resource_id, ownerId }} = this.props;
     if (currentUserId == ownerId) {
-      history.push(`/resources/edit/${id}`);
+      history.push(`/resources/edit/${resource_id}`);
     }
   }
 
   handleDeleteClick = () => {
-    const { currentUserId, deleteResource, resource: { id, ownerId }} = this.props;
+    const { currentUserId, deleteResource, resource: { resource_id, ownerId }} = this.props;
     if (currentUserId == ownerId) {
-      deleteResource(id);
+      deleteResource(resource_id);
       this.handleBackClick();
     }
   }
@@ -43,7 +43,7 @@ class ResourceInfo extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  resource: resourceSelectors.getDetailResource(state, props.match.params.id),
+  resource: resourceSelectors.getResource(state, props.match.params.id),
   currentUserId: userSelectors.currentUserId(state)
 });
 

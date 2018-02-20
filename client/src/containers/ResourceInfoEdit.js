@@ -13,15 +13,7 @@ class ResourceInfoEdit extends Component {
   )
 
   handleSubmit = (state) => {
-    const { addResource, updateResource } = this.props;
-    state.id = state.id > -1 ? state.id : -1;
-
-    if (state.id > -1) {
-      updateResource(state);
-    } else {
-      addResource(state);
-    }
-    
+    this.props.addResource(state);
     this.handleBackClick();
   }
 
@@ -43,12 +35,11 @@ class ResourceInfoEdit extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  resource: resourceSelectors.getEditResource(state, props.match.params.id)
+  resource: resourceSelectors.getResource(state, props.match.params.id)
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
-  updateResource: bindActionCreators(resourceActions.updateResource, dispatch),
+  addResource: bindActionCreators(resourceActions.addDataImport, dispatch)
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResourceInfoEdit));

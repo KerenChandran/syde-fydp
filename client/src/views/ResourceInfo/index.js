@@ -14,15 +14,15 @@ class ResourceInfoView extends Component {
       mobile,
       available,
       description,
-      rules,
+      rules_restrictions,
       application,
-      incentive,
-      fine,
+      incentive_type,
+      fee_amount,
+      fee_cadence,
       ownerId
     } = resource;
 
-    console.log('currentUserId', currentUserId);
-    console.log('ownerId', ownerId);
+    const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';
 
     return (
       <div style={{ display: 'block', width: '100%'}}>
@@ -52,7 +52,7 @@ class ResourceInfoView extends Component {
 
           <FormGroup controlId="formLocation">
             <Col componentClass={ControlLabel} sm={2}>Location</Col>
-            <Col sm={10}><FormControl.Static>{location}</FormControl.Static></Col>
+            <Col sm={10}><FormControl.Static>{location.name}</FormControl.Static></Col>
           </FormGroup>
 
           <FormGroup controlId="formModel">
@@ -77,7 +77,7 @@ class ResourceInfoView extends Component {
 
           <FormGroup controlId="formRules">
             <Col componentClass={ControlLabel} sm={2}>Rules</Col>
-            <Col sm={10}><FormControl.Static>{rules}</FormControl.Static></Col>
+            <Col sm={10}><FormControl.Static>{rules_restrictions}</FormControl.Static></Col>
           </FormGroup>
 
           <FormGroup controlId="formApplication">
@@ -90,10 +90,19 @@ class ResourceInfoView extends Component {
             <Col sm={10}><FormControl.Static>{incentive}</FormControl.Static></Col>
           </FormGroup>
 
-          <FormGroup controlId="formFees">
-            <Col componentClass={ControlLabel} sm={2}>User Fee</Col>
-            <Col sm={10}><FormControl.Static>{fine}</FormControl.Static></Col>
-          </FormGroup>
+          {
+            incentive_type === 'user_fees' && 
+            <div>
+              <FormGroup controlId="formIncentive">
+                <Col componentClass={ControlLabel} sm={2}>Fee Amount</Col>
+                <Col sm={10}><FormControl.Static>{fee_amount}</FormControl.Static></Col>
+              </FormGroup>
+              <FormGroup controlId="form">
+                <Col componentClass={ControlLabel} sm={2}>Fee Cadence</Col>
+                <Col sm={10}><FormControl.Static>{fee_cadence}</FormControl.Static></Col>
+              </FormGroup>
+            </div>
+          }
 
         </Form>
       </div>

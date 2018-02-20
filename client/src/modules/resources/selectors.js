@@ -45,15 +45,9 @@ export const userResources = (resources, userId) => (
 );
 export const currentUserResources = createSelector(filteredResources, currentUserId, userResources);
 
-
-export const getEditResource = (state, id) => {
+export const getResource = (state, id) => {
   let allResources = resources(state);
-  return allResources.find((resource) => resource.id == id);
-}
-
-export const getDetailResource = (state, id) => {
-  let allResources = resources(state);
-  return allResources.find((resource) => resource.id == id);
+  return allResources.find((resource) => resource.resource_id == id);
 }
 
 export const showBulkImport = state => state.resources.showBulkImport;
