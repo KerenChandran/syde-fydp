@@ -26,8 +26,8 @@ class LocationSearchBox extends Component {
     this.props.onChange({
       placeId: places[0].place_id,
       name: places[0].name,
-      lat: places[0].geometry.location.lat(),
-      lng: places[0].geometry.location.lng()
+      latitude: places[0].geometry.location.lat(),
+      longitude: places[0].geometry.location.lng()
     });
   }
 
