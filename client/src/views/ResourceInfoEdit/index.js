@@ -104,7 +104,10 @@ class ResourceInfoEditView extends Component {
           <FormGroup controlId="formLocation">
             <Col componentClass={ControlLabel} sm={2}>Location</Col>
             <Col sm={10}>
-              <LocationSearch onChange={this.handleLocationChange} value={location}/>
+              <LocationSearch
+                onChange={this.handleLocationChange}
+                location={location}
+              />
             </Col>            
           </FormGroup>
 
