@@ -218,8 +218,6 @@ class UploadPipeline(Pipeline):
         self.df_transform['incentive_id'] = \
             df_incentive.apply(lambda x: self.incentive_load(x), axis=1)
 
-        pdb.set_trace()
-
         # add or update incentive and resource records in join table
         upload_query = \
         """

@@ -1,0 +1,8 @@
+{
+    "mappings": {
+    },
+    "database_fields": {
+        "resource": ["category", "company", "model", "mobile", "available", "description", "rules_restrictions", "id"],
+        "location": ["placeId", "name", "latitude", "longitude"]
+    }
+}

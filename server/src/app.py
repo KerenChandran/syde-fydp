@@ -16,6 +16,7 @@ from lib.upload import UploadPipeline
 from lib.user import User
 from lib.schedule import SchedulePipeline, ScheduleFilter
 from lib.accounts import TransactionUtil
+from lib.resource import ResourceUtil
 
 import pdb
 
@@ -68,7 +69,7 @@ def root():
     return jsonify({"message": "Flask application base."})
 
 
-# single resource upload
+# upload endpoints
 @app.route("/resource_upload", methods=['POST'])
 def upload_resource():
     # get request parameters
@@ -101,7 +102,6 @@ def upload_resource():
     return jsonify(ret_val)
 
 
-# bulk resource upload
 @app.route("/bulk_resource_upload", methods=['POST'])
 def bulk_resource_upload():
     # get single location for all resources
@@ -160,7 +160,30 @@ def bulk_resource_upload():
     return jsonify(ret_val)
 
 
-# file upload URL
+# resource retrieval endpoint
+@app.route("/get_resources", methods=['POST'])
+def get_resources():
+    # retrieve resource list
+    data = request.get_json()
+
+    res_list = data['resource_list'] if 'resource_list' in data else []
+
+    res_list = [int(rid) for rid in res_list]
+
+    resutil = ResourceUtil()
+
+    success, errors, resource_data = resutil.get_resource_data(res_list)
+
+    ret_val = {
+        'success': success,
+        'errors': errors,
+        'resource_data': resource_data
+    }
+
+    return jsonify(ret_val)
+
+
+# file upload endpoint
 @app.route("/file_upload", methods=['POST'])
 def upload_file():
     try:
