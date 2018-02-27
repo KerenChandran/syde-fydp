@@ -1,57 +1,52 @@
 import React, { Component } from 'react';
-import { compose, withProps, lifecycle } from 'recompose';
-import { StandaloneSearchBox } from 'react-google-maps/lib/components/places/StandaloneSearchBox';
-import { FormControl } from 'react-bootstrap';
+import PlacesAutocomplete, { geocodeByPlaceId, getLatLng } from 'react-places-autocomplete';
 
+import LocationSuggestion from './LocationSuggestion';
+import LocationFooter from './LocationFooter';
 
 import './index.css';
 
-class LocationSearchBox extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: props.value
-    };
+class LocationSearch extends Component {
+  handleChange = name => {
+    this.props.onChange({ name })
   }
-
-  onSearchBoxMounted = (ref) => {
-    this.searchBox = ref;
-  }
-
-  onPlacesChanged = () => {
-    const places = this.searchBox.getPlaces();
-    if (places == null) {
-      return;
-    }
-    this.props.onChange({
-      placeId: places[0].place_id,
-      name: places[0].name,
-      latitude: places[0].geometry.location.lat(),
-      longitude: places[0].geometry.location.lng()
-    });
+  
+  handleSelect = (address, placeId) => {
+    geocodeByPlaceId(placeId)
+      .then(results => getLatLng(results[0]))
+      .then(({ lat, lng }) => {
+        this.props.onChange({
+          placeId,
+          latitude: lat,
+          longitude: lng,
+          name: address
+        })
+      })
+      .catch(error => console.error(error));
   }
 
   render() {
-    const { bounds, value } = this.props;
-    const location = typeof value === "object" ? value.formatted_address : value; // TODO: Remove once location format has been finalized
+    const { location } = this.props;
+    const inputProps = {
+      value: location ? location.name : '',
+      onChange: this.handleChange
+    };
+    
+    const classes = {
+      input: 'form-control',
+      autocompleteContainer: 'location__autocomplete-container',
+    };
 
     return (
-      <div data-standalone-searchbox="">
-        <StandaloneSearchBox
-          ref={this.onSearchBoxMounted}
-          bounds={bounds}
-          onPlacesChanged={this.onPlacesChanged}
-        >
-          <FormControl type="text" placeholder="Location" value={location}/>
-        </StandaloneSearchBox>
-      </div>
+      <PlacesAutocomplete
+        inputProps={inputProps}
+        classNames={classes}
+        onSelect={this.handleSelect}
+        renderSuggestion={LocationSuggestion}
+        renderFooter={LocationFooter}
+      />
     );
   }
 }
 
-LocationSearchBox.defaultProps = {
-  loadingElement: <div style={{ height: `100%` }} />,
-  containerElement: <div style={{ height: `100%` }} />
-}
-
-export default LocationSearchBox;
+export default LocationSearch;
