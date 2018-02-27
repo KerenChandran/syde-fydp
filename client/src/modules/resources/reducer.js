@@ -92,7 +92,10 @@ export default (state = initialState, { type, payload }) => {
     }
 
     case ResourceConstants.FETCH_RESOURCES: {
-      return state;
+      return {
+        ...state,
+        resources: payload.resources.resource_data
+      };
     }
 
     default:
