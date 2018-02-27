@@ -5,8 +5,6 @@
 
 from pipeline import Pipeline
 
-import pdb
-
 
 class UploadPipeline(Pipeline):
     def __init__(self):

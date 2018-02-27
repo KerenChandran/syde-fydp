@@ -7,8 +7,6 @@ import pandas as pd
 
 from pipeline import Pipeline
 
-import pdb
-
 
 class ResourceUtil(Pipeline):
     def __init__(self):
@@ -22,22 +20,37 @@ class ResourceUtil(Pipeline):
         type_dict = \
             {str: str, bool: bool, Decimal: float, int: int, float: float}
 
+        cleaned_store = []
+
         for data_point in self.resource_data:
+            placeholder = {}
+
             for fld, val in data_point.iteritems():
+                # use 'resource_id' instead of 'id' for consistency
+                if fld == 'id':
+                    fld = 'resource_id'
+                # postgres bug: ownerId camel case does not persist
+                elif fld == 'ownerid':
+                    fld = 'ownerId'
+
                 # assume one-level nesting
                 if isinstance(val, dict):
                     for _fld, _val in val.iteritems():
                         val[_fld] = type_dict[type(_val)](_val)
-                    data_point[fld] = val
+                    placeholder[fld] = val
                     continue
 
                 elif isinstance(val, list):
                     for idx, elem in enumerate(val):
                         val[idx] = type_dict[type(elem)](elem)
-                    data_point[fld] = val
+                    placeholder[fld] = val
                     continue
 
-                data_point[fld] = type_dict[type(val)](val)
+                placeholder[fld] = type_dict[type(val)](val)
+
+            cleaned_store.append(placeholder)
+
+        self.resource_data = cleaned_store
 
     def _get_resource_data(self):
         """

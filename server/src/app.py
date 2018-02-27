@@ -70,7 +70,7 @@ def root():
 
 
 # upload endpoints
-@app.route("/resource_upload", methods=['POST'])
+@app.route("/upload_resource", methods=['POST'])
 def upload_resource():
     # get request parameters
     data = request.get_json()
@@ -102,7 +102,7 @@ def upload_resource():
     return jsonify(ret_val)
 
 
-@app.route("/bulk_resource_upload", methods=['POST'])
+@app.route("/upload_resource_bulk", methods=['POST'])
 def bulk_resource_upload():
     # get single location for all resources
     data = request.form
@@ -184,7 +184,7 @@ def get_resources():
 
 
 # file upload endpoint
-@app.route("/file_upload", methods=['POST'])
+@app.route("/upload_file", methods=['POST'])
 def upload_file():
     try:
         file = request.files['image']
