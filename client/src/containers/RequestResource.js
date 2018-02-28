@@ -106,15 +106,15 @@ class RequestResource extends Component {
     if (isMyResource) {
       this.props.validateRequestBlocks({
         resource_id: this.props.match.params.id,
-        block_start: start,
-        block_end: realEnd,
+        block_start: moment(start).format('YYYY-MM-DD HH:MM'),
+        block_end: moment(realEnd).format('YYYY-MM-DD HH:MM'),
         allDay: start === end,
         block_recurring: {}
       });
       this.props.submitSchedule({
         resource_id: this.props.match.params.id,
-        block_start: start,
-        block_end: realEnd,
+        block_start: moment(start).format('YYYY-MM-DD HH:mm'),
+        block_end: moment(realEnd).format('YYYY-MM-DD HH:mm'),
         allDay: start === end,
         block_recurring: {}
       })
