@@ -1,0 +1,1 @@
+export const getEvents = state => state.schedule.events;
