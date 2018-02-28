@@ -27,7 +27,7 @@ class AllResources extends Component {
   }
 
   detailResource = (id) => {
-    this.props.history.push(`/resources/view/${id}`);
+    this.props.history.push(`/resources/${id}`);
   }
 
   render() {

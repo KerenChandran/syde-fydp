@@ -29,11 +29,11 @@ class ApplicationRouter extends Component {
           <div className="App-content">
             <Route exact path="/" component={AllResources} />
             <Route exact path="/resources" component={AllResources} />
-            <Route path="/resources/view/:id" component={ResourceInfo} />
-            <Route path="/resources/edit/:id" component={ResourceInfoEdit} />
-            <Route path="/resources/new" component={ResourceInfoEdit} />
             <Route exact path="/resources/myresources" component={MyResources} />
-            <Route path="/resources/schedule/:id" component={RequestResource} />
+            <Route exact path="/resources/:id" component={ResourceInfo} />
+            <Route exact path="/resources/:id/edit" component={ResourceInfoEdit} />
+            <Route exact path="/resources/:id/schedule" component={RequestResource} />
+            <Route path="/resources/new" component={ResourceInfoEdit} />
             <Route exact path="/profile/edit" component={EditProfile} />
             <Route exact path="/login" component={Login} />
           </div>

@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 import Calendar from '../components/Calendar';
 import moment from 'moment';
 import momentLocalizer from 'react-widgets-moment';
+
+import { userSelectors } from '../modules/users';
 
 import { DateTimePicker } from 'react-widgets';
 import {
@@ -171,11 +175,18 @@ class RequestResource extends Component {
     console.log('action', action);
   }
 
+  handleSubmitResource = () => {
+
+  }
+
   render() {
     const { events: stateEvents, showEventDetails, selectedEvent } = this.state;
     const dateFormat = selectedEvent.allDay ? "MMMM DD, YYYY" : "MMMM DD, YYYY - h:mm A";
     return (
       <div style={{display: 'flex', flexGrow: 1}}>
+        <div>
+          <button onClick={this.handleSubmitResource}>Submit</button>
+        </div>
         <Calendar
           events={[{
             id: 0,
@@ -264,4 +275,8 @@ class RequestResource extends Component {
   }
 }
 
-export default RequestResource;
+const mapStateToProps = (state) => ({
+  ownerId: userSelectors.currentUserId(state)
+});
+
+export default withRouter(connect(mapStateToProps, null)(RequestResource));

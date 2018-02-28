@@ -4,7 +4,7 @@ import { Form, FormGroup, FormControl, ControlLabel, Col, Button, ButtonGroup } 
 
 class ResourceInfoView extends Component {
   render() {
-    const { currentUserId, resource, onDeleteClick, onEditClick } = this.props;
+    const { currentUserId, resource, onDeleteClick, onEditClick, onRequestClick } = this.props;
     const {
       category,
       company,
@@ -32,6 +32,7 @@ class ResourceInfoView extends Component {
               <ButtonGroup>
                 <Button bsStyle="danger" onClick={onDeleteClick}>Delete Resource</Button>
                 <Button onClick={onEditClick}>Edit Resource</Button>
+                <Button onClick={onRequestClick}>Request Resource</Button>
               </ButtonGroup>
             </FormGroup>
           )}

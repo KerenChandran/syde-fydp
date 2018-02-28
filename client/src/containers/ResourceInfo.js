@@ -16,7 +16,7 @@ class ResourceInfo extends Component {
   handleEditClick = () => {
     const { currentUserId, history, resource: { resource_id, ownerId }} = this.props;
     if (currentUserId == ownerId) {
-      history.push(`/resources/edit/${resource_id}`);
+      history.push(`/resources/${resource_id}/edit`);
     }
   }
 
@@ -28,6 +28,11 @@ class ResourceInfo extends Component {
     }
   }
 
+  handleRequestClick = () => {
+    const { history, resource: { resource_id }} = this.props;
+    history.push(`/resources/${resource_id}/schedule`)
+  }
+
   render() {
     const { currentUserId, resource } = this.props;
     return (
@@ -37,6 +42,7 @@ class ResourceInfo extends Component {
         onBackClick={this.handleBackClick}
         onEditClick={this.handleEditClick}
         onDeleteClick={this.handleDeleteClick}
+        onRequestClick={this.handleRequestClick}
       />
     );
   }

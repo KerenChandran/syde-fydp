@@ -58,7 +58,7 @@ export const addDataImport = (resource) => async dispatch => {
       delete resource['resource_id'];
       updateFlag = false;
     }
-    let response = await fetch('http://localhost:3000/api/resource_upload', {
+    let response = await fetch('http://localhost:3000/api/upload_resource', {
       method: 'post',
       headers: {
         'Accept': 'application/json, text/plain, */*',
