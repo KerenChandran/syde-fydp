@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -30,10 +30,12 @@ class ApplicationRouter extends Component {
             <Route exact path="/" component={AllResources} />
             <Route exact path="/resources" component={AllResources} />
             <Route exact path="/resources/myresources" component={MyResources} />
-            <Route exact path="/resources/:id" component={ResourceInfo} />
+            <Switch>
+              <Route exact path="/resources/new" component={ResourceInfoEdit} />
+              <Route exact path="/resources/:id" component={ResourceInfo} />
+            </Switch>
             <Route exact path="/resources/:id/edit" component={ResourceInfoEdit} />
             <Route exact path="/resources/:id/schedule" component={RequestResource} />
-            <Route path="/resources/new" component={ResourceInfoEdit} />
             <Route exact path="/profile/edit" component={EditProfile} />
             <Route exact path="/login" component={Login} />
           </div>
