@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import Calendar from '../components/Calendar';
 import moment from 'moment';
 import momentLocalizer from 'react-widgets-moment';
 
-import { userSelectors } from '../modules/users';
+import { resourceSelectors } from '../modules/resources';
+import { scheduleActions, scheduleSelectors } from '../modules/schedule';
 
 import { DateTimePicker } from 'react-widgets';
 import {
@@ -25,8 +27,8 @@ momentLocalizer();
 
 const EMPTY_EVENT = {
   title: '',
-  start: null,
-  end: null
+  block_start: null,
+  block_end: null
 };
 
 class RequestResource extends Component {
@@ -91,6 +93,7 @@ class RequestResource extends Component {
   }
 
   handleSelectSlot = ({ start, end }) => {
+    const { isMyResource } = this.props;
     const { events } = this.state;
     const momentEnd = moment(end);
 
@@ -100,17 +103,36 @@ class RequestResource extends Component {
       return false;
     }
 
-    this.setState({
-      events: [
-        ...events,
-        {
-          title: 'No Title',
-          start,
-          end: realEnd,
-          allDay: start === end
-        }
-      ]
-    });
+    if (isMyResource) {
+      this.props.validateRequestBlocks({
+        resource_id: this.props.match.params.id,
+        block_start: start,
+        block_end: realEnd,
+        allDay: start === end,
+        block_recurring: {}
+      });
+      this.props.submitSchedule({
+        resource_id: this.props.match.params.id,
+        block_start: start,
+        block_end: realEnd,
+        allDay: start === end,
+        block_recurring: {}
+      })
+    } else {
+      this.setState({
+        events: [
+          ...events,
+          {
+            resource_id: this.props.match.params.id,
+            title: 'No Title',
+            block_start: start,
+            block_end: realEnd,
+            allDay: start === end,
+            block_recurring: {}
+          }
+        ]
+      });
+    }
   }
 
   handleEventDetailClose = () => {
@@ -175,30 +197,27 @@ class RequestResource extends Component {
     console.log('action', action);
   }
 
-  handleSubmitResource = () => {
-
+  handleSubmitSchedule = () => {
+    // this.props.submitSchedule(this.state.events);
   }
 
   render() {
     const { events: stateEvents, showEventDetails, selectedEvent } = this.state;
+    const { scheduledEvents } = this.props;
     const dateFormat = selectedEvent.allDay ? "MMMM DD, YYYY" : "MMMM DD, YYYY - h:mm A";
     return (
       <div style={{display: 'flex', flexGrow: 1}}>
         <div>
-          <button onClick={this.handleSubmitResource}>Submit</button>
+          <button onClick={this.handleSubmitSchedule}>Submit</button>
         </div>
         <Calendar
-          events={[{
-            id: 0,
-            title: 'All Day Event very long title',
-            allDay: true,
-            start: new Date(2018, 1, 0),
-            end: new Date(2018, 1, 1),
-          }, ...stateEvents]}
+          events={[scheduledEvents, ...stateEvents]}
           onEventResize={this.handleEventResize}
           onSelectEvent={this.handleSelectEvent}
           onSelectSlot={this.handleSelectSlot}
           onNavigate={this.handleNavigate}
+          startAccessor="block_start"
+          endAccessor="block_end"
         />
         <Modal show={showEventDetails} onHide={this.handleEventDetailClose}>
           <Modal.Header closeButton>
@@ -221,7 +240,7 @@ class RequestResource extends Component {
                     time={!selectedEvent.allDay}
                     format={dateFormat}
                     onChange={this.handleUpdateDateEvent('start')}
-                    value={selectedEvent.start}
+                    value={selectedEvent.block_start}
                   />
                 </Col>
               </FormGroup>
@@ -230,11 +249,11 @@ class RequestResource extends Component {
                 <Col componentClass={ControlLabel} sm={2}>End</Col>
                 <Col sm={10}>
                   <DateTimePicker
-                    min={selectedEvent.start}
+                    min={selectedEvent.block_start}
                     time={!selectedEvent.allDay}
                     format={dateFormat}
                     onChange={this.handleUpdateDateEvent('end')}
-                    value={selectedEvent.end}
+                    value={selectedEvent.block_end}
                   />
                 </Col>
               </FormGroup>
@@ -250,7 +269,7 @@ class RequestResource extends Component {
               </FormGroup>
 
               <FormGroup>
-                <Col sm={2}>
+                <Col smOffset={2} sm={2}>
                   <Checkbox
                     checked={selectedEvent.allDay}
                     onChange={this.handleUpdateCheckedEvent('allDay')}
@@ -276,8 +295,14 @@ class RequestResource extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-  ownerId: userSelectors.currentUserId(state)
+const mapStateToProps = (state, props) => ({
+  isMyResource: resourceSelectors.resourceOwnedByCurrentUser(state, props.match.params.id),
+  scheduledEvents: scheduleSelectors.getEvents(state)
 });
 
-export default withRouter(connect(mapStateToProps, null)(RequestResource));
+const mapDispatchToProps = (dispatch) => ({
+  submitSchedule: bindActionCreators(scheduleActions.submitScheduleBlock, dispatch),
+  validateRequestBlocks: bindActionCreators(scheduleActions.validateRequestBlocks, dispatch)
+});
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(RequestResource));
