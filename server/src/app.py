@@ -309,9 +309,10 @@ def login_user():
 def submit_initial_availability():
     data = request.get_json()
 
-    data = data['resource']
+    # user_id = g.user['id']
 
-    user_id = g.user['id']
+    # temporarily hard code user id until profiles are working
+    user_id = 1
 
     pipeline = SchedulePipeline(user_id=user_id)
 
@@ -329,7 +330,10 @@ def submit_initial_availability():
 def submit_schedule_blocks():
     data = request.get_json()
 
-    user_id = g.user['id']
+    # user_id = g.user['id']
+
+    # temporarily hard code user id until profiles are working
+    user_id = 1
 
     pipeline = SchedulePipeline(user_id=user_id)
 
@@ -419,6 +423,43 @@ def specify_account_types():
     ret_val = {
         'success': success,
         'errors': errors
+    }
+
+    return jsonify(ret_val)
+
+
+"""
+    REQUEST ENDPOINTS
+"""
+@app.route("/validate_request_block")
+def validate_request_block():
+    data = request.get_json()
+
+    resid = int(data['resource_id'])
+    start = str(data['block_start'])
+    end = str(data['block_end'])
+    recur = dict(data['block_recurring'])
+
+    schedpipe = SchedulePipeline()
+
+    # generate blocks based on recurrence
+    schedpipe.generate_blocks(resid, start, end, block_recurring=recur)
+
+    generated_blocks = schedpipe.get_generated_blocks()
+
+    # iterate through each block and check if an overlap is present
+    final_blocks = []
+
+    for block in generated_blocks:
+        no_overlap = schedpipe.check_block_overlap(
+            block['resource_id'], block['block_start'], block['block_end'])
+
+        if no_overlap:
+            final_blocks.append(block)
+
+    ret_val = {
+        'final_blocks': final_blocks,
+        'errors': schedpipe.get_error_logs()
     }
 
     return jsonify(ret_val)
