@@ -7,6 +7,8 @@ import pandas as pd
 
 from pipeline import Pipeline
 
+import pdb
+
 
 class ResourceUtil(Pipeline):
     def __init__(self):
@@ -150,8 +152,8 @@ class ResourceUtil(Pipeline):
         if len(self.resource_list) > 0:
             res_list = ",".join([str(res) for res in self.resource_list])
 
-            avail_where_clause = "WHERE resource_id IN (%s)"
-            block_where_clause = "WHERE resource_id IN (%s)"
+            avail_where_clause = "WHERE resource_id IN (%s)" % res_list
+            block_where_clause = "WHERE resource_id IN (%s)" % res_list
 
         avail_fields = ",".join(self.database_fields['resource_availability'])
 
@@ -187,12 +189,14 @@ class ResourceUtil(Pipeline):
             # iterate through each block and add to list of dicts in main
             # resource dictionary
             resid = dct['resource_id']
-            dp = {key:val for key in dct if key != 'resource_id'}
+            dp = {key:dct[key] for key in dct if key != 'resource_id'}
 
-            if block_list not in self.resource_data[resid]:
-                self.resource_data[resid] = []
+            if 'block_list' not in self.resource_data[resid]:
+                self.resource_data[resid]['block_list'] = []
 
-            self.resource_data[resid].append(dp)
+            self.resource_data[resid]['block_list'].append(dp)
+
+        self.resource_data = self.resource_data.values()
 
         return
 
@@ -235,11 +239,10 @@ class ResourceUtil(Pipeline):
 
         if dataset == "common":
             self.get_common_data_points()
+            self._clean_result()
 
         elif dataset == "schedule":
             self.get_schedule_data_points()
-
-        self._clean_result()
 
         return True, self.error_logs, self.resource_data
 

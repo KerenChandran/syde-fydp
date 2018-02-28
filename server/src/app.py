@@ -431,7 +431,7 @@ def specify_account_types():
 """
     REQUEST ENDPOINTS
 """
-@app.route("/validate_request_block")
+@app.route("/validate_request_block", methods=['POST'])
 def validate_request_block():
     data = request.get_json()
 

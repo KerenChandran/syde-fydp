@@ -147,19 +147,17 @@ class SchedulePipeline(Pipeline):
 
         existing_blocks = self.crs.fetch_dict(block_retrieval_query)
 
-        dt_convert = \
-            lambda x: dt.datetime.strptime(x, self.expected_datetime_format)
+        block_start = \
+            dt.datetime.strptime(block_start, self.expected_datetime_format)
 
-        existing_blocks = map(
-            lambda x: {'bstart': dt_convert(x['block_start']), 
-                       'bend': dt_convert(x['block_end'])},
-            existing_blocks)
+        block_end = \
+            dt.datetime.strptime(block_end, self.expected_datetime_format)
 
         overlap_flag = False
 
         for block in existing_blocks:
-            if (block['bstart'] <= block_start <= block['bend']) or \
-                (block['bstart'] <= block_end <= block['bend']):
+            if (block['block_start'] <= block_start <= block['block_end']) or \
+                (block['block_start'] <= block_end <= block['block_end']):
                 overlap_flag = True
                 break
 
@@ -298,8 +296,10 @@ class SchedulePipeline(Pipeline):
                     x['resource_id'], x['block_start'], x['block_end']),
                 axis=1)]
 
-            block_sched_df['block_id'] = block_sched_df.apply(
-                lambda x: self.block_scheduling_load(x), axis=1)
+            if not block_sched_df.empty:
+                # only add new cols to non-empty dataframes after overlap check
+                block_sched_df['block_id'] = block_sched_df.apply(
+                    lambda x: self.block_scheduling_load(x), axis=1)
 
         self.crs.commit()
 
