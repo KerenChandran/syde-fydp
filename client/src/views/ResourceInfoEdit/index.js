@@ -56,7 +56,7 @@ class ResourceInfoEditView extends Component {
 
     return (
       <div style={{ display: 'block', width: '100%'}}>
-        <Form horizontal>
+        <div className="form-horizontal">
           <FormGroup>
             <Col smOffset={10} sm={2}>
               <Button type="button" onClick={this.props.onBackClick}>Go Back</Button>
@@ -220,7 +220,7 @@ class ResourceInfoEditView extends Component {
               </FormGroup>
             </div>
           }
-        </Form>
+        </div>
       </div>
     );
   }

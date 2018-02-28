@@ -13,8 +13,8 @@ class ResourceInfoEdit extends Component {
   )
 
   handleSubmit = (state) => {
-    this.props.addResource(state);
-    this.handleBackClick();
+    const { addResource, history } = this.props;
+    addResource(state, history);
   }
 
   render() {

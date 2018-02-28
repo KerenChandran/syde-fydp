@@ -1,5 +1,6 @@
 import { createAction } from 'redux-actions';
 import * as ResourceConstants from './constants';
+import StaticRouter from 'react-router/StaticRouter';
 
 // Create Form Actions
 export const toggleBulkImportForm = createAction(ResourceConstants.TOGGLE_BULK_IMPORT_FORM);
@@ -51,7 +52,7 @@ export const fetchResource = (id) => async dispatch => {
   }
 };
 
-export const addDataImport = (resource) => async dispatch => {
+export const addDataImport = (resource, history) => async dispatch => {
   try {
     let updateFlag = true;
     if (resource.resource_id === undefined) {
@@ -68,7 +69,12 @@ export const addDataImport = (resource) => async dispatch => {
     });
     let data = await response.json();
     resource.resource_id = data.resource_id;
-    return updateFlag ? dispatch(updateResourceSucesses(resource)) : dispatch(addResourceSuccess(resource));
+    if (updateFlag) {
+      dispatch(updateResourceSucesses(resource));
+      return history.push('/resources/');
+    }
+    dispatch(addResourceSuccess(resource));
+    return history.push(`/resources/${data.resource_id}/availability`);
   } catch (error) {
     throw new Error(error);
   }
@@ -86,6 +92,22 @@ export const addBulkImport = (data) => async dispatch => {
     });
     let info = await response.json();
     return dispatch(addBulkResourceSuccess(info.resources));
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+export const initialAvailability = (availability) => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/submit_initial_availability', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(availability)
+    });
+    let data = await response.json();
   } catch (error) {
     throw new Error(error);
   }

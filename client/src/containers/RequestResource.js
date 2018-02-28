@@ -230,6 +230,7 @@ class RequestResource extends Component {
                 <Col componentClass={ControlLabel} sm={2}>End</Col>
                 <Col sm={10}>
                   <DateTimePicker
+                    min={selectedEvent.start}
                     time={!selectedEvent.allDay}
                     format={dateFormat}
                     onChange={this.handleUpdateDateEvent('end')}
