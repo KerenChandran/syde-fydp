@@ -25,7 +25,7 @@ import pdb
 app = Flask(__name__, static_url_path='')
 # bcrypt for encryption
 bcrypt = Bcrypt(app)
-# authentication / login stuff
+# authentication / login modules
 auth = HTTPBasicAuth()
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -69,7 +69,9 @@ def root():
     return jsonify({"message": "Flask application base."})
 
 
-# upload endpoints
+"""
+    UPLOAD ENDPOINTS
+"""
 @app.route("/upload_resource", methods=['POST'])
 def upload_resource():
     # get request parameters
@@ -160,7 +162,9 @@ def bulk_resource_upload():
     return jsonify(ret_val)
 
 
-# resource retrieval endpoint
+"""
+    RESOURCE DATA RETRIEVAL ENDPOINTS
+"""
 @app.route("/get_resources", methods=['POST'])
 def get_resources():
     # retrieve resource list
@@ -183,7 +187,32 @@ def get_resources():
     return jsonify(ret_val)
 
 
-# file upload endpoint
+@app.route("/get_resource_schedules", methods=['POST'])
+def get_resource_schedules():
+    # retrieve resource list
+    data = request.get_json()
+
+    res_list = data['resource_list'] if 'resource_list' in data else []
+
+    res_list = [int(rid) for rid in res_list]
+
+    resutil = ResourceUtil()
+
+    success, errors, resource_data = \
+        resutil.get_resource_data(res_list, dataset="schedule")
+
+    ret_val = {
+        'success': success,
+        'errors': errors,
+        'resource_data': resource_data
+    }
+
+    return jsonify(ret_val)
+
+
+"""
+    FILE UPLOAD ENDPOINTS
+"""
 @app.route("/upload_file", methods=['POST'])
 def upload_file():
     try:
@@ -205,6 +234,9 @@ def upload_file():
     return jsonify(ret_val)
 
 
+"""
+    PROFILE ENDPOINTS
+"""
 @app.route("/new_user", methods=['POST'])
 def new_user():
     data = request.form
@@ -270,10 +302,14 @@ def login_user():
     return jsonify(ret_val)
 
 
-# scheduling endpoints
+"""
+    SCHEDULING ENDPOINTS
+"""
 @app.route("/submit_initial_availability", methods=['POST'])
 def submit_initial_availability():
     data = request.get_json()
+
+    data = data['resource']
 
     user_id = g.user['id']
 
@@ -332,7 +368,9 @@ def submit_schedule_filter():
     return jsonify(ret_val)
 
 
-# transaction endpoints
+"""
+    TRANSACTION ENDPOINTS
+"""
 @app.route("/create_basic_profile", methods=['POST'])
 def create_basic_profile():
     """
@@ -386,7 +424,9 @@ def specify_account_types():
     return jsonify(ret_val)
 
 
-# remote server termination for tests
+"""
+    MISC
+"""
 @app.route("/shutdown", methods=['POST'])
 def shutdown():
     shutdown_server()

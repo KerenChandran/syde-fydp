@@ -18,7 +18,8 @@ class ResourceUtil(Pipeline):
             Helper method to clean resource data (i.e. make it JSON compatible).
         """
         type_dict = \
-            {str: str, bool: bool, Decimal: float, int: int, float: float}
+            {str: str, bool: bool, Decimal: float, int: int, float: float,
+             list: list, dict: dict}
 
         cleaned_store = []
 
@@ -46,6 +47,9 @@ class ResourceUtil(Pipeline):
                     placeholder[fld] = val
                     continue
 
+                elif isinstance(val, type(None)):
+                    placeholder[fld] = val
+
                 placeholder[fld] = type_dict[type(val)](val)
 
             cleaned_store.append(placeholder)
@@ -59,7 +63,7 @@ class ResourceUtil(Pipeline):
         where_clause = ""
 
         if len(self.resource_list) > 0:
-            res_list = ",".join(str(res) for res in self.resource_list)
+            res_list = ",".join([str(res) for res in self.resource_list])
 
             where_clause = "WHERE resource.id IN (%s)" % res_list
 
@@ -135,7 +139,78 @@ class ResourceUtil(Pipeline):
 
         return
 
-    def get_resource_data(self, resource_list):
+    def _get_schedule_data(self):
+        """
+            Underlying method to retrieve scheduling information for specified
+            resources.
+        """
+        avail_where_clause = ""
+        block_where_clause = ""
+
+        if len(self.resource_list) > 0:
+            res_list = ",".join([str(res) for res in self.resource_list])
+
+            avail_where_clause = "WHERE resource_id IN (%s)"
+            block_where_clause = "WHERE resource_id IN (%s)"
+
+        avail_fields = ",".join(self.database_fields['resource_availability'])
+
+        avail_retrieval_query = \
+        """
+            SELECT {fields}
+            FROM resource_availability
+            {where_clause}
+        """.format(fields=avail_fields, where_clause=avail_where_clause)
+
+        avail_result = self.crs.fetch_dict(avail_retrieval_query)
+
+        placeholder_dict = {}
+
+        for dct in avail_result:
+            placeholder_dict[dct['resource_id']] = dct
+
+        self.resource_data = placeholder_dict
+
+        block_fields = \
+            ",".join(self.database_fields['resource_schedule_blocks'])
+
+        block_retrieval_query = \
+        """
+            SELECT {fields}
+            FROM resource_schedule_blocks
+            {where_clause}
+        """.format(fields=block_fields, where_clause=block_where_clause)
+
+        block_result = self.crs.fetch_dict(block_retrieval_query)
+
+        for dct in block_result:
+            # iterate through each block and add to list of dicts in main
+            # resource dictionary
+            resid = dct['resource_id']
+            dp = {key:val for key in dct if key != 'resource_id'}
+
+            if block_list not in self.resource_data[resid]:
+                self.resource_data[resid] = []
+
+            self.resource_data[resid].append(dp)
+
+        return
+
+    def get_common_data_points(self):
+        """
+            Propagation method used to invoke underlying methods for retrieval
+            of common resource attributes.
+        """
+        self._get_resource_data()
+
+    def get_schedule_data_points(self):
+        """
+            Propagation method used to invoke underlying methods for retrieval
+            of scheduling-related data points.
+        """
+        self._get_schedule_data()
+
+    def get_resource_data(self, resource_list, dataset="common"):
         """
             Main method to retrieve data for a list of resources.
 
@@ -145,14 +220,24 @@ class ResourceUtil(Pipeline):
                 list of unique resource identifiers for which data is to be
                 retrieved. If empty list is passed, then data for all resources
                 are retrieved.
+
+            dataset : {str}
+                corresponds to the type of data to be returned. valid options
+                are common, schedule
         """
+        self.resource_data = []
+
         if not isinstance(resource_list, list):
             self.error_logs.append("Invalid format for resource list.")
             return False, self.error_logs, []
 
         self.resource_list = resource_list
 
-        self._get_resource_data()
+        if dataset == "common":
+            self.get_common_data_points()
+
+        elif dataset == "schedule":
+            self.get_schedule_data_points()
 
         self._clean_result()
 
@@ -162,4 +247,4 @@ class ResourceUtil(Pipeline):
 if __name__ == '__main__':
     resutil = ResourceUtil()
 
-    resutil.get_resource_data([])
+    resutil.get_resource_data([], dataset="schedule")
