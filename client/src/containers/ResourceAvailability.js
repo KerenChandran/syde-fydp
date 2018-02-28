@@ -38,7 +38,7 @@ class ResourceAvailability extends Component {
   }
 
   handleSubmit = () => {
-    const { history, initialAvailability } = this.prop;
+    const { history, initialAvailability } = this.props;
     const { resource_id, start, end } = this.state;
     initialAvailability({
       resource_id,
