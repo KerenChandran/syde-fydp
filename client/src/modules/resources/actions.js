@@ -1,6 +1,5 @@
 import { createAction } from 'redux-actions';
 import * as ResourceConstants from './constants';
-import StaticRouter from 'react-router/StaticRouter';
 
 // Create Form Actions
 export const toggleBulkImportForm = createAction(ResourceConstants.TOGGLE_BULK_IMPORT_FORM);

@@ -53,3 +53,10 @@ export const getResource = (state, id) => {
 export const showBulkImport = state => state.resources.showBulkImport;
 export const showDataImport = state => state.resources.showDataImport;
 export const showDetailsResource = state => state.resources.showDetailsResource;
+
+export const resourceOwnedByCurrentUser = (state, id) => {
+  const resource = getResource(state, id);
+  if (resource) {
+    return resource.ownerId === currentUserId(state)
+  }
+};
