@@ -309,9 +309,10 @@ def login_user():
 def submit_initial_availability():
     data = request.get_json()
 
-    data = data['resource']
+    # user_id = g.user['id']
 
-    user_id = g.user['id']
+    # temporarily hard code user id until profiles are working
+    user_id = 1
 
     pipeline = SchedulePipeline(user_id=user_id)
 
@@ -329,7 +330,10 @@ def submit_initial_availability():
 def submit_schedule_blocks():
     data = request.get_json()
 
-    user_id = g.user['id']
+    # user_id = g.user['id']
+
+    # temporarily hard code user id until profiles are working
+    user_id = 1
 
     pipeline = SchedulePipeline(user_id=user_id)
 
