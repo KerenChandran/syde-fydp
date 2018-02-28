@@ -97,7 +97,7 @@ export const addBulkImport = (data) => async dispatch => {
   }
 }
 
-export const initialAvailability = (availability) => async dispatch => {
+export const initialAvailability = (availability, history) => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/submit_initial_availability', {
       method: 'post',
@@ -108,6 +108,7 @@ export const initialAvailability = (availability) => async dispatch => {
       body: JSON.stringify(availability)
     });
     let data = await response.json();
+    history.push(`/resources/${availability.resource_id}/schedule`);
   } catch (error) {
     throw new Error(error);
   }

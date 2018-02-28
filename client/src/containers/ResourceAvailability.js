@@ -38,12 +38,13 @@ class ResourceAvailability extends Component {
   }
 
   handleSubmit = () => {
+    const { history, initialAvailability } = this.prop;
     const { resource_id, start, end } = this.state;
-    this.props.initialAvailability({
+    initialAvailability({
       resource_id,
-      start: moment(start).format('YYYY-MM-DD'),
-      end: moment(end).format('YYYY-MM-DD'),
-    });
+      availability_start: moment(start).format('YYYY-MM-DD'),
+      availability_end: moment(end).format('YYYY-MM-DD'),
+    }, history);
   }
 
   render() {
