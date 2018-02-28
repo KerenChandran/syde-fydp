@@ -33,7 +33,7 @@ export const submitScheduleBlock = (block) => async dispatch => {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify([block])
+      body: JSON.stringify(block)
     });
     let data = await response.json();
     return fetchResourceScheduleHelper(block.resource_id, dispatch);
