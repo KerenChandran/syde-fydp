@@ -115,6 +115,12 @@ class SchedulePipeline(Pipeline):
 
         return
 
+    def get_generated_blocks(self):
+        """
+            Helper method to retrieve all blocks generated from pipeline.
+        """
+        return self.generated_blocks
+
     def check_block_overlap(self, resource_id, block_start, block_end):
         """
             Helper method to check if the specified block overlaps with

@@ -32,6 +32,12 @@ class Pipeline(object):
         # error logs to propagate to method which invoked class run method
         self.error_logs = []
 
+    def get_error_logs(self):
+        """
+            Helper function to retrieve error logs for a given pipeline.
+        """
+        return self.error_logs
+
     def parse_mappings(self):
         """
             Helper function to parse JSON mappings and generate
