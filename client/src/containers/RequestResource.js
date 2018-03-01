@@ -5,6 +5,7 @@ import { withRouter } from 'react-router';
 import Calendar from '../components/Calendar';
 import moment from 'moment';
 import momentLocalizer from 'react-widgets-moment';
+import { isEmpty } from 'lodash';
 
 import { resourceSelectors } from '../modules/resources';
 import { scheduleActions, scheduleSelectors } from '../modules/schedule';
@@ -28,7 +29,12 @@ momentLocalizer();
 const EMPTY_EVENT = {
   title: '',
   block_start: null,
-  block_end: null
+  block_end: null,
+  allDay: false,
+  repeat: false,
+  cadence: null,
+  start: null,
+  end: null
 };
 
 class RequestResource extends Component {
@@ -43,11 +49,12 @@ class RequestResource extends Component {
   }
 
   componentDidMount() {
-    console.log('CALL SCHEDULE ENDPOINT TO RECEIVE CURRENT SCHEDULE!!');
+    const { fetchResourceSchedule, match: { params } } = this.props;
+    this.props.fetchResourceSchedule(params.id);
   }
 
   checkNoOverlap = (event) => {
-    return this.checkNoOverlapHelper(event, this.state.events); // && this.checkNoOverlapHelper(event, this.props.events);
+    return this.checkNoOverlapHelper(event, this.props.events); // && this.checkNoOverlapHelper(event, this.props.events);
   }
 
   checkNoOverlapHelper = (event, eventList) => {
@@ -82,19 +89,25 @@ class RequestResource extends Component {
   }
 
   handleSelectEvent = (event) => {
-    const { events } = this.state;
+    const { events } = this.props;
     const idx = events.indexOf(event);
 
     this.setState({
       selectedEventIdx: idx,
-      selectedEvent: events[idx],
+      selectedEvent: {
+        ...events[idx],
+        block_start: new Date(event.block_start + "-0500"),
+        block_end: new Date(event.block_end + "-0500"),
+        allDay: this.allDayCheck(event),
+        repeat: !isEmpty(event.block_recurring)
+      },
       showEventDetails: true
     });
   }
 
   handleSelectSlot = ({ start, end }) => {
-    const { isMyResource } = this.props;
-    const { events } = this.state;
+    const { isMyResource, match: { params }, submitSchedule, validateRequestBlocks } = this.props;
+    const { selectedEvent } = this.state;
     const momentEnd = moment(end);
 
     const realEnd = momentEnd.hour() === 0 && momentEnd.minute() === 0 ? momentEnd.set({ hour: 23, minute: 59 }).toDate() : end;
@@ -103,35 +116,24 @@ class RequestResource extends Component {
       return false;
     }
 
+    const event = {
+      resource_id: params.id,
+      block_start: moment(start).format('YYYY-MM-DD HH:mm'),
+      block_end: moment(realEnd).format('YYYY-MM-DD HH:mm'),
+      block_recurring: {
+        cadence: selectedEvent.cadence,
+        start: selectedEvent.recurring_start,
+        end: selectedEvent.recurring_end
+      }
+    };
+
+    if (!selectedEvent.repeat) {
+      event.block_recurring = {};
+    }
+
     if (isMyResource) {
-      this.props.validateRequestBlocks({
-        resource_id: this.props.match.params.id,
-        block_start: moment(start).format('YYYY-MM-DD HH:MM'),
-        block_end: moment(realEnd).format('YYYY-MM-DD HH:MM'),
-        allDay: start === end,
-        block_recurring: {}
-      });
-      this.props.submitSchedule({
-        resource_id: this.props.match.params.id,
-        block_start: moment(start).format('YYYY-MM-DD HH:mm'),
-        block_end: moment(realEnd).format('YYYY-MM-DD HH:mm'),
-        allDay: start === end,
-        block_recurring: {}
-      })
-    } else {
-      this.setState({
-        events: [
-          ...events,
-          {
-            resource_id: this.props.match.params.id,
-            title: 'No Title',
-            block_start: start,
-            block_end: realEnd,
-            allDay: start === end,
-            block_recurring: {}
-          }
-        ]
-      });
+      validateRequestBlocks(event);
+      submitSchedule(event)
     }
   }
 
@@ -143,17 +145,31 @@ class RequestResource extends Component {
   }
 
   handleSaveEvent = () => {
-    const { events, selectedEvent, selectedEventIdx } = this.state;
+    const { isMyResource, match: { params }, submitSchedule, validateRequestBlocks } = this.props;
+    const { selectedEvent } = this.state;
+
+    const event = {
+      resource_id: params.id,
+      block_start: moment(selectedEvent.block_start).format('YYYY-MM-DD HH:mm'),
+      block_end: moment(selectedEvent.block_end).format('YYYY-MM-DD HH:mm'),
+      block_recurring: {
+        cadence: selectedEvent.cadence,
+        start: moment(selectedEvent.recurring_start).format('YYYY-MM-DD'),
+        end: moment(selectedEvent.recurring_end).format('YYYY-MM-DD'),
+      }
+    };
+
+    if (!selectedEvent.repeat) {
+      event.block_recurring = {};
+    }
+
+    if (isMyResource) {
+      validateRequestBlocks(event);
+      submitSchedule(event)
+    }
     this.setState({
-      events: [
-        ...events.slice(0, selectedEventIdx),
-        selectedEvent,
-        ...events.slice(selectedEventIdx + 1),
-      ],
-      selectedEvent: EMPTY_EVENT,
       showEventDetails: false
     });
-    return false
   }
 
   handleUpdateEvent = (name) => (event) => {
@@ -193,6 +209,14 @@ class RequestResource extends Component {
     this.setState({ selectedEvent })
   }
 
+  handleChange = (name) => (event) => {
+    const selectedEvent = {
+      ...this.state.selectedEvent,
+      [name]: event.target.value
+    };
+    this.setState({ selectedEvent });
+  }
+
   handleNavigate = action => {
     console.log('action', action);
   }
@@ -201,23 +225,33 @@ class RequestResource extends Component {
     // this.props.submitSchedule(this.state.events);
   }
 
+  allDayCheck = event => {
+    const { block_start, block_end } = event;
+    const start = moment(block_start + '-0500');
+    const end = moment(block_end + '-0500');
+
+    return start.isSame(end, 'day') && start.hour() === 0 && start.minute() === 0 && end.hour() === 23 && end.minute() === 59;
+  }
+
   render() {
-    const { events: stateEvents, showEventDetails, selectedEvent } = this.state;
-    const { scheduledEvents } = this.props;
+    const { showEventDetails, selectedEvent } = this.state;
+    const { events } = this.props;
+
     const dateFormat = selectedEvent.allDay ? "MMMM DD, YYYY" : "MMMM DD, YYYY - h:mm A";
     return (
       <div style={{display: 'flex', flexGrow: 1}}>
         <div>
-          <button onClick={this.handleSubmitSchedule}>Submit</button>
+          <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Submit</Button>
         </div>
         <Calendar
-          events={[scheduledEvents, ...stateEvents]}
+          events={events}
           onEventResize={this.handleEventResize}
           onSelectEvent={this.handleSelectEvent}
           onSelectSlot={this.handleSelectSlot}
           onNavigate={this.handleNavigate}
-          startAccessor="block_start"
-          endAccessor="block_end"
+          startAccessor={event => new Date(event.block_start + "-0500")}
+          endAccessor={event => new Date(event.block_end + "-0500")}
+          allDayAccessor={this.allDayCheck}
         />
         <Modal show={showEventDetails} onHide={this.handleEventDetailClose}>
           <Modal.Header closeButton>
@@ -239,7 +273,7 @@ class RequestResource extends Component {
                   <DateTimePicker
                     time={!selectedEvent.allDay}
                     format={dateFormat}
-                    onChange={this.handleUpdateDateEvent('start')}
+                    onChange={this.handleUpdateDateEvent('block_start')}
                     value={selectedEvent.block_start}
                   />
                 </Col>
@@ -252,7 +286,7 @@ class RequestResource extends Component {
                     min={selectedEvent.block_start}
                     time={!selectedEvent.allDay}
                     format={dateFormat}
-                    onChange={this.handleUpdateDateEvent('end')}
+                    onChange={this.handleUpdateDateEvent('block_end')}
                     value={selectedEvent.block_end}
                   />
                 </Col>
@@ -271,17 +305,50 @@ class RequestResource extends Component {
               <FormGroup>
                 <Col smOffset={2} sm={2}>
                   <Checkbox
-                    checked={selectedEvent.allDay}
-                    onChange={this.handleUpdateCheckedEvent('allDay')}
+                    checked={selectedEvent.repeat}
+                    onChange={this.handleUpdateCheckedEvent('repeat')}
                   >Repeat</Checkbox>
                 </Col>
-                <Col sm={4}>
-                  <Checkbox
-                    checked={selectedEvent.allDay}
-                    onChange={this.handleUpdateCheckedEvent('allDay')}
-                  >Repeat</Checkbox>
-                </Col>
+                {
+                  selectedEvent.repeat &&
+                  <Col sm={4}>
+                    <FormControl componentClass="select" placeholder="Cadence" onChange={this.handleChange('cadence')} value={selectedEvent.cadence}>
+                      <option value="">N/A</option>
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="biweekly">Biweekly</option>
+                      <option value="monthly">Monthly</option>
+                    </FormControl>
+                  </Col>
+                }
               </FormGroup>
+
+              {
+                selectedEvent.repeat &&
+                <FormGroup>
+                  <Col componentClass={ControlLabel} sm={2}>Start</Col>
+                  <Col sm={4}>
+                    <DateTimePicker
+                      min={new Date()}
+                      format='MMMM DD, YYYY'
+                      time={false}
+                      onChange={this.handleUpdateDateEvent('recurring_start')}
+                      value={selectedEvent.recurring_start}
+                    />
+                  </Col>
+                  <Col componentClass={ControlLabel} sm={2}>End</Col>
+                  <Col sm={4}>
+                    <DateTimePicker
+                      min={new Date()}
+                      format='MMMM DD, YYYY'
+                      time={false}
+                      onChange={this.handleUpdateDateEvent('recurring_end')}
+                      value={selectedEvent.recurring_end}
+                    />
+                  </Col>
+                </FormGroup>
+              }
+
             </Form>
           </Modal.Body>
 
@@ -297,10 +364,11 @@ class RequestResource extends Component {
 
 const mapStateToProps = (state, props) => ({
   isMyResource: resourceSelectors.resourceOwnedByCurrentUser(state, props.match.params.id),
-  scheduledEvents: scheduleSelectors.getEvents(state)
+  events: scheduleSelectors.getEvents(state)
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  fetchResourceSchedule: bindActionCreators(scheduleActions.fetchResourceSchedule, dispatch),
   submitSchedule: bindActionCreators(scheduleActions.submitScheduleBlock, dispatch),
   validateRequestBlocks: bindActionCreators(scheduleActions.validateRequestBlocks, dispatch)
 });
