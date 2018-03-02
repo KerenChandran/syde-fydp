@@ -4,10 +4,9 @@
 from decimal import Decimal
 
 import pandas as pd
+import datetime as dt
 
 from pipeline import Pipeline
-
-import pdb
 
 
 class ResourceUtil(Pipeline):
@@ -189,7 +188,18 @@ class ResourceUtil(Pipeline):
             # iterate through each block and add to list of dicts in main
             # resource dictionary
             resid = dct['resource_id']
-            dp = {key:dct[key] for key in dct if key != 'resource_id'}
+
+            # block-specific cleanup and transformations
+            dp = {}
+
+            for key, val in dct.iteritems():
+                if key == 'resource_id':
+                    continue
+                elif isinstance(val, dt.datetime):
+                    dp[key] = val.isoformat()
+                    continue
+
+                dp[key] = val
 
             if 'block_list' not in self.resource_data[resid]:
                 self.resource_data[resid]['block_list'] = []
@@ -197,6 +207,24 @@ class ResourceUtil(Pipeline):
             self.resource_data[resid]['block_list'].append(dp)
 
         self.resource_data = self.resource_data.values()
+        
+        placeholder_store = []
+
+        # schedule-specific cleanup and transformations
+        for dct in self.resource_data:
+            dp = {}
+
+            for key in dct:
+                if isinstance(dct[key], dt.datetime) or \
+                    isinstance(dct[key], dt.date):
+                    dp[key] = dct[key].isoformat()
+                    continue
+
+                dp[key] = dct[key]
+
+            placeholder_store.append(dp)
+
+        self.resource_data = placeholder_store
 
         return
 
