@@ -227,8 +227,8 @@ class RequestResource extends Component {
 
   allDayCheck = event => {
     const { block_start, block_end } = event;
-    const start = moment(block_start + '-0500');
-    const end = moment(block_end + '-0500');
+    const start = moment(block_start);
+    const end = moment(block_end);
 
     return start.isSame(end, 'day') && start.hour() === 0 && start.minute() === 0 && end.hour() === 23 && end.minute() === 59;
   }
@@ -249,8 +249,8 @@ class RequestResource extends Component {
           onSelectEvent={this.handleSelectEvent}
           onSelectSlot={this.handleSelectSlot}
           onNavigate={this.handleNavigate}
-          startAccessor={event => new Date(event.block_start + "-0500")}
-          endAccessor={event => new Date(event.block_end + "-0500")}
+          startAccessor="block_start"
+          endAccessor="block_end"
           allDayAccessor={this.allDayCheck}
         />
         <Modal show={showEventDetails} onHide={this.handleEventDetailClose}>

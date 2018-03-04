@@ -5,7 +5,8 @@ const initialState = {
   events: [],
   errors: [],
   availability_start: null,
-  availability_end: null
+  availability_end: null,
+  filteredResources: []
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -31,6 +32,17 @@ export default (state = initialState, { type, payload }) => {
         events: newEvents,
         errors: payload.schedule.errors        
       };
+    }
+
+    case ScheduleConstants.FETCH_SCHEDULE_RESOURCE_IDS: {
+      return {
+        ...state,
+        filteredResources: payload.resourceInfo.resources
+      };
+    }
+
+    case ScheduleConstants.CLEAR_SCHEDULE: {
+      return initialState;
     }
 
     default:

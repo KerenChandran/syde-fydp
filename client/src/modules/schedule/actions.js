@@ -3,6 +3,7 @@ import * as ScheduleConstants from './constants';
 
 export const fetchScheduleBlocksSuccess = createAction(ScheduleConstants.FETCH_SCHEDULE, schedule => ({ schedule }));
 export const validateRequestBlocksSuccess = createAction(ScheduleConstants.VALIDATE_BLOCKS, schedule => ({ schedule }));
+export const fetchScheduleFilterResourceIdsSuccess = createAction(ScheduleConstants.FETCH_SCHEDULE_RESOURCE_IDS, ids => ({ ids }));
 
 export const fetchResourceSchedule = id => async dispatch => {
   try {
@@ -13,16 +14,16 @@ export const fetchResourceSchedule = id => async dispatch => {
 }
 
 export const fetchResourceScheduleHelper = async (id, dispatch) => {
-    let response = await fetch('http://localhost:3000/api/get_resource_schedules', {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ resource_list: [id] })
-    });
-    let data = await response.json();
-    return dispatch(fetchScheduleBlocksSuccess(data));
+  let response = await fetch('http://localhost:3000/api/get_resource_schedules', {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ resource_list: [id] })
+  });
+  let data = await response.json();
+  return dispatch(fetchScheduleBlocksSuccess(data));
 }
 
 export const submitScheduleBlock = (block) => async dispatch => {
@@ -54,6 +55,23 @@ export const validateRequestBlocks = (block) => async dispatch => {
     });
     let data = await response.json();
     return dispatch(validateRequestBlocksSuccess(data));
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const fetchScheduleFilterResourceIds = (filters) => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/submit_schedule_filter', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(filters)
+    });
+    let data = await response.json();
+    return dispatch(fetchScheduleFilterResourceIdsSuccess(data));
   } catch (error) {
     throw new Error(error);
   }
