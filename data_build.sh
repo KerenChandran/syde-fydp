@@ -3,17 +3,19 @@
 
 # drop all tables
 cd trxn_db
-bash exec.sh scripts/2018_22_01/rollback.sql
+bash exec.sh scripts/2018_01_22/rollback.sql
 
 cd ../database
-bash exec.sh scripts/2018_28_01/rollback.sql
-bash exec.sh scripts/2018_24_01/rollback.sql
-bash exec.sh scripts/2017_23_11/rollback.sql
+bash exec.sh scripts/2018_03_04/rollback.sql
+bash exec.sh scripts/2018_01_28/rollback.sql
+bash exec.sh scripts/2018_01_24/rollback.sql
+bash exec.sh scripts/2017_11_23/rollback.sql
 
 # build all tables
-bash exec.sh scripts/2017_23_11/release.sql
-bash exec.sh scripts/2018_24_01/release.sql
-bash exec.sh scripts/2018_28_01/release.sql
+bash exec.sh scripts/2017_11_23/release.sql
+bash exec.sh scripts/2018_01_24/release.sql
+bash exec.sh scripts/2018_01_28/release.sql
+bash exec.sh scripts/2018_03_04/release.sql
 
 cd ../trxn_db
-bash exec.sh scripts/2018_22_01/release.sql
+bash exec.sh scripts/2018_01_22/release.sql

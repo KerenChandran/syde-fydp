@@ -2,7 +2,7 @@
 
 -- primary request table
 CREATE TABLE request (
-    id SERIAL,
+    id SERIAL PRIMARY KEY,
     requester_id SERIAL REFERENCES platform_user (id),
     resource_id SERIAL REFERENCES resource (id),
     source_account TEXT,
@@ -11,14 +11,14 @@ CREATE TABLE request (
 
 -- primary notification table
 CREATE TABLE notification (
-    id SERIAL,
+    id SERIAL PRIMARY KEY,
     message TEXT,
     read_flag BOOLEAN
 );
 
 -- relationship/mapping tables
 CREATE TABLE request_schedule_blocks (
-    block_id SERIAL,
+    block_id SERIAL PRIMARY KEY,
     request_id SERIAL REFERENCES request (id),
     block_start timestamp,
     block_end timestamp
