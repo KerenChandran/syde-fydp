@@ -57,6 +57,12 @@ CREATE TABLE file (
     filename TEXT
 );
 
+CREATE TABLE notification (
+    id SERIAL PRIMARY KEY,
+    request_date timestamp,
+    status TEXT
+);
+
 -- relationship tables
 
 CREATE TABLE resource_user (
@@ -98,4 +104,10 @@ CREATE TABLE lab_user (
 CREATE TABLE lab_application (
     lab_id SERIAL REFERENCES lab (id),
     application_id SERIAL REFERENCES application (id)
+);
+
+CREATE TABLE notification_users (
+    notification_id SERIAL REFERENCES notification(id),
+    lender_id SERIAL REFERENCES platform_user(id),
+    borrower_id SERIAL REFERENCES platform_user(id)
 );
