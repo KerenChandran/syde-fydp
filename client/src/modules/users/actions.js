@@ -16,7 +16,6 @@ export const signUp = (user) => async dispatch => {
     });
     let data = await response.json();
     localStorage.setItem('id_token', data.token);
-    console.log(data);
     dispatch(addLoginSuccess(data));
     return true;
   } catch (error) {
@@ -55,7 +54,6 @@ export const editProfile = (profile) => async dispatch => {
       body: JSON.stringify({ profile: profile })
     });
     let data = await response.json();
-    console.log("Data: " + data);
     return dispatch(editProfileSuccess(data));
   } catch (error) {
     throw new Error(error);

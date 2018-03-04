@@ -9,6 +9,7 @@ class EditProfile extends React.Component {
     state = {
         first_name: "",
         last_name: "",
+        email: currentUser.email,
         phone: "",
         department: "",
         faculty: "",
@@ -26,70 +27,74 @@ class EditProfile extends React.Component {
         const {
             first_name,
             last_name,
+            email,
             phone,
             department,
             faculty
         } = this.state;
 
         return (
-            <div>
-                <FormGroup controlId="formHorizontalFirstName">
-                    <Col componentClass={ControlLabel} sm={2}>
+            <div class="container">
+                <div class="row" controlId="formHorizontalFirstName">
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         First Name
-                    </Col>
-                    <Col sm={10}>
+                    </label>
+                    <div class="col-sm-4">
                         <FormControl type="firstName" placeholder="First Name" value={first_name} onChange={this.handleChange('first_name')} />
-                    </Col>
-                </FormGroup>
+                    </div>
 
-                <FormGroup controlId="formHorizontalLastName">
-                    <Col componentClass={ControlLabel} sm={2}>
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Last Name
-                    </Col>
-                    <Col sm={10}>
+                    </label>
+                    <div class="col-sm-4">
                         <FormControl type="lastName" placeholder="Last Name" value={last_name} onChange={this.handleChange('last_name')} />
-                    </Col>
-                </FormGroup>
+                    </div>
+                </div>
 
-                <FormGroup controlId="formHorizontalLastName">
-                    <Col componentClass={ControlLabel} sm={2}>
+                <div class="row" controlId="formHorizontalLastName">
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                        Email
+                    </label>
+                    <div class="col-sm-4">
+                        <FormControl type="email" placeholder="Email" value={email} onChange={this.handleChange('email')} />
+                    </div>
+
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Phone Number
-                    </Col>
-                    <Col sm={10}>
+                    </label>
+                    <div class="col-sm-4">
                         <FormControl type="phone" placeholder="Phone Number" value={phone} onChange={this.handleChange('phone')} />
-                    </Col>
-                </FormGroup>
+                    </div>
+                </div>
 
-                <FormGroup controlId="formHorizontalDepartment">
-                    <Col componentClass={ControlLabel} sm={2}>
+                <div class="row" controlId="formHorizontalDepartment">
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Department
-                    </Col>
-                    <Col sm={10}>
-                        <FormControl type="department" placeholder="department" value={department} onChange={this.handleChange('department')} />
-                    </Col>
-                </FormGroup>
+                    </label>
+                    <div class="col-sm-4">
+                        <FormControl type="department" placeholder="Department" value={department} onChange={this.handleChange('department')} />
+                    </div>
 
-                <FormGroup controlId="formHorizontalFaculty">
-                    <Col componentClass={ControlLabel} sm={2}>
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Faculty
-                    </Col>
-                    <Col sm={10}>
+                    </label>
+                    <div class="col-sm-4">
                         <FormControl type="faculty" placeholder="Faculty" value={faculty} onChange={this.handleChange('faculty')} />
-                    </Col>
-                </FormGroup>
+                    </div>
+                </div>
 
-                <FormGroup>
-                    <Col smOffset={2} sm={10}>
-                        <Button type="submit" onClick={this.handleSubmit}>Save</Button>
-                    </Col>
-                </FormGroup>
+                <div class="row">
+                    <div class="container" style={{textAlign: 'center', marginTop: 10+'px'}}>
+                        <button class="btn btn-primary" type="submit" onClick={this.handleSubmit}>Save</button>
+                    </div>
+                </div>
             </div>
         )
     }
 }
 
 const mapStateToProps = state => ({
-    currentUser: userSelectors.currentUser
+    currentUser: userSelectors.currentUser.user
 });
 
 const mapDispatchToProps = dispatch => ({

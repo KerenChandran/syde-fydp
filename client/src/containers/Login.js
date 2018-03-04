@@ -26,32 +26,30 @@ class Login extends React.Component {
         } = this.state;
 
         return (
-            <div>
-                <div>
-                <FormGroup controlId="formHorizontalEmail">
-                    <Col componentClass={ControlLabel} sm={2}>
+            <div class="container">
+                <div class="row" controlId="formHorizontalEmail">
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Email
-                    </Col>
-                    <Col sm={10}>
+                    </label>
+                    <div class="col-sm-6">
                         <FormControl type="email" placeholder="Email" value={email} onChange={this.handleChange('email')}/>
-                    </Col>
-                </FormGroup>
+                    </div>
+                </div>
 
-                <FormGroup controlId="formHorizontalPassword">
-                    <Col componentClass={ControlLabel} sm={2}>
+                <div class="row" controlId="formHorizontalPassword">
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Password
-                    </Col>
-                    <Col sm={10}>
+                    </label>
+                    <div class="col-sm-6">
                         <FormControl type="password" placeholder="Password" value={password} onChange={this.handleChange('password')}/>
-                    </Col>
-                </FormGroup>
+                    </div>
+                </div>
 
-                <FormGroup>
-                    <Col smOffset={2} sm={10}>
-                        <Button type="submit" onClick={this.handleSubmit}>Login</Button>
-                    </Col>
-                </FormGroup>
-            </div>
+                <div class="row">
+                    <div class="col-sm-8" style={{textAlign: 'center', marginTop: 10+'px'}}>
+                        <button type="submit" onClick={this.handleSubmit} class="btn btn-primary">Login</button>
+                    </div>
+                </div>
             </div>
         )
     }
