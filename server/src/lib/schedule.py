@@ -340,13 +340,13 @@ class SchedulePipeline(Pipeline):
         return (True, self.error_logs)
 
 
-class ScheduleFilter:
+class ScheduleFilter(Pipeline):
     """
         Engine class used for main schedule filtering tasks.
     """
     def __init__(self):
         # use pipeline super class for transformation utils.
-        super(SchedulePipeline, self).__init__("schedule_filter.json")
+        super(ScheduleFilter, self).__init__("schedule_filter.json")
 
         self.timedelta_map = {
             'hours': lambda x: relativedelta(hours=x),
@@ -359,13 +359,12 @@ class ScheduleFilter:
             Helper method used to get the resulting resource dataframe after
             applying the window criterion.
         """
-        
         resource_fetch_query = \
         """
             SELECT DISTINCT resource_id
             FROM resource_availability
             WHERE availability_start <= '{window_start}'
-                AND availability_end >= '{window_end}'
+                OR availability_end >= '{window_end}'
         """.format(window_start=self.start, window_end=self.end)
 
         self.resource_df = self.crs.fetch_dataframe(resource_fetch_query)
@@ -377,6 +376,10 @@ class ScheduleFilter:
             must exist x hours within the time frame of 8AM - 8PM.
         """
         resource_list = self.resource_df['resource_id'].tolist()
+
+        if len(resource_list) == 0:
+            self.final_resources = resource_list
+
         resource_list = [str(x) for x in resource_list]
 
         retrieve_block_query = \
@@ -384,7 +387,7 @@ class ScheduleFilter:
             SELECT resource_id, block_start, block_end
             FROM resource_schedule_blocks
             WHERE resource_id IN ({resource_list})
-        """.format(",".join(resource_list))
+        """.format(resource_list=",".join(resource_list))
 
         resource_blocks = self.crs.fetch_dict(retrieve_block_query)
             
@@ -401,10 +404,9 @@ class ScheduleFilter:
             resource_store[elem['resource_id']] += \
                 [elem['block_start'], elem['block_end']]
 
-        # convert all block elements into datetime objects and sort
+        # sort all block elements - returned as datetime objects
         for res, dt_list in resource_store.iteritems():
-            resource_store[res] = \
-                sorted([dt.datetime.strptime(x) for x in dt_list])
+            resource_store[res] = sorted(dt_list)
         
             # sanity check
             assert(len(resource_store[res]) % 2 == 0)
@@ -413,12 +415,30 @@ class ScheduleFilter:
         # iterate through each resource and check to see if there exists
         # at least one contiguous block that matches the filtering criterion
         # only interested in the timedelta between block_end and block_start
-        resource_flags = {res: (False, None) for res in resource_store}
+        resource_flags = {res: [False, None] for res in resource_store}
 
-        for res in resource_store:
-            for idx in range(1, len(resource_store[res]), 2):
-                if idx == len(resource_store[res]) - 1:
-                    # last element so we skip
+        # convert availability start and end dates to datetime objects
+        expected_date_format = '%Y-%m-%d'
+
+        self.start = dt.datetime.strptime(self.start, expected_date_format)
+        self.end = dt.datetime.strptime(self.end, expected_date_format)
+
+        for res, dtlist in resource_store.iteritems():
+            # initial check: does avail start + timedelta overlap w/ first block
+            if self.start + self.timedelta_map[self.dtype](self.dquantity) < dtlist[0]:
+                resource_flags[res][0] = True
+                resource_flags[res][1] = self.start
+                continue
+
+            for idx in range(1, len(dtlist), 2):
+                if idx == len(dtlist) - 1:
+                    # last element
+                    # check to see if timedelta exists between last block
+                    # and window end
+                    if dtlist[idx] + self.timedelta_map[self.dtype](self.dquantity) < self.end:
+                        resource_flags[res][0] = True
+                        resource_flags[res][1] = dtlist[idx]
+                    
                     continue
                 elif resource_flags[res][0]:
                     # move to next resource
@@ -427,23 +447,20 @@ class ScheduleFilter:
                 # check to see if the timedelta between current block_end
                 # and next block_start matches filtering criterion
                 # use strictly less than conditional to allow for small buffers
-                if res[idx] + self.timedelta_map[self.dtype] < res[idx+1]:
+                if dtlist[idx] + self.timedelta_map[self.dtype](self.dquantity) < dtlist[idx+1]:
                     resource_flags[res][0] = True
-                    resource_flags[res][1] = res[idx]
+                    resource_flags[res][1] = dtlist[idx]
 
         # retrieve all resources that match the criterion
-        self.final_resources = \
-            [res for res in resource_flags if resource_flags[res][0]]
+        self.final_resources = [(res, resource_flags[res][1]) for res in 
+                                resource_flags if resource_flags[res][0]]
 
         # sort final resources by availability
         self.final_resources = \
             sorted(self.final_resources, key=lambda x: x[1])
 
-        expected_datetime_format = '%Y-%m-%d %H:%M'
-
         self.final_resources = \
-            [(tup[0], dt.datetime.strftime(tup[1])) for tup in 
-             self.final_resources]
+            [(lst[0], lst[1].isoformat()) for lst in self.final_resources]
 
     def _filter(self):
         """
@@ -501,7 +518,7 @@ class ScheduleFilter:
                         The minimum block length must be one for any of the
                         duration types.
         """
-        if not isinstance(init_window, tuple) or len(tuple) != 2:
+        if not isinstance(init_window, tuple) or len(init_window) != 2:
             self.error_logs.append("Incorrect initial window specification.")
             return (False, self.error_logs)
         elif not isinstance(preferred_duration, dict) or \
@@ -518,17 +535,17 @@ class ScheduleFilter:
 
         if duration_quantity < 1:
             self.error_logs.append("Minimum block length must be 1.")
-            return (False, self.error_logs)
+            return (False, [], self.error_logs)
 
         elif duration_type == 'hours' and duration_quantity > 12:
             self.error_logs.append(
                 "Hourly duration cannot exceed 12 units. Please use daily type."
             )
-            return (False, self.error_logs)
+            return (False, [], self.error_logs)
 
         data_obj = {
-            "window_start": init_window[0],
-            "window_end": init_window[1],
+            "window_start": window_start,
+            "window_end": window_end,
             "duration_type": preferred_duration["type"],
             "duration_quantity": preferred_duration["quantity"]
         }

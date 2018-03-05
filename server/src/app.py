@@ -358,10 +358,16 @@ def submit_schedule_filter():
 
     preferred_duration = data['preferred_duration']
 
+    pd_payload = {}
+
+    pd_payload['type'] = str(preferred_duration['type'])
+
+    pd_payload['quantity'] = int(preferred_duration['quantity'])
+
     filter_engine = ScheduleFilter()
 
     success, resource_list, errors = \
-        filter_engine.filter(initial_window, preferred_duration)
+        filter_engine.filter(initial_window, pd_payload)
 
     ret_val = {
         "success": success,
