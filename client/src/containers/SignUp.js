@@ -19,23 +19,14 @@ class SignUp extends React.Component {
     };
 
     handleSubmit = () => {
-        let success = this.props.signUp(this.state);
-        if (success) {
-            this.setState({redirect: true});
-        }
+        let success = this.props.signUp(this.state, this.props.history);
     };
 
     render() {
         const {
             email,
-            password,
-            redirect
+            password
         } = this.state;
-
-
-        if (redirect) {
-            return <Redirect to='../profile/edit' />;
-        }
 
         return (
             <div class="container">

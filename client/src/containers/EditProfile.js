@@ -6,14 +6,28 @@ import {userActions, userSelectors} from '../modules/users'
 
 class EditProfile extends React.Component {
 
-    state = {
-        first_name: "",
-        last_name: "",
-        email: currentUser.email,
-        phone: "",
-        department: "",
-        faculty: "",
-    };
+    constructor(props) {
+    super(props);
+    console.log("sfdkjlkdf", props.currentUser);
+
+    const {
+        first_name,
+        last_name,
+        email,
+        phone,
+        department,
+        faculty
+    } = props.currentUser;
+
+    this.state = {
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        phone: phone,
+        department: department,
+        faculty: faculty
+        };
+    }
 
     handleChange = name => event => {
         this.setState({ [name]: event.target.value })
@@ -33,6 +47,7 @@ class EditProfile extends React.Component {
             faculty
         } = this.state;
 
+        console.log("render ", this.props);
         return (
             <div class="container">
                 <div class="row" controlId="formHorizontalFirstName">
@@ -56,7 +71,7 @@ class EditProfile extends React.Component {
                         Email
                     </label>
                     <div class="col-sm-4">
-                        <FormControl type="email" placeholder="Email" value={email} onChange={this.handleChange('email')} />
+                        <FormControl readOnly type="email" placeholder="Email" value={email} onChange={this.handleChange('email')} />
                     </div>
 
                     <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
@@ -90,11 +105,11 @@ class EditProfile extends React.Component {
                 </div>
             </div>
         )
-    }
+    }S
 }
 
 const mapStateToProps = state => ({
-    currentUser: userSelectors.currentUser.user
+    currentUser: userSelectors.currentUser(state)
 });
 
 const mapDispatchToProps = dispatch => ({

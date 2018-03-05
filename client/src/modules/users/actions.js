@@ -4,7 +4,7 @@ import * as UserConstants from './constants';
 export const addLoginSuccess = createAction(UserConstants.LOGIN_USER, user => ({ user }));
 export const editProfileSuccess = createAction(UserConstants.EDIT_PROFILE, profile => ({ profile }));
 
-export const signUp = (user) => async dispatch => {
+export const signUp = (user, history) => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/new_user', {
       method: 'post',
@@ -17,7 +17,7 @@ export const signUp = (user) => async dispatch => {
     let data = await response.json();
     localStorage.setItem('id_token', data.token);
     dispatch(addLoginSuccess(data));
-    return true;
+    history.push('/profile/edit');
   } catch (error) {
     throw new Error(error);
   }
