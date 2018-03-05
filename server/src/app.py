@@ -369,10 +369,23 @@ def submit_schedule_filter():
     success, resource_list, errors = \
         filter_engine.filter(initial_window, pd_payload)
 
+    filter_dict = dict(resource_list)
+
+    # retrieve resource information
+    secondary_res_list = [int(rid) for rid, _ in resource_list]
+
+    resutil = ResourceUtil()
+
+    success, errors, resource_data = \
+        resutil.get_resource_data(secondary_res_list)
+
+    for data in resource_data:
+        data['first_available'] = filter_dict[data['resource_id']]
+
     ret_val = {
         "success": success,
         "errors": errors,
-        "resources": resource_list
+        "resources": resource_data
     }
 
     return jsonify(ret_val)
