@@ -6,3 +6,4 @@ Flask-Bcrypt
 Flask-Login
 itsdangerous
 Flask-HTTPAuth
+requests

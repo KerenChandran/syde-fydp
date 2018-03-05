@@ -48,8 +48,8 @@ class Search extends Component {
     const { open, ...filters } = this.state;
 
     return (
-      <div class="search-root">
-        <div class="search-container">
+      <div className="search-root">
+        <div className="search-container">
           <Button bsStyle="link" className="search-btn" onClick={this.handleSubmit}>
             <Glyphicon glyph="search"/>
           </Button>

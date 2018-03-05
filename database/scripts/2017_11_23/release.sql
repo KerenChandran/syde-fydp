@@ -43,7 +43,8 @@ CREATE TABLE user_fee (
 CREATE TABLE incentive (
     id SERIAL PRIMARY KEY,
     type VARCHAR(50),
-    fee_id SERIAL REFERENCES user_fee (id)
+    -- using integer as null values can be present
+    fee_id INTEGER REFERENCES user_fee (id)
 );
 
 CREATE TABLE application (

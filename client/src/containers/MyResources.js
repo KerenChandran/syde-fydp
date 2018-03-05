@@ -16,7 +16,7 @@ class MyResources extends Component {
   }
 
   detailResource = (id) => {
-    this.props.history.push(`/resources/view/${id}`);
+    this.props.history.push(`/resources/${id}`);
   }
 
   // editResource = (id) => {

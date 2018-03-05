@@ -1,3 +1,37 @@
-.pac-container {
-  z-index: 2000;
+.result-container {
+  z-index: 1;
+}
+
+.location__suggestion-icon {
+  margin-right: 8px;
+}
+
+.location__autocomplete-container {
+  border-bottom: honeydew;
+  border-left: honeydew;
+  border-right: honeydew;
+  border-top: 1px solid #e6e6e6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border-radius: 0 0 2px 2px;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.location__suggestion-item {
+  padding: 4px;
+  text-align: left;
+}
+
+.location__dropdown-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px;
+  background-color: #fcfcfc;
+}
+
+.location__dropdown-footer-image {
+  display: inline-block;
+  width: 150px;
 }

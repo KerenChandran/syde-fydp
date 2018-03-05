@@ -1,8 +1,7 @@
-import data from './data_modified.json';
 import * as ResourceConstants from './constants';
 
 const initialState = {
-  resources: data.resources,
+  resources: [],
   showDataImport: false,
   showBulkImport: false,
   editResourceId: null
@@ -26,7 +25,10 @@ export default (state = initialState, { type, payload }) => {
       let { resources, ...others } = state;
       let newResources = [
         ...resources,
-        payload.resource
+        {
+          ...payload.resource,
+          ownerId: 1
+        }
       ];
       return {
         resources: newResources,
@@ -90,7 +92,10 @@ export default (state = initialState, { type, payload }) => {
     }
 
     case ResourceConstants.FETCH_RESOURCES: {
-      return state;
+      return {
+        ...state,
+        resources: payload.resources.resource_data
+      };
     }
 
     default:

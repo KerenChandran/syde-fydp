@@ -121,7 +121,7 @@ def create_account(user_id, account_type):
         """.format(uid=user_id))
 
     # generate random initial amount for account
-    init_amt = random.randint(1000, 2000)
+    init_amt = random.randint(10000, 20000)
 
     # create account
     create_account_query = """

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
+import ScheduleFIlters from '../../containers/ScheduleFilters';
 
 class ResourcesDataTable extends Component {
   // handleDetails = id => () => {
@@ -10,7 +11,7 @@ class ResourcesDataTable extends Component {
   // }
 
   handleRowDoubleClick = (row) => {
-    this.props.showDetailsForm(row.id);
+    this.props.showDetailsForm(row.resource_id);
   }
 
   // handleEdit = id => () => {
@@ -94,19 +95,22 @@ class ResourcesDataTable extends Component {
     };
 
     return (
-      <BootstrapTable
-        pagination
-        data={resources}
-        options={options}
-        selectRow={selectRowOptions}
-      >
-        <TableHeaderColumn dataField='id' isKey hidden>ID</TableHeaderColumn>
-        <TableHeaderColumn dataField='category' dataSort caretRender={this.caretRender}>Category</TableHeaderColumn>
-        <TableHeaderColumn dataField='company' dataSort caretRender={this.caretRender}>Company</TableHeaderColumn>
-        <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>
-        <TableHeaderColumn dataField='location' dataFormat={this.locationFormatter} dataSort caretRender={this.caretRender}>Location</TableHeaderColumn>
-        <TableHeaderColumn dataField='available' dataFormat={this.availableFormatter} dataSort caretRender={this.caretRender}>Availability</TableHeaderColumn>
-      </BootstrapTable>
+      <div>
+        <ScheduleFIlters />
+        <BootstrapTable
+          pagination
+          data={resources}
+          options={options}
+          selectRow={selectRowOptions}
+        >
+          <TableHeaderColumn dataField='resource_id' isKey hidden>ID</TableHeaderColumn>
+          <TableHeaderColumn dataField='category' dataSort caretRender={this.caretRender}>Category</TableHeaderColumn>
+          <TableHeaderColumn dataField='company' dataSort caretRender={this.caretRender}>Company</TableHeaderColumn>
+          <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>
+          <TableHeaderColumn dataField='location' dataFormat={this.locationFormatter} dataSort caretRender={this.caretRender}>Location</TableHeaderColumn>
+          <TableHeaderColumn dataField='available' dataFormat={this.availableFormatter} dataSort caretRender={this.caretRender}>Availability</TableHeaderColumn>
+        </BootstrapTable>
+      </div>
     );
   }
 }

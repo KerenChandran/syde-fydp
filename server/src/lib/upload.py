@@ -23,11 +23,6 @@ class UploadPipeline(Pipeline):
 
             update : {boolean}
                 Flag which explicitly states whether update is taking place.
-
-            Keyword-Arguments
-            -----------------
-            resource_id : {int}
-                Identifier or resource for which values are being updated.
         """
         flds, resource_data = self.crs.sanitize(record)
 
@@ -42,15 +37,19 @@ class UploadPipeline(Pipeline):
 
         if update:
             update_cols = zip(flds, resource_data)
-            update_cols = ["%s=%s" % (tup[0], tup[1]) for tup in update_cols]
+
+            # ignore resource_id column
+            update_cols = ["%s=%s" % tup for tup in update_cols 
+                           if tup[0] != 'resource_id']
 
             update_query = \
             """
                 UPDATE resource
                 SET {update_cols}
                 WHERE id = {rid}
+                RETURNING id;
             """.format(update_cols=",".join(update_cols), 
-                       rid=kwargs['resource_id'])
+                       rid=record['resource_id'])
 
             execution_query = update_query
 
@@ -99,6 +98,60 @@ class UploadPipeline(Pipeline):
         return place_id
 
 
+    def incentive_load(self, record):
+        """
+            Main method to load incentive information into postgres table.
+            Even if the resource information is being updated, a new incentive
+            record is created. The update takes place within the relationship
+            table.
+
+            Parameters
+            ----------
+            record : {pandas.Series}
+                Data point for incentive information to be uploaded.
+        """
+        flds, incentive_data = self.crs.sanitize(record)
+
+        incentive_dict = dict(zip(flds, incentive_data))
+
+        # create incentive
+        incentive_upload_query = \
+        """
+            INSERT INTO incentive (type)
+            VALUES ({type})
+            RETURNING id;
+        """.format(type=incentive_dict['incentive_type'])
+
+        incentive_id = self.crs.fetch_first(incentive_upload_query)
+
+        # if user fee is present create a user fee record and update incentive
+        if incentive_dict['incentive_type'] == "'user_fee'":
+            fee_amount = incentive_dict['fee_amount']
+
+            fee_cadence = incentive_dict['fee_cadence']
+
+            uf_upload_query = \
+            """
+                INSERT INTO user_fee (fee_amount, cadence)
+                VALUES ({amount}, {cadence})
+                RETURNING id;
+            """.format(amount=fee_amount, cadence=fee_cadence)
+
+            uf_id = self.crs.fetch_first(uf_upload_query)
+
+            # update incentive record to reflect newly added fee id
+            incentive_update_query = \
+            """
+                UPDATE incentive
+                SET fee_id={ufid}
+                WHERE id={incentive_id}
+            """.format(ufid=uf_id, incentive_id=incentive_id)
+
+            self.crs.execute(incentive_update_query)
+
+        return incentive_id
+
+
     def load(self):
         """
             Main method to load transformed data into postgres tables.
@@ -109,8 +162,13 @@ class UploadPipeline(Pipeline):
 
         # handle resource data
         resource_fields = self.database_fields['resource']
+        resource_fields = \
+            list(set(resource_fields) & set(self.df_transform.columns))
 
-        df_resource = self.df_transform[resource_fields]
+        if update_flag:
+            df_resource = self.df_transform[resource_fields + ['resource_id']]
+        else:
+            df_resource = self.df_transform[resource_fields]
 
         self.df_transform['resource_id'] = df_resource.apply(
             lambda x: self.resource_load(x, update=update_flag), axis=1)
@@ -146,6 +204,37 @@ class UploadPipeline(Pipeline):
         self.df_transform.apply(
             lambda x: self.crs.execute(
                 res_loc_query.format(rid=x['resource_id'], lid=x['place_id'])), 
+            axis=1)
+
+        # handle incentive data
+        incentive_fields = self.database_fields['incentive']
+        incentive_fields = \
+            list(set(incentive_fields) & set(self.df_transform.columns))
+
+        df_incentive = self.df_transform[incentive_fields]
+
+        self.df_transform['incentive_id'] = \
+            df_incentive.apply(lambda x: self.incentive_load(x), axis=1)
+
+        # add or update incentive and resource records in join table
+        upload_query = \
+        """
+            INSERT INTO resource_incentive (resource_id, incentive_id)
+            VALUES ({rid}, {iid})
+        """
+
+        update_query = \
+        """
+            UPDATE resource_incentive
+            SET incentive_id = {iid}
+            WHERE resource_id = {rid}
+        """
+
+        res_inc_query = update_query if update_flag else upload_query
+
+        self.df_transform.apply(
+            lambda x: self.crs.execute(
+                res_inc_query.format(rid=x['resource_id'], iid=x['incentive_id'])),
             axis=1)
 
         # TODO: all of the following logic up until adding to resource_user

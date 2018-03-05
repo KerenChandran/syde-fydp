@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import {
-  Form,
   FormGroup,
   FormControl,
   ControlLabel,
@@ -47,15 +46,16 @@ class ResourceInfoEditView extends Component {
       mobile,
       available,
       description,
-      rules,
+      rules_restrictions,
       application,
-      incentive,
-      fine
+      incentive_type,
+      fee_amount,
+      fee_cadence
     } = this.state;
 
     return (
       <div style={{ display: 'block', width: '100%'}}>
-        <Form>
+        <div className="form-horizontal">
           <FormGroup>
             <Col smOffset={10} sm={2}>
               <Button type="button" onClick={this.props.onBackClick}>Go Back</Button>
@@ -63,107 +63,163 @@ class ResourceInfoEditView extends Component {
             </Col>
           </FormGroup>
           <FormGroup controlId="formCategory">
-            <ControlLabel>Category</ControlLabel>
-            <FormControl
-              type="text"
-              value={category}
-              placeholder="Category"
-              onChange={this.handleChange('category')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>
+              Category
+            </Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={category}
+                placeholder="Category"
+                onChange={this.handleChange('category')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formCompany">
-            <ControlLabel>Company</ControlLabel>
-            <FormControl
-              type="text"
-              value={company}
-              placeholder="Company"
-              onChange={this.handleChange('company')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Company</Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={company}
+                placeholder="Company"
+                onChange={this.handleChange('company')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formFaculty">
-            <ControlLabel>Faculty</ControlLabel>
-            <FormControl
-              type="text"
-              value={faculty}
-              placeholder="Faculty"
-              onChange={this.handleChange('faculty')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={faculty}
+                placeholder="Faculty"
+                onChange={this.handleChange('faculty')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formLocation">
-            <ControlLabel>Location</ControlLabel>
-            <LocationSearch onChange={this.handleLocationChange} value={location}/>
+            <Col componentClass={ControlLabel} sm={2}>Location</Col>
+            <Col sm={10}>
+              <LocationSearch
+                onChange={this.handleLocationChange}
+                location={location}
+              />
+            </Col>            
           </FormGroup>
 
           <FormGroup controlId="formModel">
-            <ControlLabel>Model</ControlLabel>
-            <FormControl
-              type="text"
-              value={model}
-              placeholder="Model"
-              onChange={this.handleChange('model')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Model</Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={model}
+                placeholder="Model"
+                onChange={this.handleChange('model')}
+              />
+            </Col>
           </FormGroup>
 
 
           <FormGroup controlId="formMobile">
             <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
-            <Col sm={10}><FormControl.Static>{mobile ? 'Yes' : 'No'}</FormControl.Static></Col>
+            <Col sm={10}>
+              <FormControl componentClass="select" onChange={this.handleChange('mobile')} value={mobile}>
+                <option value="">N/A</option>
+                <option value={false}>False</option>
+                <option value={true}>True</option>
+              </FormControl>
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formAvailable">
             <Col componentClass={ControlLabel} sm={2}>Available</Col>
-            <Col sm={10}><FormControl.Static>{available ? 'Yes' : 'No'}</FormControl.Static></Col>
+            <Col sm={10}>
+              <FormControl componentClass="select" onChange={this.handleChange('available')} value={available}>
+                <option value="">N/A</option>
+                <option value={false}>False</option>
+                <option value={true}>True</option>
+              </FormControl>
+            </Col>
           </FormGroup>
 
 
           <FormGroup controlId="formDescription">
-            <ControlLabel>Description</ControlLabel>
-            <FormControl
-              componentClass="textarea"
-              value={description}
-              placeholder="Description"
-              onChange={this.handleChange('description')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Description</Col>
+            <Col sm={10}>
+              <FormControl
+                componentClass="textarea"
+                value={description}
+                placeholder="Description"
+                onChange={this.handleChange('description')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formRules">
-            <ControlLabel>Rules</ControlLabel>
-            <FormControl
-              componentClass="textarea"
-              value={rules}
-              placeholder="Rules"
-              onChange={this.handleChange('rules')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Rules</Col>
+            <Col sm={10}>
+              <FormControl
+                componentClass="textarea"
+                value={rules_restrictions}
+                placeholder="Rules"
+                onChange={this.handleChange('rules_restrictions')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formApplication">
-            <ControlLabel>Application</ControlLabel>
-            <FormControl
-              componentClass="textarea"
-              value={application}
-              placeholder="Application"
-              onChange={this.handleChange('application')}
-            />
+            <Col componentClass={ControlLabel} sm={2}>Application</Col>
+            <Col sm={10}>
+              <FormControl
+                componentClass="textarea"
+                value={application}
+                placeholder="Application"
+                onChange={this.handleChange('application')}
+              />
+            </Col>
           </FormGroup>
 
           <FormGroup controlId="formIncentive">
             <Col componentClass={ControlLabel} sm={2}>Incentive</Col>
-            <Col sm={10}><FormControl.Static>{incentive}</FormControl.Static></Col>
+            <Col sm={10}>
+              <FormControl componentClass="select" placeholder="user_fee" onChange={this.handleChange('incentive_type')} value={incentive_type}>
+                <option value="">N/A</option>
+                <option value="user_fee">User Fee</option>
+              </FormControl>
+            </Col>
           </FormGroup>
 
-          <FormGroup controlId="formFees">
-            <ControlLabel>User Fee</ControlLabel>
-            <FormControl
-              type="number"
-              value={fine}
-              placeholder="User Fee"
-              onChange={this.handleChange('fine')}
-            />
-          </FormGroup>
-        </Form>
+          { 
+            incentive_type === 'user_fee' && 
+            <div>
+              <FormGroup controlId="formFees">
+                <Col componentClass={ControlLabel} sm={2}>Fee Amount</Col>
+                <Col sm={10}>
+                  <FormControl
+                    type="number"
+                    value={fee_amount}
+                    placeholder="Free"
+                    onChange={this.handleChange('fee_amount')}
+                  />
+                </Col>
+              </FormGroup>
+
+              <FormGroup controlId="formCadence">
+                <Col componentClass={ControlLabel} sm={2}>Fee Cadence</Col>
+                <Col sm={10}>
+                  <FormControl componentClass="select" placeholder="Fee Cadence" onChange={this.handleChange('fee_cadence')} value={fee_cadence}>
+                    <option value="">N/A</option>
+                    <option value="hourly">Hourly</option>
+                    <option value="daily">Daily</option>
+                  </FormControl>
+                </Col>
+              </FormGroup>
+            </div>
+          }
+        </div>
       </div>
     );
   }

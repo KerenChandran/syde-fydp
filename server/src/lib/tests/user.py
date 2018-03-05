@@ -2,7 +2,7 @@
 Testing functions in user.py
 """
 
-from server.src.pipelines.user import User
+from ..user import User
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 def main():

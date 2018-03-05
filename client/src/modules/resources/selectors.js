@@ -45,17 +45,18 @@ export const userResources = (resources, userId) => (
 );
 export const currentUserResources = createSelector(filteredResources, currentUserId, userResources);
 
-
-export const getEditResource = (state, id) => {
+export const getResource = (state, id) => {
   let allResources = resources(state);
-  return allResources.find((resource) => resource.id == id);
-}
-
-export const getDetailResource = (state, id) => {
-  let allResources = resources(state);
-  return allResources.find((resource) => resource.id == id);
+  return allResources.find((resource) => resource.resource_id == id);
 }
 
 export const showBulkImport = state => state.resources.showBulkImport;
 export const showDataImport = state => state.resources.showDataImport;
 export const showDetailsResource = state => state.resources.showDetailsResource;
+
+export const resourceOwnedByCurrentUser = (state, id) => {
+  const resource = getResource(state, id);
+  if (resource) {
+    return resource.ownerId === currentUserId(state)
+  }
+};

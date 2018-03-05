@@ -11,6 +11,7 @@
         },
         "location": {
             "data_type": "dictionary",
+            "flatten": true,
             "dictionary_fields": {
                 "placeId": {
                     "data_type": "text"
@@ -62,6 +63,7 @@
     },
     "database_fields": {
         "resource": ["category", "model", "company", "description", "mobile", "available", "rules_restrictions"],
-        "location": ["placeId", "name", "latitude", "longitude"]
+        "location": ["placeId", "name", "latitude", "longitude"],
+        "incentive": ["incentive_type", "fee_amount", "fee_cadence"]
     }
 }

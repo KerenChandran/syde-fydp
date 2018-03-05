@@ -10,16 +10,20 @@ from flask import Flask, jsonify, request, g
 from flask_bcrypt import Bcrypt
 from flask_httpauth import HTTPTokenAuth
 from flask_login import LoginManager
+import requests as rq
 
 from lib.upload import UploadPipeline
 from lib.user import User
 from lib.profile import ProfilePipeline
-
+from lib.schedule import SchedulePipeline, ScheduleFilter
+from lib.accounts import TransactionUtil
+from lib.resource import ResourceUtil
 
 # global application instance
 app = Flask(__name__, static_url_path='')
 # bcrypt for encryption
 bcrypt = Bcrypt(app)
+
 # authentication / login stuff
 auth = HTTPTokenAuth('Bearer')
 login_manager = LoginManager()
@@ -29,6 +33,14 @@ login_manager.init_app(app)
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# HELPER METHODS
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
 
 # function for authentication
 # TODO: Need to verify that token is passed through properly here
@@ -55,13 +67,22 @@ def root():
     return jsonify({"message": "Flask application base."})
 
 
-# single resource upload
-@app.route("/resource_upload", methods=['POST'])
+"""
+    UPLOAD ENDPOINTS
+"""
+@app.route("/upload_resource", methods=['POST'])
 def upload_resource():
     # get request parameters
-    # assumption: record has ownerId data point
     data = request.get_json()
     data = data['resource']
+
+    # user_id = g.user['id']
+
+    # temporarily hard code user id until profiles are working
+    user_id = 1
+
+    # update data point with ownerId
+    data['ownerId'] = user_id
 
     # create list of single dictionary
     data = [data]
@@ -81,13 +102,15 @@ def upload_resource():
     return jsonify(ret_val)
 
 
-# bulk resource upload
-@app.route("/bulk_resource_upload", methods=['POST'])
+@app.route("/upload_resource_bulk", methods=['POST'])
 def bulk_resource_upload():
     # get single location for all resources
     data = request.form
 
     location = json.loads(data['location'])
+
+    # get single owner id for all resources
+    user_id = g.user['id']
 
     # parse csv input and generate data points
     f = request.files['resources']
@@ -119,6 +142,9 @@ def bulk_resource_upload():
     for idx, dp in enumerate(body):
         # add location data to each record
         body[idx]['location'] = location
+        
+        # add owner data to each record
+        body[idx]['ownerId'] = user_id
 
     # run upload pipeline
     pipeline = UploadPipeline()
@@ -134,8 +160,58 @@ def bulk_resource_upload():
     return jsonify(ret_val)
 
 
-# file upload URL
-@app.route("/file_upload", methods=['POST'])
+"""
+    RESOURCE DATA RETRIEVAL ENDPOINTS
+"""
+@app.route("/get_resources", methods=['POST'])
+def get_resources():
+    # retrieve resource list
+    data = request.get_json()
+
+    res_list = data['resource_list'] if 'resource_list' in data else []
+
+    res_list = [int(rid) for rid in res_list]
+
+    resutil = ResourceUtil()
+
+    success, errors, resource_data = resutil.get_resource_data(res_list)
+
+    ret_val = {
+        'success': success,
+        'errors': errors,
+        'resource_data': resource_data
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/get_resource_schedules", methods=['POST'])
+def get_resource_schedules():
+    # retrieve resource list
+    data = request.get_json()
+
+    res_list = data['resource_list'] if 'resource_list' in data else []
+
+    res_list = [int(rid) for rid in res_list]
+
+    resutil = ResourceUtil()
+
+    success, errors, resource_data = \
+        resutil.get_resource_data(res_list, dataset="schedule")
+
+    ret_val = {
+        'success': success,
+        'errors': errors,
+        'resource_data': resource_data
+    }
+
+    return jsonify(ret_val)
+
+
+"""
+    FILE UPLOAD ENDPOINTS
+"""
+@app.route("/upload_file", methods=['POST'])
 def upload_file():
     try:
         file = request.files['image']
@@ -156,6 +232,9 @@ def upload_file():
     return jsonify(ret_val)
 
 
+"""
+    PROFILE ENDPOINTS
+"""
 @app.route("/new_user", methods=['POST'])
 def new_user():
 
@@ -167,6 +246,9 @@ def new_user():
     # save user in database
     save_user = User()
     user_id = save_user.save(email, password_hash)
+
+    trxn = TransactionUtil(user_id)
+    trxn_success = trxn.create_basic_profile()
 
     # login user
     if user_id is None:
@@ -181,6 +263,7 @@ def new_user():
 
     ret_val = {
         "success": success,
+        "trxn_succes": trxn_success,
         "token": auth_token,
         "user": user
     }
@@ -207,6 +290,7 @@ def edit_profile():
 
     return jsonify(ret_val)
 
+
 @app.route("/login", methods=['POST'])
 def login_user():
     data = request.get_json()
@@ -226,7 +310,179 @@ def login_user():
 
     return jsonify(ret_val)
 
-# remote server termination for tests
+"""
+    SCHEDULING ENDPOINTS
+"""
+@app.route("/submit_initial_availability", methods=['POST'])
+def submit_initial_availability():
+    data = request.get_json()
+
+    # user_id = g.user['id']
+
+    # temporarily hard code user id until profiles are working
+    user_id = 1
+
+    pipeline = SchedulePipeline(user_id=user_id)
+
+    success, errors = pipeline.run([data], block_scheduling=False)
+
+    ret_val = {
+        "success": success,
+        "errors": errors
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/submit_schedule_blocks", methods=['POST'])
+def submit_schedule_blocks():
+    data = request.get_json()
+
+    # user_id = g.user['id']
+
+    # temporarily hard code user id until profiles are working
+    user_id = 1
+
+    pipeline = SchedulePipeline(user_id=user_id)
+
+    success, errors = pipeline.run([data], init_availability=False)
+
+    ret_val = {
+        "success": success,
+        "errors": errors
+    }
+
+    return jsonify(ret_val)
+
+@app.route("/submit_schedule_filter", methods=['POST'])
+def submit_schedule_filter():
+    data = request.get_json()
+
+    window_start = data['window_start']
+
+    window_end = data['window_end']
+
+    initial_window = (window_start, window_end)
+
+    preferred_duration = data['preferred_duration']
+
+    pd_payload = {}
+
+    pd_payload['type'] = str(preferred_duration['type'])
+
+    pd_payload['quantity'] = int(preferred_duration['quantity'])
+
+    filter_engine = ScheduleFilter()
+
+    success, resource_list, errors = \
+        filter_engine.filter(initial_window, pd_payload)
+
+    ret_val = {
+        "success": success,
+        "errors": errors,
+        "resources": resource_list
+    }
+
+    return jsonify(ret_val)
+
+
+"""
+    TRANSACTION ENDPOINTS
+"""
+@app.route("/create_basic_profile", methods=['POST'])
+def create_basic_profile():
+    """
+        Non-primary method used to create a basic trxn profile for a given user.
+    """
+    user_id = g.user['id']
+
+    trxn = TransactionUtil(user_id)
+
+    success = trxn.create_basic_profile()
+
+    ret_val = {
+        'success': success
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/get_accounts", methods=['GET'])
+def get_trxn_accounts():
+    user_id = g.user['id']
+
+    trxn = TransactionUtil(user_id)
+
+    account_information = trxn.get_account_information()
+
+    ret_val = {
+        'account_information': account_information
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/specify_account_use", methods=['POST'])
+def specify_account_types():
+    user_id = g.user['id']
+    data = request.get_json()
+
+    account_id = data['account_id']
+
+    account_use = data['account_use']
+
+    trxn = TransactionUtil(user_id)
+
+    success, errors = trxn.specify_account_usage(account_id, account_use)
+
+    ret_val = {
+        'success': success,
+        'errors': errors
+    }
+
+    return jsonify(ret_val)
+
+
+"""
+    REQUEST ENDPOINTS
+"""
+@app.route("/validate_request_block", methods=['POST'])
+def validate_request_block():
+    data = request.get_json()
+
+    resid = int(data['resource_id'])
+    start = str(data['block_start'])
+    end = str(data['block_end'])
+    recur = dict(data['block_recurring'])
+
+    schedpipe = SchedulePipeline()
+
+    # generate blocks based on recurrence
+    schedpipe.generate_blocks(resid, start, end, block_recurring=recur)
+
+    generated_blocks = schedpipe.get_generated_blocks()
+
+    # iterate through each block and check if an overlap is present
+    final_blocks = []
+
+    for block in generated_blocks:
+        no_overlap = schedpipe.check_block_overlap(
+            block['resource_id'], block['block_start'], block['block_end'])
+
+        if no_overlap:
+            final_blocks.append(block)
+
+    ret_val = {
+        'final_blocks': final_blocks,
+        'errors': schedpipe.get_error_logs()
+    }
+
+    return jsonify(ret_val)
+
+
+"""
+    MISC
+"""
 @app.route("/shutdown", methods=['POST'])
 def shutdown():
     shutdown_server()

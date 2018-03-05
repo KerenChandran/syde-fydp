@@ -4,9 +4,10 @@ import { Provider } from 'react-redux'
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
 import './index.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import './css/bootstrap-flat.min.css';
-// import './css/bootstrap-flat-extras.min.css';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import 'react-widgets/dist/css/react-widgets.css';
 
 import Router from './router';
 import store from './store';

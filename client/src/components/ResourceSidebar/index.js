@@ -49,7 +49,7 @@ class Sidebar extends Component {
       submitBulkImport
     } = this.props;
     return (
-      <div>
+      <div className="resources-sidebar-root">
         <DropdownButton noCaret bsClass="new-resource-btn dropdown" bsStyle="primary" title="New">
           <MenuItem eventKey="1" onSelect={this.handleDataImport}>Data Import</MenuItem>
           <MenuItem eventKey="2" onSelect={this.handleBulkImport}>Bulk Data Import</MenuItem>
