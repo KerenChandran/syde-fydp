@@ -12,7 +12,8 @@ import ResourceInfo from './containers/ResourceInfo';
 
 import EditProfile from './containers/EditProfile';
 import Login from './containers/Login';
-import SignUp from './containers/SignUp';
+import MyRequests from './containers/MyRequests';
+import Payment from './containers/Payment';
 
 import { resourceActions } from './modules/resources';
 
@@ -35,7 +36,8 @@ class ApplicationRouter extends Component {
             <Route exact path="/resources/myresources" component={MyResources} />
             <Route exact path="/profile/edit" component={EditProfile} />
             <Route exact path="/login" component={Login} />
-            <Route exact path="/signup" component={SignUp} />
+            <Route exact path="/myrequests" component={MyRequests} />
+            <Route exact path="/payment" component={Payment} />
           </div>
         </div>
       </Router>
