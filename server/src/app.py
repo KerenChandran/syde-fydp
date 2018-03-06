@@ -291,6 +291,24 @@ def edit_profile():
 
     return jsonify(ret_val)
 
+@app.route("/auth_user", methods=['POST'])
+@auth.login_required
+def auth_user():
+
+    user_id = g.user['id']
+
+    user = User()
+    user_info = user.get_user_from_id(user_id)
+
+    trxn = TransactionUtil(user_id)
+    trxn_accounts = trxn.get_account_information()
+
+    ret_val = {
+        "user": user_info,
+        "accounts": trxn_accounts
+    }
+    return ret_val
+
 
 @app.route("/login", methods=['POST'])
 def login_user():
