@@ -307,7 +307,7 @@ def auth_user():
         "user": user_info,
         "accounts": trxn_accounts
     }
-    return ret_val
+    return jsonify(ret_val)
 
 
 @app.route("/login", methods=['POST'])
