@@ -1,26 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment'
 
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 import ScheduleFIlters from '../../containers/ScheduleFilters';
 
 class ResourcesDataTable extends Component {
-  // handleDetails = id => () => {
-  //   this.props.showDetailsForm(id);
-  // }
-
   handleRowDoubleClick = (row) => {
     this.props.showDetailsForm(row.resource_id);
   }
-
-  // handleEdit = id => () => {
-  //   this.props.showEditForm(id);
-  // }
-
-  // handleDelete = id => () => {
-  //   this.props.deleteResource(id);
-  // }
 
   sortFunc = (a, b, order, sortField) => {
     if (order === 'asc') {
@@ -35,6 +24,10 @@ class ResourcesDataTable extends Component {
 
   availableFormatter = (cell) => (
     cell ? 'Yes' : 'No'
+  )
+
+  firstAvailableFormatter = (cell) => (
+    moment(cell).format('YYYY-MM-DD')
   )
 
   locationFormatter = (cell) => (
@@ -109,6 +102,7 @@ class ResourcesDataTable extends Component {
           <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>
           <TableHeaderColumn dataField='location' dataFormat={this.locationFormatter} dataSort caretRender={this.caretRender}>Location</TableHeaderColumn>
           <TableHeaderColumn dataField='available' dataFormat={this.availableFormatter} dataSort caretRender={this.caretRender}>Availability</TableHeaderColumn>
+          <TableHeaderColumn hidden={resources.length && resources[0].first_available == null} dataField='first_available' dataFormat={this.firstAvailableFormatter} dataSort caretRender={this.caretRender}>First Available</TableHeaderColumn>
         </BootstrapTable>
       </div>
     );

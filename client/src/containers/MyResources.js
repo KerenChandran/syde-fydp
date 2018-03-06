@@ -19,10 +19,6 @@ class MyResources extends Component {
     this.props.history.push(`/resources/${id}`);
   }
 
-  // editResource = (id) => {
-  //   this.props.history.push(`/resources/edit/${id}`);
-  // }
-
   render() {
     const {
       currentUserId,
