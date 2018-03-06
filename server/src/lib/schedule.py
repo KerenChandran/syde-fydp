@@ -7,7 +7,6 @@ from dateutil.relativedelta import relativedelta
 import pandas as pd
 
 from pipeline import Pipeline
-from utils.db import Cursor
 
 
 class SchedulePipeline(Pipeline):
@@ -411,6 +410,11 @@ class ScheduleFilter(Pipeline):
             # sanity check
             assert(len(resource_store[res]) % 2 == 0)
 
+        # case handling: no blocks exist for a given resource
+        for resid in map(lambda x: int(x), resource_list):
+            if resid not in resource_store:
+                resource_store[resid] = []
+
         # block overlaps cannot exist so all block start and ends are adjacent
         # iterate through each resource and check to see if there exists
         # at least one contiguous block that matches the filtering criterion
@@ -424,8 +428,11 @@ class ScheduleFilter(Pipeline):
         self.end = dt.datetime.strptime(self.end, expected_date_format)
 
         for res, dtlist in resource_store.iteritems():
-            # initial check: does avail start + timedelta overlap w/ first block
-            if self.start + self.timedelta_map[self.dtype](self.dquantity) < dtlist[0]:
+            # initial checks:
+            # 1) do blocks exist for this particular resource
+            # 2) does avail start + timedelta overlap w/ first block
+            if len(dtlist) == 0 or \
+                self.start + self.timedelta_map[self.dtype](self.dquantity) < dtlist[0]:
                 resource_flags[res][0] = True
                 resource_flags[res][1] = self.start
                 continue
