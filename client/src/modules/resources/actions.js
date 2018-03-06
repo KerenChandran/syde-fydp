@@ -16,6 +16,8 @@ export const deleteResource = createAction(ResourceConstants.DELETE_RESOURCE, id
 export const setDetailResource = createAction(ResourceConstants.SET_DETAIL_RESOURCE, id => ({ id }));
 
 export const fetchResourcesSuccess = createAction(ResourceConstants.FETCH_RESOURCES, resources => ({ resources }));
+export const fetchResourceSuccess = createAction(ResourceConstants.FETCH_RESOURCE, resource => ({ resource }));
+
 
 export const fetchResources = () => async dispatch => {
   try {
@@ -45,7 +47,7 @@ export const fetchResource = (id) => async dispatch => {
       body: JSON.stringify({ resource_list: [id] })
     });
     let data = await response.json();
-    return dispatch(updateResourceSucesses(data));
+    return dispatch(fetchResourceSuccess(data));
   } catch (error) {
     throw new Error(error);
   }
@@ -112,3 +114,23 @@ export const initialAvailability = (availability, history) => async dispatch => 
     throw new Error(error);
   }
 }
+
+export const fetchScheduleFilterResources = (filters) => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/submit_schedule_filter', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(filters)
+    });
+    let data = await response.json();
+    return dispatch(fetchResourcesSuccess({
+      ...data,
+      resource_data: data.resources
+    }));
+  } catch (error) {
+    throw new Error(error);
+  }
+};

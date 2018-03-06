@@ -97,6 +97,38 @@ export default (state = initialState, { type, payload }) => {
         resources: payload.resources.resource_data
       };
     }
+    
+    case ResourceConstants.FETCH_RESOURCE: {
+      const { resources } = state;
+      if (!resources.length) {
+        return {
+          ...state,
+          resources: payload.resource.resource_data
+        }
+      }
+
+      let idx = -1;
+      const res = payload.resource.resource_data[0];
+
+      resources.find((resource, index) => {
+        if (resource.resource_id === res.resource_id) {
+          idx = index;
+          return true;
+        }
+        return false;
+      });
+
+      const newResources = [
+        ...resources.slice(0, idx),
+        res,
+        ...resources.slice(idx + 1)
+      ];
+
+      return {
+        ...state,
+        resources: newResources
+      };
+    }
 
     default:
       return state;
