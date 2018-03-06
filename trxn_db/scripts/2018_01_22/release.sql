@@ -6,7 +6,7 @@ CREATE TABLE trxn_user (
 );
 
 CREATE TABLE account (
-    id TEXT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     type TEXT,
     balance NUMERIC
 );
@@ -15,5 +15,5 @@ CREATE TABLE account (
 
 CREATE TABLE user_account (
     user_id SERIAL REFERENCES trxn_user (id),
-    account_id TEXT REFERENCES account (id)
+    account_id SERIAL REFERENCES account (id)
 );

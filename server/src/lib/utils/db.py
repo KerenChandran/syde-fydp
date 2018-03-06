@@ -107,6 +107,9 @@ class Cursor:
 
         return len(result) > 0
 
+    def fetch_all(self):
+        return self.crs.fetchall()
+
 
     def fetch_first(self, query):
         """

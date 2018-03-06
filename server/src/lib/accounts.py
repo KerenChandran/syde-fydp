@@ -2,8 +2,10 @@
     Module with account / trxn - related methods and classes.
 """
 import requests as rq
+import json
 
 from utils.db import Cursor
+
 
 class TransactionUtil:
     def __init__(self, user_id):
@@ -30,12 +32,15 @@ class TransactionUtil:
             Method to create a basic profile on the transaction system for
             a given user.
         """
+
         payload = {'user_id': self.uid}
 
         success = rq.post(self.base_url % "create_basic_profile", 
                           data=json.dumps(payload), headers=self.json_headers)
 
-        return success
+        success = json.loads(success.text)
+
+        return success['success']
 
     def get_account_information(self):
         """
@@ -46,6 +51,8 @@ class TransactionUtil:
         account_information = \
             rq.post(self.base_url % "get_accounts", data=json.dumps(payload),
                     headers=self.json_headers)
+
+        account_information = json.loads(account_information.text)
 
         return account_information['accounts']
 
@@ -70,9 +77,15 @@ class TransactionUtil:
             'fund_amount': float(transfer_amount)
         }
 
-        success, errors = \
+        res = \
             rq.post(self.base_url % "transfer_funds", data=json.dumps(payload),
                     headers=self.json_headers)
+
+        res = json.loads(res.text)
+
+        success = res['success']
+
+        errors = res['errors']
 
         return success, errors
 
@@ -87,7 +100,7 @@ class TransactionUtil:
             account_id : {string}
                 unique account identifier
 
-            account_user : {string}
+            account_use : {string}
                 specification as to whether the account is going to be used
                 for inflow or outflow. Valid options: inflow, outflow
         """
@@ -102,7 +115,7 @@ class TransactionUtil:
 
         # validate that the passed account matches the usage spec
         account_found = False
-        correct_spec = False
+        correct_spec = True
 
         usage_map = {
             'inflow': ['operational'],
@@ -111,11 +124,12 @@ class TransactionUtil:
 
         for data in account_information:
             if data['id'] != account_id:
-                continueuser_id
+                continue
 
             account_found = True
 
             if data['type'] not in usage_map[account_use]:
+                correct_spec = False
                 break
 
         if not account_found:

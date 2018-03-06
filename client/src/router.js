@@ -14,6 +14,7 @@ import ResourceAvailability from './containers/ResourceAvailability';
 
 import EditProfile from './containers/EditProfile';
 import Login from './containers/Login';
+import SignUp from './containers/SignUp';
 
 import { resourceActions } from './modules/resources';
 
@@ -40,6 +41,7 @@ class ApplicationRouter extends Component {
             <Route exact path="/resources/:id/schedule" component={RequestResource} />
             <Route exact path="/profile/edit" component={EditProfile} />
             <Route exact path="/login" component={Login} />
+            <Route exact path="/signup" component={SignUp} />
           </div>
         </div>
       </Router>

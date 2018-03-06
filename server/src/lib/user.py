@@ -1,6 +1,7 @@
 from utils.db import Cursor
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
                           BadSignature, SignatureExpired)
+import pdb
 
 # TODO: move this out
 secret_key = "abkdjskfdl4238472cjhkdhf38"
@@ -44,7 +45,7 @@ class User:
 
         self.user_dict = self.crs.fetch_dict(query)
 
-        return self.user_dict
+        return self.user_dict[0]
 
     def get_user_from_email(self, email):
         """
@@ -60,7 +61,7 @@ class User:
 
         self.user_dict = self.crs.fetch_dict(query)
 
-        return self.user_dict
+        return self.user_dict[0]
 
     def get_id_from_email(self, email):
         """
