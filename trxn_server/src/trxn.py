@@ -6,7 +6,6 @@ from decimal import Decimal
 
 from utils.db import Cursor
 
-
 # global database connection object
 crs = Cursor()
 
@@ -112,6 +111,7 @@ def create_account(user_id, account_type):
         account_type : {str}
             corresponds to either 'research' or 'operational'
     """
+
     # check to see that user exists
     if not valid_user(user_id):
         # create user record in user table
