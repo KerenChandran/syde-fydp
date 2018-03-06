@@ -106,6 +106,9 @@ class Pipeline(object):
                 elif mapping_dict[elem]['data_type'] == 'dictionary':
                     new_mappings[prefix + elem] = dict
 
+                elif mapping_dict[elem]['data_type'] == 'array':
+                    new_mappings[prefix + elem] = list
+
                 else:
                     # default text data type
                     new_mappings[prefix + elem] = str
