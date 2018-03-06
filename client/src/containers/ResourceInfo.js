@@ -9,6 +9,10 @@ import { userSelectors } from '../modules/users';
 import ResourceInfoView from '../views/ResourceInfo';
 
 class ResourceInfo extends Component {
+  componentDidMount() {
+    this.props.fetchResource(this.props.match.params.id);
+  }
+
   handleBackClick = () => (
     this.props.history.push('/resources')
   )
@@ -35,6 +39,10 @@ class ResourceInfo extends Component {
 
   render() {
     const { currentUserId, resource } = this.props;
+    if (resource == null) {
+      return null;
+    }
+
     return (
       <ResourceInfoView
         currentUserId={currentUserId}
@@ -54,7 +62,8 @@ const mapStateToProps = (state, props) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch)
+  deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
+  fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch)
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResourceInfo));
