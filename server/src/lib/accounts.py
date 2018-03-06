@@ -1,19 +1,21 @@
 """
     Module with account / trxn - related methods and classes.
 """
+import json
+
 import requests as rq
 
 from utils.db import Cursor
 
 class TransactionUtil:
-    def __init__(self, user_id):
+    def __init__(self, user_id=None):
         """
             Parameters
             ----------
             user_id : {int}
                 unique user identifier
         """
-        self.uid = int(user_id)
+        self.uid = int(user_id) if user_id is not None else user_id
         
         self.base_url = "http://trxn_server:5000/%s"
         
@@ -55,18 +57,18 @@ class TransactionUtil:
 
             Parameters
             ----------
-            source_account : {string}
+            source_account : {int}
                 source account identifier
 
-            target_account : {string}
+            target_account : {int}
                 target account identifier
 
             transfer_amount : {float}
                 amount of money to transfer from source account to target
         """
         payload = {
-            'source_account': str(source_account),
-            'target_account': str(target_account),
+            'source_account': int(source_account),
+            'target_account': int(target_account),
             'fund_amount': float(transfer_amount)
         }
 
