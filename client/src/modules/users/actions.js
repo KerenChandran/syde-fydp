@@ -54,6 +54,7 @@ export const editProfile = (profile) => async dispatch => {
       body: JSON.stringify({ profile: profile })
     });
     let data = await response.json();
+    alert("Success!");
     return dispatch(editProfileSuccess(data));
   } catch (error) {
     throw new Error(error);

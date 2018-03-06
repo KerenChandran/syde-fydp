@@ -71,15 +71,13 @@ def root():
     UPLOAD ENDPOINTS
 """
 @app.route("/upload_resource", methods=['POST'])
+@auth.login_required
 def upload_resource():
     # get request parameters
     data = request.get_json()
     data = data['resource']
 
-    # user_id = g.user['id']
-
-    # temporarily hard code user id until profiles are working
-    user_id = 1
+    user_id = g.user['id']
 
     # update data point with ownerId
     data['ownerId'] = user_id
@@ -103,6 +101,7 @@ def upload_resource():
 
 
 @app.route("/upload_resource_bulk", methods=['POST'])
+@auth.login_required
 def bulk_resource_upload():
     # get single location for all resources
     data = request.form
@@ -249,6 +248,7 @@ def new_user():
 
     trxn = TransactionUtil(user_id)
     trxn_success = trxn.create_basic_profile()
+    trxn_accounts = trxn.get_account_information()
 
     # login user
     if user_id is None:
@@ -265,7 +265,8 @@ def new_user():
         "success": success,
         "trxn_succes": trxn_success,
         "token": auth_token,
-        "user": user
+        "user": user,
+        "accounts": trxn_accounts
     }
 
     return jsonify(ret_val)
@@ -314,13 +315,11 @@ def login_user():
     SCHEDULING ENDPOINTS
 """
 @app.route("/submit_initial_availability", methods=['POST'])
+@auth.login_required
 def submit_initial_availability():
     data = request.get_json()
 
-    # user_id = g.user['id']
-
-    # temporarily hard code user id until profiles are working
-    user_id = 1
+    user_id = g.user['id']
 
     pipeline = SchedulePipeline(user_id=user_id)
 
@@ -335,13 +334,11 @@ def submit_initial_availability():
 
 
 @app.route("/submit_schedule_blocks", methods=['POST'])
+@auth.login_required
 def submit_schedule_blocks():
     data = request.get_json()
 
-    # user_id = g.user['id']
-
-    # temporarily hard code user id until profiles are working
-    user_id = 1
+    user_id = g.user['id']
 
     pipeline = SchedulePipeline(user_id=user_id)
 
@@ -390,6 +387,7 @@ def submit_schedule_filter():
     TRANSACTION ENDPOINTS
 """
 @app.route("/create_basic_profile", methods=['POST'])
+@auth.login_required
 def create_basic_profile():
     """
         Non-primary method used to create a basic trxn profile for a given user.
@@ -408,6 +406,7 @@ def create_basic_profile():
 
 
 @app.route("/get_accounts", methods=['GET'])
+@auth.login_required
 def get_trxn_accounts():
     user_id = g.user['id']
 
@@ -423,6 +422,7 @@ def get_trxn_accounts():
 
 
 @app.route("/specify_account_use", methods=['POST'])
+@auth.login_required
 def specify_account_types():
     user_id = g.user['id']
     data = request.get_json()

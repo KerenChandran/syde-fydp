@@ -3,12 +3,13 @@ import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import {Form, FormGroup, FormControl, ControlLabel, Col, Button} from 'react-bootstrap'
 import {userActions, userSelectors} from '../modules/users'
+import AccountInput from '../components/AccountInput'
 
 class EditProfile extends React.Component {
 
     constructor(props) {
     super(props);
-    console.log("sfdkjlkdf", props.currentUser);
+    console.log("props ", props.currentUser);
 
     const {
         first_name,
@@ -46,6 +47,8 @@ class EditProfile extends React.Component {
             department,
             faculty
         } = this.state;
+
+        const {currentUserAccounts} = this.props;
 
         console.log("render ", this.props);
         return (
@@ -98,6 +101,14 @@ class EditProfile extends React.Component {
                     </div>
                 </div>
 
+                {
+                    currentUserAccounts.map((account) => (
+                        <AccountInput key={account.id} {...account}/>
+                    ))
+                }
+
+
+
                 <div class="row">
                     <div class="container" style={{textAlign: 'center', marginTop: 10+'px'}}>
                         <button class="btn btn-primary" type="submit" onClick={this.handleSubmit}>Save</button>
@@ -109,7 +120,8 @@ class EditProfile extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    currentUser: userSelectors.currentUser(state)
+    currentUser: userSelectors.currentUser(state),
+    currentUserAccounts: userSelectors.currentUserAccounts(state)
 });
 
 const mapDispatchToProps = dispatch => ({

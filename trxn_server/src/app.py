@@ -7,6 +7,7 @@ from flask import Flask, jsonify, request
 
 import trxn
 
+
 # global application instance
 app = Flask(__name__, static_url_path='')
 
@@ -27,6 +28,7 @@ def root():
 # basic profile creation
 @app.route("/create_basic_profile", methods=['POST'])
 def create_basic_profile():
+
     data = request.get_json()
     user_id = data['user_id']
 
