@@ -9,6 +9,7 @@ import { isEmpty } from 'lodash';
 
 import { resourceSelectors } from '../modules/resources';
 import { scheduleActions, scheduleSelectors } from '../modules/schedule';
+import { userSelectors } from '../modules/users';
 
 import { DateTimePicker } from 'react-widgets';
 import {
@@ -27,7 +28,6 @@ moment.locale('en');
 momentLocalizer();
 
 const EMPTY_EVENT = {
-  title: '',
   block_start: null,
   block_end: null,
   allDay: false,
@@ -89,7 +89,10 @@ class RequestResource extends Component {
   }
 
   handleSelectEvent = (event) => {
-    const { events } = this.props;
+    const { events, currentUser } = this.props;
+    if (event.user_id !== currentUser.id) {
+      return false;
+    }
     const idx = events.indexOf(event);
 
     this.setState({
@@ -172,14 +175,6 @@ class RequestResource extends Component {
     });
   }
 
-  handleUpdateEvent = (name) => (event) => {
-    const selectedEvent = {
-      ...this.state.selectedEvent,
-      [name]: event.target.value
-    };
-    this.setState({ selectedEvent });
-  }
-
   handleDeleteEvent = () => {
     const { events, selectedEventIdx } = this.state;
     this.setState({
@@ -235,20 +230,24 @@ class RequestResource extends Component {
 
   render() {
     const { showEventDetails, selectedEvent } = this.state;
-    const { events } = this.props;
+    const { events, currentUser, isMyResource } = this.props;
 
     const dateFormat = selectedEvent.allDay ? "MMMM DD, YYYY" : "MMMM DD, YYYY - h:mm A";
     return (
       <div style={{display: 'flex', flexGrow: 1}}>
-        <div>
-          <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Submit</Button>
-        </div>
+        {
+          isMyResource &&
+          <div>
+            <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Submit</Button>
+          </div>
+        }
         <Calendar
           events={events}
           onEventResize={this.handleEventResize}
           onSelectEvent={this.handleSelectEvent}
           onSelectSlot={this.handleSelectSlot}
           onNavigate={this.handleNavigate}
+          titleAccessor={event => event.user_id === currentUser.id ? `${currentUser.first_name} ${currentUser.last_name}` : "Unavailable"}
           startAccessor="block_start"
           endAccessor="block_end"
           allDayAccessor={this.allDayCheck}
@@ -260,13 +259,6 @@ class RequestResource extends Component {
           
           <Modal.Body>
             <Form horizontal onSubmit={this.handleSaveEvent}>
-              <FormGroup controlId="formTitle">
-                <Col componentClass={ControlLabel} sm={2}>Title</Col>
-                <Col sm={10}>
-                  <FormControl placeholder="Title" onChange={this.handleUpdateEvent('title')} value={selectedEvent.title} />
-                </Col>
-              </FormGroup>
-
               <FormGroup controlId="formStart">
                 <Col componentClass={ControlLabel} sm={2}>Start</Col>
                 <Col sm={10}>
@@ -364,7 +356,8 @@ class RequestResource extends Component {
 
 const mapStateToProps = (state, props) => ({
   isMyResource: resourceSelectors.resourceOwnedByCurrentUser(state, props.match.params.id),
-  events: scheduleSelectors.getEvents(state)
+  events: scheduleSelectors.getEvents(state),
+  currentUser: userSelectors.currentUser(state)
 });
 
 const mapDispatchToProps = (dispatch) => ({

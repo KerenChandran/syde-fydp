@@ -59,14 +59,7 @@ export default (state = initialState, { type, payload }) => {
         ...others
       };
     }
-
-    case ResourceConstants.TOGGLE_DATA_IMPORT_FORM: {
-      return {
-        ...state,
-        showDataImport: !state.showDataImport
-      }
-    }
-
+    
     case ResourceConstants.TOGGLE_BULK_IMPORT_FORM: {
       return {
         ...state,
@@ -80,14 +73,6 @@ export default (state = initialState, { type, payload }) => {
       return {
         resources: newResources,
         ...others
-      };
-    }
-
-    case ResourceConstants.SET_EDIT_RESOURCE: {
-      return {
-        ...state,
-        showDataImport: true,
-        editResourceId: payload.id
       };
     }
 
@@ -128,6 +113,13 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         resources: newResources
       };
+    }
+
+    case ResourceConstants.CLEAR_RESOURCES: {
+      return {
+        ...state,
+        resources: []
+      }
     }
 
     default:

@@ -12,6 +12,11 @@ import Sidebar from '../components/ResourceSidebar';
 
 class MyResources extends Component {
   componentDidMount() {
+    this.props.fetchResources();
+  }
+
+  componentWillUnmount() {
+    this.props.clearResources();
     this.props.resetSearch();
   }
 
@@ -45,6 +50,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  fetchResources: bindActionCreators(resourceActions.fetchResources, dispatch),
+  clearResources: bindActionCreators(resourceActions.clearResources, dispatch),  
   resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
 });
 

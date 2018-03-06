@@ -9,7 +9,6 @@ class EditProfile extends React.Component {
 
     constructor(props) {
     super(props);
-    console.log("props ", props.currentUser);
 
     const {
         first_name,
@@ -35,7 +34,7 @@ class EditProfile extends React.Component {
     };
 
     handleSubmit = () => {
-        this.props.editProfile(this.state)
+        this.props.editProfile(this.state, this.props.history);
     };
 
     render() {

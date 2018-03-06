@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { routerReducer } from 'react-router-redux';
 
 //Reducers
 import { resourceReducer as resources } from './resources';
@@ -10,5 +11,6 @@ export default combineReducers({
   resources,
   schedule,
   search,
-  users
+  users,
+  router: routerReducer
 });

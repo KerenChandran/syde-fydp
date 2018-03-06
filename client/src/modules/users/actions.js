@@ -1,3 +1,5 @@
+import { push } from 'react-router-redux';
+
 import { createAction } from 'redux-actions';
 import * as UserConstants from './constants';
 
@@ -17,7 +19,7 @@ export const signUp = (user, history) => async dispatch => {
     let data = await response.json();
     localStorage.setItem('id_token', data.token);
     dispatch(addLoginSuccess(data));
-    history.push('/profile/edit');
+    dispatch(push('/profile/edit'));
   } catch (error) {
     throw new Error(error);
   }
@@ -36,7 +38,8 @@ export const login = (user) => async dispatch => {
     let data = await response.json();
     localStorage.setItem('id_token', data.token);
     console.log(data.token);
-    return dispatch(addLoginSuccess(data));
+    dispatch(addLoginSuccess(data));
+    dispatch(push('/resources'));
   } catch (error) {
     throw new Error(error);
   }
@@ -54,8 +57,26 @@ export const editProfile = (profile) => async dispatch => {
       body: JSON.stringify({ profile: profile })
     });
     let data = await response.json();
-    alert("Success!");
-    return dispatch(editProfileSuccess(data));
+    dispatch(editProfileSuccess(data));
+    dispatch(push('/resources'));
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const authUser = () => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/auth_user', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('id_token')
+      }
+    });
+    let data = await response.json();
+    dispatch(editProfileSuccess(data));
+    dispatch(push('/resources'));
   } catch (error) {
     throw new Error(error);
   }
