@@ -38,6 +38,10 @@ class ResourceUtil(Pipeline):
                 # assume one-level nesting
                 if isinstance(val, dict):
                     for _fld, _val in val.iteritems():
+                        if isinstance(_val, type(None)):
+                            val[_fld] = _val
+                            continue
+
                         val[_fld] = type_dict[type(_val)](_val)
                     placeholder[fld] = val
                     continue
@@ -50,6 +54,7 @@ class ResourceUtil(Pipeline):
 
                 elif isinstance(val, type(None)):
                     placeholder[fld] = val
+                    continue
 
                 placeholder[fld] = type_dict[type(val)](val)
 
@@ -76,9 +81,10 @@ class ResourceUtil(Pipeline):
         # assumption for now is that user_fee is the only incentive type
         retrieval_query = \
         """
-            SELECT {res_fields}, incentive.type as incentive_type,
-                uf.fee_amount, uf.cadence as fee_cadence, 
-                ru.user_id as ownerId
+            SELECT 
+                {res_fields}, incentive.id as incentive_id,
+                incentive.type as incentive_type, uf.fee_amount, 
+                uf.cadence as fee_cadence, ru.user_id as ownerId
 
             FROM resource
             

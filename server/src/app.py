@@ -18,7 +18,8 @@ from lib.profile import ProfilePipeline
 from lib.schedule import SchedulePipeline, ScheduleFilter
 from lib.accounts import TransactionUtil
 from lib.resource import ResourceUtil
-import pdb
+from lib.request import RequestUtil
+
 # global application instance
 app = Flask(__name__, static_url_path='')
 # bcrypt for encryption
@@ -446,7 +447,7 @@ def create_basic_profile():
     """
     user_id = g.user['id']
 
-    trxn = TransactionUtil(user_id)
+    trxn = TransactionUtil(user_id=user_id)
 
     success = trxn.create_basic_profile()
 
@@ -462,7 +463,7 @@ def create_basic_profile():
 def get_trxn_accounts():
     user_id = g.user['id']
 
-    trxn = TransactionUtil(user_id)
+    trxn = TransactionUtil(user_id=user_id)
 
     account_information = trxn.get_account_information()
 
@@ -483,7 +484,7 @@ def specify_account_types():
 
     account_use = data['account_use']
 
-    trxn = TransactionUtil(user_id)
+    trxn = TransactionUtil()
 
     success, errors = trxn.specify_account_usage(account_id, account_use)
 
@@ -498,8 +499,27 @@ def specify_account_types():
 """
     REQUEST ENDPOINTS
 """
+@app.route("/get_requests", methods=['POST'])
+def get_requests():
+    data = request.get_json()
+
+    owner_id = int(data['owner_id'])
+
+    request_util = RequestUtil()
+
+    request_data = request_util.get_requests(owner_id)
+
+    ret_val = {
+        "request_data": request_data
+    }
+
+    return jsonify(ret_val)
+
+
 @app.route("/validate_request_block", methods=['POST'])
+@auth.login_required
 def validate_request_block():
+    user_id = g.user['id']
     data = request.get_json()
 
     resid = int(data['resource_id'])
@@ -522,11 +542,126 @@ def validate_request_block():
             block['resource_id'], block['block_start'], block['block_end'])
 
         if no_overlap:
+            block['user_id'] = user_id
+
             final_blocks.append(block)
 
     ret_val = {
         'final_blocks': final_blocks,
         'errors': schedpipe.get_error_logs()
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/submit_request", methods=['POST'])
+def submit_request():
+    data = request.get_json()
+
+    # requests are submitted on an individual basis
+    # recreate the data object for sanity checks
+    request_object = {}
+
+    # required attributes
+    request_object['resource_id'] = int(data['resource_id'])
+
+    request_object['user_id'] = int(data['user_id'])
+
+    requested_blocks = data['requested_blocks']
+
+    # sanity - this check can be handled on client
+    assert(len(requested_blocks) > 0)
+
+    request_object['requested_blocks'] = list(requested_blocks)
+
+    incentive_data = data['incentive_data']
+
+    # sanity - this check can be handled on client
+    # new incentive present and incentive id passed
+    check_1 = bool(incentive_data['new_incentive']) and \
+        ('incentive_id' in incentive_data and 
+         incentive_data['incentive_id'] is not None)
+
+    assert(not check_1)
+
+    # new incentive missing and no incentive id
+    check_2 = not bool(incentive_data['new_incentive']) and \
+        ('incentive_id' not in incentive_data or 
+         incentive_data['incentive_id'] is None)
+
+    assert(not check_2)
+
+    request_object['incentive_data'] = dict(incentive_data)
+
+    # optional attributes
+    request_object['source_account'] = \
+        int(data['source_account']) if 'source_account' in data else None
+
+    request_object['message'] = \
+        str(data['message']) if 'message' in data else ""
+
+    request_util = RequestUtil()
+
+    success, errors, request_data = \
+        request_util.submit_request([request_object])
+
+    ret_val = {
+        'success': success,
+        'errors': errors,
+        'request_data': request_data 
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/accept_request", methods=['POST'])
+def accept_request():
+    data = request.get_json()
+
+    # create util payload for correctness
+    payload = {}
+
+    # required attributes
+    payload['request_id'] = int(data['request_id'])
+
+    # optional attributes
+    payload['target_account'] = \
+        int(data['target_account']) if 'target_account' in data else None
+
+    payload['message'] = str(data['message']) if 'message' in data else ""
+
+    request_util = RequestUtil()
+
+    success, errors = request_util.accept_reject_request("accept", payload)
+
+    ret_val = {
+        "success": success,
+        "errors": errors
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/reject_request", methods=['POST'])
+def reject_request():
+    data = request.get_json()
+
+    # create util payload
+    payload = {}
+
+    # required attributes
+    payload['request_id'] = int(data['request'])
+
+    # optional attributes
+    payload['message'] = str(data['message']) if 'message' in data else ""
+
+    request_util = RequestUtil()
+
+    success, errors = request_util.accept_reject_request("reject", payload)
+
+    ret_val = {
+        "success": success,
+        "errors": errors
     }
 
     return jsonify(ret_val)

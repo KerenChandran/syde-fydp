@@ -3,10 +3,12 @@
 -- primary request table
 CREATE TABLE request (
     id SERIAL PRIMARY KEY,
-    requester_id SERIAL REFERENCES platform_user (id),
+    user_id SERIAL REFERENCES platform_user (id), 
     resource_id SERIAL REFERENCES resource (id),
-    source_account TEXT,
-    target_account TEXT
+    source_account integer,
+    target_account integer,
+    owner_accepted BOOLEAN,
+    owner_rejected BOOLEAN
 );
 
 -- primary notification table

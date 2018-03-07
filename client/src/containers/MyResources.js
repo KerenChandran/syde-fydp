@@ -12,16 +12,17 @@ import Sidebar from '../components/ResourceSidebar';
 
 class MyResources extends Component {
   componentDidMount() {
+    this.props.fetchResources();
+  }
+
+  componentWillUnmount() {
+    this.props.clearResources();
     this.props.resetSearch();
   }
 
   detailResource = (id) => {
     this.props.history.push(`/resources/${id}`);
   }
-
-  // editResource = (id) => {
-  //   this.props.history.push(`/resources/edit/${id}`);
-  // }
 
   render() {
     const {
@@ -49,6 +50,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  fetchResources: bindActionCreators(resourceActions.fetchResources, dispatch),
+  clearResources: bindActionCreators(resourceActions.clearResources, dispatch),  
   resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
 });
 

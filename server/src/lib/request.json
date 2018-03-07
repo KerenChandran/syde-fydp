@@ -1,0 +1,50 @@
+{
+    "mappings": {
+        "request_id": {
+            "data_type": "integer"
+        },
+        "resource_id": {
+            "data_type": "integer"
+        },
+        "user_id": {
+            "data_type": "integer"
+        },
+        "source_account": {
+            "data_type": "integer"
+        },
+        "target_account": {
+            "data_type": "integer"
+        },
+        "message": {
+            "data_type": "text"
+        },
+        "requested_blocks": {
+            "data_type": "array"
+        },
+        "incentive_data": {
+            "data_type": "dictionary",
+            "flatten": false,
+            "dictionary_fields": {
+                "new_incentive": {
+                    "data_type": "boolean"
+                },
+                "incentive_id": {
+                    "data_type": "integer"
+                },
+                "incentive_type": {
+                    "data_type": "text"
+                },
+                "fee_amount": {
+                    "data_type": "float"
+                },
+                "fee_cadence": {
+                    "data_type": "text"
+                }
+            }
+        }
+    },
+    "database_fields": {
+        "request": ["user_id", "resource_id", "source_account", "target_account"],
+        "notification": ["message"]
+    }
+}

@@ -189,10 +189,10 @@ def transfer_funds(source, target, amount):
 
         Parameters
         ----------
-        source : {str}
+        source : {int}
             identifier of source account
 
-        target : {str}
+        target : {int}
             identifier of target account
 
         amount : {float}

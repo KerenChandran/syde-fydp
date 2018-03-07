@@ -6,7 +6,7 @@ import './index.css';
 
 const Header = () => (
   <header className="app-header">
-    <Link to="/">
+    <Link to="/resources">
       <span className="app-logo">Share-It</span>
     </Link>
     <div className="app-search">

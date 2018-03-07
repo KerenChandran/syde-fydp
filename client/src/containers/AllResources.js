@@ -17,6 +17,10 @@ const GRID = 'grid';
 
 class AllResources extends Component {
   componentDidMount() {
+    this.props.fetchResources();
+  }
+
+  componentWillUnmount() {
     this.props.resetSearch();
   }
 
@@ -83,6 +87,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
+  fetchResources: bindActionCreators(resourceActions.fetchResources, dispatch),
+  clearResources: bindActionCreators(resourceActions.clearResources, dispatch),
   resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
 });
 

@@ -1,10 +1,17 @@
 import React from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
+import { Redirect } from 'react-router-dom';
 import {Form, FormGroup, FormControl, ControlLabel, Col, Button} from 'react-bootstrap'
 import {userActions} from '../modules/users'
 
 class Login extends React.Component {
+
+    // componentWillMount() {
+    //     if (localStorage.getItem('id_token') != null) {
+    //       this.props.authUser();
+    //     }
+    //   }
 
     state = {
         email: "",
@@ -16,7 +23,7 @@ class Login extends React.Component {
     };
 
     handleSubmit = () => {
-        this.props.login(this.state)
+        this.props.login(this.state, this.props.history);
     };
 
     render() {
@@ -56,7 +63,8 @@ class Login extends React.Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-    login: bindActionCreators(userActions.login, dispatch)
+    login: bindActionCreators(userActions.login, dispatch),
+    authUser: bindActionCreators(userActions.authUser, dispatch),
 });
 
 export default connect(null, mapDispatchToProps)(Login)

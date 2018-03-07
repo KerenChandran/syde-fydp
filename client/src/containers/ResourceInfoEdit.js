@@ -8,6 +8,13 @@ import { resourceActions, resourceSelectors } from '../modules/resources';
 import ResourceInfoEditView from '../views/ResourceInfoEdit';
 
 class ResourceInfoEdit extends Component {
+  componentDidMount() {
+    const id = this.props.match.params.ids;
+    if (id >= 0) {
+      this.props.fetchResource(id);
+    }
+  }
+
   handleBackClick = () => (
     this.props.history.push('/resources')
   )
@@ -21,9 +28,13 @@ class ResourceInfoEdit extends Component {
     const {
       addResource,
       resource,
-      updateResource
+      updateResource,
+      match: { params }
     } = this.props;
 
+    if (params.id >= 0 && resource == null) {
+      return null;
+    }
     return (
       <ResourceInfoEditView
         resource={resource}
@@ -39,7 +50,8 @@ const mapStateToProps = (state, props) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  addResource: bindActionCreators(resourceActions.addDataImport, dispatch)
+  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
+  fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch)
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResourceInfoEdit));

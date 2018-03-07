@@ -1,0 +1,2 @@
+export const CLEAR_REQUEST = 'CLEAR_REQUEST';
+export const SAVE_REQUEST = 'SAVE_REQUEST';

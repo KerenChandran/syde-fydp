@@ -1,8 +1,6 @@
 """
     Test upload pipeline by simulating API endpoint.
 """
-import json
-
 from ..upload import UploadPipeline
 
 
