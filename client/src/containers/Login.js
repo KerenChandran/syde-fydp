@@ -7,11 +7,11 @@ import {userActions} from '../modules/users'
 
 class Login extends React.Component {
 
-    componentWillMount() {
-        if (localStorage.getItem('id_token') != null) {
-          this.props.authUser();
-        }
-      }
+    // componentWillMount() {
+    //     if (localStorage.getItem('id_token') != null) {
+    //       this.props.authUser();
+    //     }
+    //   }
 
     state = {
         email: "",

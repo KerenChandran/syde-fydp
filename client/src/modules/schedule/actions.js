@@ -4,6 +4,7 @@ import ApiHeaders from '../api/headers';
 
 export const fetchScheduleBlocksSuccess = createAction(ScheduleConstants.FETCH_SCHEDULE, schedule => ({ schedule }));
 export const validateRequestBlocksSuccess = createAction(ScheduleConstants.VALIDATE_BLOCKS, schedule => ({ schedule }));
+export const deleteRequestedEvent = createAction(ScheduleConstants.DELETE_EVENT, idx => ({ idx }));
 
 export const fetchResourceSchedule = id => async dispatch => {
   try {

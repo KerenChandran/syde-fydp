@@ -5,6 +5,7 @@ import * as UserConstants from './constants';
 
 export const addLoginSuccess = createAction(UserConstants.LOGIN_USER, user => ({ user }));
 export const editProfileSuccess = createAction(UserConstants.EDIT_PROFILE, profile => ({ profile }));
+export const fetchAccountsSuccess = createAction(UserConstants.FETCH_ACCOUNTS, accounts => accounts);
 
 export const signUp = (user, history) => async dispatch => {
   try {
@@ -37,8 +38,18 @@ export const login = (user) => async dispatch => {
     });
     let data = await response.json();
     localStorage.setItem('id_token', data.token);
-    console.log(data.token);
     dispatch(addLoginSuccess(data));
+    response = await fetch('http://localhost:3000/api/get_accounts', {
+      method: 'get',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('id_token')
+      }
+    });
+    data = await response.json();
+    console.log('accounts data', data);
+    dispatch(fetchAccountsSuccess(data));
     dispatch(push('/resources'));
   } catch (error) {
     throw new Error(error);

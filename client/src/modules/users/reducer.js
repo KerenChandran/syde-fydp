@@ -29,6 +29,17 @@ export default (state = initialState, { type, payload }) => {
         };
       };
 
+      case UserConstants.FETCH_ACCOUNTS: {
+        let currentUser = {
+          ...state.currentUser,
+          accounts: payload.account_information
+        };
+
+        return {
+          ...state, currentUser
+        };
+      }
+
     default:
       return state;
   }

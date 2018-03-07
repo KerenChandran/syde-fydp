@@ -3,6 +3,7 @@ import moment from 'moment';
 
 const initialState = {
   events: [],
+  requestedEvents: [],
   errors: [],
   availability_start: null,
   availability_end: null
@@ -21,15 +22,23 @@ export default (state = initialState, { type, payload }) => {
     }
 
     case ScheduleConstants.VALIDATE_BLOCKS: {
-      const { events, ...others } = state;
-      const newEvents = [
-        ...events,
+      const { requestedEvents, ...others } = state;
+      const newRequestedEvents = [
+        ...requestedEvents,
         ...payload.schedule.final_blocks
       ];
       return {
         ...others,
-        events: newEvents,
+        requestedEvents: newRequestedEvents,
         errors: payload.schedule.errors        
+      };
+    }
+
+    case ScheduleConstants.DELETE_EVENT: {
+      const { requestedEvents, ...others } = state;
+      return {
+        requestedEvents: requestedEvents.filter((event, idx) => idx != payload.idx),
+        ...others
       };
     }
 

@@ -12,6 +12,8 @@ import MyResources from './containers/MyResources';
 import ResourceInfoEdit from './containers/ResourceInfoEdit';
 import ResourceInfo from './containers/ResourceInfo';
 import RequestResource from './containers/RequestResource';
+import RequestInfo from './containers/RequestInfo';
+import ScheduleResource from './containers/ScheduleResource';
 import ResourceAvailability from './containers/ResourceAvailability';
 
 import EditProfile from './containers/EditProfile';
@@ -45,7 +47,9 @@ class ApplicationRouter extends Component {
               </Switch>
               <Route exact path="/resources/:id/edit" component={ResourceInfoEdit} />
               <Route exact path="/resources/:id/availability" component={ResourceAvailability} />
-              <Route exact path="/resources/:id/schedule" component={RequestResource} />
+              <Route exact path="/resources/:id/schedule" component={ScheduleResource} />
+              <Route exact path="/resources/:id/incentive" component={RequestResource} />
+              <Route exact path="/resources/:id/request" component={RequestInfo} />
             </div>
           </div>
         </Switch>

@@ -18,15 +18,15 @@ class ResourceInfo extends Component {
   )
 
   handleEditClick = () => {
-    const { currentUserId, history, resource: { resource_id, ownerId }} = this.props;
-    if (currentUserId == ownerId) {
+    const { currentUser, history, resource: { resource_id, ownerId }} = this.props;
+    if (currentUser.id === ownerId) {
       history.push(`/resources/${resource_id}/edit`);
     }
   }
 
   handleDeleteClick = () => {
-    const { currentUserId, deleteResource, resource: { resource_id, ownerId }} = this.props;
-    if (currentUserId == ownerId) {
+    const { currentUser, deleteResource, resource: { resource_id, ownerId }} = this.props;
+    if (currentUser.id === ownerId) {
       deleteResource(resource_id);
       this.handleBackClick();
     }
@@ -38,14 +38,15 @@ class ResourceInfo extends Component {
   }
 
   render() {
-    const { currentUserId, resource } = this.props;
+    const { currentUser, resource } = this.props;
     if (resource == null) {
       return null;
     }
 
     return (
       <ResourceInfoView
-        currentUserId={currentUserId}
+        currentUser={currentUser}
+        isMyResource={resource.ownerId === currentUser.id}
         resource={resource}
         onBackClick={this.handleBackClick}
         onEditClick={this.handleEditClick}
@@ -58,7 +59,7 @@ class ResourceInfo extends Component {
 
 const mapStateToProps = (state, props) => ({
   resource: resourceSelectors.getResource(state, props.match.params.id),
-  currentUserId: userSelectors.currentUserId(state)
+  currentUser: userSelectors.currentUser(state)
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -4,7 +4,7 @@ import { Form, FormGroup, FormControl, ControlLabel, Col, Button, ButtonGroup } 
 
 class ResourceInfoView extends Component {
   render() {
-    const { currentUserId, resource, onDeleteClick, onEditClick, onRequestClick } = this.props;
+    const { currentUser, isMyResource, resource, onDeleteClick, onEditClick, onRequestClick } = this.props;
     const {
       category,
       company,
@@ -27,12 +27,12 @@ class ResourceInfoView extends Component {
     return (
       <div style={{ display: 'block', width: '100%'}}>
         <Form horizontal>
-          { ownerId == currentUserId && (
+          { currentUser != null && (
             <FormGroup>
               <ButtonGroup>
                 {/*<Button bsStyle="danger" onClick={onDeleteClick}>Delete Resource</Button>*/}
-                <Button onClick={onEditClick}>Edit Resource</Button>
-                <Button onClick={onRequestClick}>Request Resource</Button>
+                {isMyResource && <Button onClick={onEditClick}>Edit Resource</Button>}
+                <Button onClick={onRequestClick}>{isMyResource ? "Block Resource" : "Request Resource"}</Button>
               </ButtonGroup>
             </FormGroup>
           )}
