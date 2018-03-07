@@ -496,7 +496,9 @@ def get_requests():
 
 
 @app.route("/validate_request_block", methods=['POST'])
+@auth.login_required
 def validate_request_block():
+    user_id = g.user['id']
     data = request.get_json()
 
     resid = int(data['resource_id'])
@@ -519,6 +521,8 @@ def validate_request_block():
             block['resource_id'], block['block_start'], block['block_end'])
 
         if no_overlap:
+            block['user_id'] = user_id
+
             final_blocks.append(block)
 
     ret_val = {
