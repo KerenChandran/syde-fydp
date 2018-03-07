@@ -18,7 +18,7 @@ from lib.profile import ProfilePipeline
 from lib.schedule import SchedulePipeline, ScheduleFilter
 from lib.accounts import TransactionUtil
 from lib.resource import ResourceUtil
-
+import pdb
 # global application instance
 app = Flask(__name__, static_url_path='')
 # bcrypt for encryption
@@ -46,10 +46,11 @@ def shutdown_server():
 # TODO: Need to verify that token is passed through properly here
 @auth.verify_token
 def verify_token(token):
+    pdb.set_trace()
     user = User()
     user_info = user.verify_token(token)
     if user_info:
-        g.user = user_info
+        setattr(g, 'user', user_info)
         return True
     else:
         return False
@@ -327,6 +328,26 @@ def login_user():
         "user": user_info
     }
 
+    return jsonify(ret_val)
+
+@app.route("/fetch_all_users", methods=['GET'])
+def fetch_all_users():
+    user = User()
+    all_users = user.get_all_users()
+
+    ret_val = {
+        "all_users": all_users
+    }
+    return jsonify(ret_val)
+
+@app.route("/fetch_user_by_id", methods=['POST'])
+def fetch_user():
+    data = request.get_json()
+    user = User()
+    user_info = user.get_user_from_id(data['user_id'])
+    ret_val = {
+        "user": user_info
+    }
     return jsonify(ret_val)
 
 """

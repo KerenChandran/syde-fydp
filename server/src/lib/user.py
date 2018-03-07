@@ -14,23 +14,6 @@ class User:
         self.email = None
         self.user_dict = None
 
-    # Properties and functions for Flask-Login stuff
-    # @property
-    # def is_active(self):
-    #     return True
-    #
-    # @property
-    # def is_authenticated(self):
-    #     return True
-    #
-    # @property
-    # def is_anonymouse(self):
-    #     return False
-    #
-    # def get_id(self):
-    #     # Flask-Login requires this to be unicode value
-    #     return str(self.id).encode("utf-8").decode("utf-8")
-
     def get_user_from_id(self, user_id):
         """
         Given the user id, returns a dictionary of the record
@@ -173,3 +156,14 @@ class User:
 
         # successful
         return self.id
+
+    def get_all_users(self):
+        query = """
+            SELECT *
+            FROM platform_user
+        """
+
+        self.crs.execute(query)
+
+        result = self.crs.fetch_all()
+        return result
