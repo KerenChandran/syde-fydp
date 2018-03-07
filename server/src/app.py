@@ -20,6 +20,8 @@ from lib.accounts import TransactionUtil
 from lib.resource import ResourceUtil
 from lib.request import RequestUtil
 
+import pdb
+
 # global application instance
 app = Flask(__name__, static_url_path='')
 # bcrypt for encryption

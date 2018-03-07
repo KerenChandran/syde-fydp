@@ -41,7 +41,7 @@
                     "data_type": "text"
                 }
             }
-        },
+        }
     },
     "database_fields": {
         "request": ["user_id", "resource_id", "source_account", "target_account"],

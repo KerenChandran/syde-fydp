@@ -2,8 +2,12 @@
     Module to handle creation and update of notifications.
 """
 
+from utils.db import Cursor
+
 class NotificationUtil:
     def __init__(self):
+        self.crs = Cursor()
+
         pass
 
     def create_notification(self, receiver_id, message):
@@ -25,7 +29,7 @@ class NotificationUtil:
         notification_insert_query = \
         """
             INSERT INTO notification (message, read_flag)
-            VALUES ({msg}, False)
+            VALUES ('{msg}', False)
             RETURNING id;
         """.format(msg=message)
 
@@ -39,6 +43,8 @@ class NotificationUtil:
         """.format(uid=receiver_id, nid=notification_id)
 
         self.crs.execute(user_notification_mapping_query)
+
+        self.crs.commit()
 
         return True, notification_id
 
@@ -60,6 +66,8 @@ class NotificationUtil:
         """.format(nid=notification_id)
 
         self.crs.execute(update_notification_query)
+
+        self.crs.commit()
 
         return True
 

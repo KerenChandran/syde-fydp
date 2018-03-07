@@ -9,6 +9,8 @@ from pipeline import Pipeline
 from notification import NotificationUtil
 from accounts import TransactionUtil
 
+import pdb
+
 
 class RequestUtil(Pipeline):
     def __init__(self):
@@ -89,9 +91,9 @@ class RequestUtil(Pipeline):
 
             # convert and re-convert start block
             try:
-                block_start = block_start.strptime(expected_dt_format)
                 block_start = \
-                    dt.datetime.strftime(block_start, expected_dt_format)
+                    dt.datetime.strptime(block_start, expected_dt_format)
+                block_start = block_start.strftime(expected_dt_format)
 
                 block_obj['block_start'] = block_start
             except:
@@ -99,9 +101,9 @@ class RequestUtil(Pipeline):
 
             # convert and re-convert end block
             try:
-                block_end = block_end.strptime(expected_dt_format)
                 block_end = \
-                    dt.datetime.strftime(block_end, expected_dt_format)
+                    dt.datetime.strptime(block_end, expected_dt_format)
+                block_end = block_end.strftime(expected_dt_format)
 
                 block_obj['block_end'] = block_end
             except:
@@ -160,31 +162,33 @@ class RequestUtil(Pipeline):
                 record with incentive information for a given request.
         """
         if not incentive_data['new_incentive'] and \
-            incentive_data['incentive_id'] is None:
+            ('incentive_id' not in incentive_data or incentive_data['incentive_id'] is None):
             self.error_logs.append(
                 "Neither existing incentive or new incentive specified.")
-            return False
+            return None
 
-        incentive_id = incentive_data['incentive_id']
+        incentive_id = \
+            incentive_data['incentive_id'] if 'incentive_id' in incentive_data \
+            else None
 
         if incentive_data['new_incentive']:
             # create a new incentive record
             incentive_load_query = \
             """
                 INSERT INTO incentive (type)
-                VALUES ({type})
+                VALUES ('{type}')
                 RETURNING id;
-            """.format(type=incentive_id['incentive_type'])
+            """.format(type=incentive_data['incentive_type'])
 
             incentive_id = self.crs.fetch_first(incentive_load_query)
 
             # check if user fee information is required
-            if incentive_data['incentive_id'] == 'user_fee' and \
+            if incentive_data['incentive_type'] == 'user_fee' and \
                 ('fee_amount' in incentive_data and 'fee_cadence' in incentive_data):
                 user_fee_load_query = \
                 """
                     INSERT INTO user_fee (fee_amount, cadence)
-                    VALUES ({fee_amt}, {cadence})
+                    VALUES ({fee_amt}, '{cadence}')
                     RETURNING id;
                 """.format(fee_amt=float(incentive_data['fee_amount']),
                            cadence=incentive_data['fee_cadence'])
@@ -196,7 +200,7 @@ class RequestUtil(Pipeline):
                 """
                     UPDATE incentive
                     SET fee_id={fee_id}
-                    WHERE incentive_id={in_id}
+                    WHERE id={in_id}
                 """.format(fee_id=fee_id, in_id=incentive_id)
 
                 self.crs.execute(incentive_update_query)
@@ -210,7 +214,7 @@ class RequestUtil(Pipeline):
 
         self.crs.execute(request_incentive_mapping_query)
 
-        return True
+        return incentive_id
 
     def block_load(self, request_id, block_list):
         """
@@ -234,7 +238,7 @@ class RequestUtil(Pipeline):
             """
                 INSERT INTO request_schedule_blocks
                     (request_id, block_start, block_end)
-                VALUES ({req_id}, {start}, {end})
+                VALUES ({req_id}, '{start}', '{end}')
                 RETURNING block_id;
             """.format(req_id=request_id, start=start, end=end)
 
@@ -270,7 +274,7 @@ class RequestUtil(Pipeline):
 
         message_template = \
         """
-        A request for {rid} has been submitted.
+        A request for resource_id: {rid} has been submitted.
 
         REQUESTER MESSAGE
         -----------------
@@ -302,7 +306,7 @@ class RequestUtil(Pipeline):
         # load schedule blocks
         self.df_transform['block_ids'] = \
             self.df_transform.apply(lambda x: 
-                self.block_load(x['request_id'], x['block_list']), axis=1)
+                self.block_load(x['request_id'], x['requested_blocks']), axis=1)
 
         # load incentive information
         self.df_transform['incentive_id'] = \
@@ -315,6 +319,8 @@ class RequestUtil(Pipeline):
             self.df_transform.apply(lambda x:
                 self.notification_load(x['resource_id'], x['message']), axis=1)
 
+        self.crs.commit()
+
         return
 
     def create_request_packages(self):
@@ -322,11 +328,13 @@ class RequestUtil(Pipeline):
             Underlying method to create a set of packages for all requests. The 
             package includes basic attributes and mapping information.
         """
-        remove_cols = ['incentive_data', 'block_list', 'message']
+        remove_cols = ['incentive_data', 'requested_blocks', 'message']
 
         self.df_transform.drop(remove_cols, inplace=True, axis=1)
 
         self.final_requests = self.df_transform.to_dict(orient='index')
+
+        self.final_requests = self.final_requests.values()
 
         return
 
@@ -504,6 +512,8 @@ class RequestUtil(Pipeline):
         _, notification_id = self.notif_util.create_notification(
             self.get_requester_id(request_id), message)
 
+        self.crs.commit()
+
         return True
 
     def reject_request(self):
@@ -518,7 +528,7 @@ class RequestUtil(Pipeline):
         update_rejection_query = \
         """
             UPDATE request
-            SET owner_reject=True
+            SET owner_rejected=True
             WHERE id = {rid}
         """.format(rid=request_id)
 
@@ -542,6 +552,8 @@ class RequestUtil(Pipeline):
 
         _, notification_id = self.notif_util.create_notification(
             self.get_requester_id(request_id), message)
+
+        self.crs.commit()
 
         return True
 
@@ -567,10 +579,10 @@ class RequestUtil(Pipeline):
 
         # custom transformation for underlying blocks
         self.df_transform['transformed_block_list'] = \
-            self.df_transform['block_list'].apply(
+            self.df_transform['requested_blocks'].apply(
                 lambda x: self.block_transform(x))
 
-        self.df_transform['block_list'] = \
+        self.df_transform['requested_blocks'] = \
             self.df_transform['transformed_block_list']
 
         self.df_transform.drop('transformed_block_list', inplace=True, axis=1)
