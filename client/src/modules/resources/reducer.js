@@ -59,14 +59,7 @@ export default (state = initialState, { type, payload }) => {
         ...others
       };
     }
-
-    case ResourceConstants.TOGGLE_DATA_IMPORT_FORM: {
-      return {
-        ...state,
-        showDataImport: !state.showDataImport
-      }
-    }
-
+    
     case ResourceConstants.TOGGLE_BULK_IMPORT_FORM: {
       return {
         ...state,
@@ -83,19 +76,50 @@ export default (state = initialState, { type, payload }) => {
       };
     }
 
-    case ResourceConstants.SET_EDIT_RESOURCE: {
-      return {
-        ...state,
-        showDataImport: true,
-        editResourceId: payload.id
-      };
-    }
-
     case ResourceConstants.FETCH_RESOURCES: {
       return {
         ...state,
         resources: payload.resources.resource_data
       };
+    }
+    
+    case ResourceConstants.FETCH_RESOURCE: {
+      const { resources } = state;
+      if (!resources.length) {
+        return {
+          ...state,
+          resources: payload.resource.resource_data
+        }
+      }
+
+      let idx = -1;
+      const res = payload.resource.resource_data[0];
+
+      resources.find((resource, index) => {
+        if (resource.resource_id === res.resource_id) {
+          idx = index;
+          return true;
+        }
+        return false;
+      });
+
+      const newResources = [
+        ...resources.slice(0, idx),
+        res,
+        ...resources.slice(idx + 1)
+      ];
+
+      return {
+        ...state,
+        resources: newResources
+      };
+    }
+
+    case ResourceConstants.CLEAR_RESOURCES: {
+      return {
+        ...state,
+        resources: []
+      }
     }
 
     default:

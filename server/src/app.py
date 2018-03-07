@@ -8,26 +8,25 @@ import json
 
 from flask import Flask, jsonify, request, g
 from flask_bcrypt import Bcrypt
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPTokenAuth
 from flask_login import LoginManager
 import requests as rq
 
 from lib.upload import UploadPipeline
 from lib.user import User
+from lib.profile import ProfilePipeline
 from lib.schedule import SchedulePipeline, ScheduleFilter
 from lib.accounts import TransactionUtil
 from lib.resource import ResourceUtil
 from lib.request import RequestUtil
 
-import pdb
-
-
 # global application instance
 app = Flask(__name__, static_url_path='')
 # bcrypt for encryption
 bcrypt = Bcrypt(app)
-# authentication / login modules
-auth = HTTPBasicAuth()
+
+# authentication / login stuff
+auth = HTTPTokenAuth('Bearer')
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -46,23 +45,22 @@ def shutdown_server():
 
 # function for authentication
 # TODO: Need to verify that token is passed through properly here
-@auth.verify_password
-def verify_password(username_or_token, password = None):
+@auth.verify_token
+def verify_token(token):
     user = User()
-    # try verifying by token first
-    user_info = user.verify_token(username_or_token)
-    if not user_info:
-        if not password:
-            return False
-        # now verify by token
-        pw_hash = user.get_password_hash(username_or_token)
-        verify = bcrypt.check_password_hash(pw_hash, password)
-        if verify is True:
-            g.user = user
-        return verify
-    else:
+    user_info = user.verify_token(token)
+    if user_info:
+        g.user = user_info
         return True
+    else:
+        return False
 
+# HELPER METHODS
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
 
 # root URL
 @app.route("/")
@@ -74,15 +72,13 @@ def root():
     UPLOAD ENDPOINTS
 """
 @app.route("/upload_resource", methods=['POST'])
+@auth.login_required
 def upload_resource():
     # get request parameters
     data = request.get_json()
     data = data['resource']
 
-    # user_id = g.user['id']
-
-    # temporarily hard code user id until profiles are working
-    user_id = 1
+    user_id = g.user['id']
 
     # update data point with ownerId
     data['ownerId'] = user_id
@@ -106,6 +102,7 @@ def upload_resource():
 
 
 @app.route("/upload_resource_bulk", methods=['POST'])
+@auth.login_required
 def bulk_resource_upload():
     # get single location for all resources
     data = request.form
@@ -240,7 +237,9 @@ def upload_file():
 """
 @app.route("/new_user", methods=['POST'])
 def new_user():
-    data = request.form
+
+    data = request.get_json()
+    data = data['user']
     email = data['email']
     password_hash = bcrypt.generate_password_hash(data['password'])
 
@@ -248,51 +247,80 @@ def new_user():
     save_user = User()
     user_id = save_user.save(email, password_hash)
 
+    trxn = TransactionUtil(user_id)
+    trxn_success = trxn.create_basic_profile()
+    trxn_accounts = trxn.get_account_information()
+
     # login user
     if user_id is None:
         auth_token = None
         user = None
+        success = False
     # return token
     else:
         auth_token = save_user.generate_auth_token(user_id)
         user = save_user.get_user_from_id(user_id)
+        success = True
 
     ret_val = {
+        "success": success,
+        "trxn_succes": trxn_success,
         "token": auth_token,
-        "user": user
+        "user": user,
+        "accounts": trxn_accounts
     }
 
     return jsonify(ret_val)
 
-
 @app.route("/edit_profile", methods=['POST'])
 @auth.login_required
 def edit_profile():
-    data = request.form
-    # needs token
-    # TODO: check with KC if this is how to get token from client
-    try:
-        token = data['token']
-        user = User()
-        user_info = user.verify_token(token)
-    except:
-        user_info = None
+    data = request.get_json()
+    data = data['profile']
+
+    profile = ProfilePipeline()
+    save = profile.run([data])
+
+    user = User()
+    user_info = user.get_user_from_id(g.user['id'])
+    g.user = user_info
 
     ret_val = {
-        "user_data": user_info
+        "success": save,
+        "user": user_info
+    }
+
+    return jsonify(ret_val)
+
+@app.route("/auth_user", methods=['POST'])
+@auth.login_required
+def auth_user():
+
+    user_id = g.user['id']
+
+    user = User()
+    user_info = user.get_user_from_id(user_id)
+
+    trxn = TransactionUtil(user_id)
+    trxn_accounts = trxn.get_account_information()
+
+    ret_val = {
+        "user": user_info,
+        "accounts": trxn_accounts
     }
     return jsonify(ret_val)
 
 
 @app.route("/login", methods=['POST'])
 def login_user():
-    data = request.form
+    data = request.get_json()
+    data = data['user']
 
     user = User()
     pw_hash = user.get_password_hash(data['email'])
     validate = bcrypt.check_password_hash(pw_hash, data['password'])
     user_info = user.get_user_from_email(data['email'])
-    token = user.generate_auth_token(user_info[0]['id'])
+    token = user.generate_auth_token(user_info['id'])
 
     ret_val = {
         "success": validate,
@@ -302,18 +330,15 @@ def login_user():
 
     return jsonify(ret_val)
 
-
 """
     SCHEDULING ENDPOINTS
 """
 @app.route("/submit_initial_availability", methods=['POST'])
+@auth.login_required
 def submit_initial_availability():
     data = request.get_json()
 
-    # user_id = g.user['id']
-
-    # temporarily hard code user id until profiles are working
-    user_id = 1
+    user_id = g.user['id']
 
     pipeline = SchedulePipeline(user_id=user_id)
 
@@ -328,13 +353,11 @@ def submit_initial_availability():
 
 
 @app.route("/submit_schedule_blocks", methods=['POST'])
+@auth.login_required
 def submit_schedule_blocks():
     data = request.get_json()
 
-    # user_id = g.user['id']
-
-    # temporarily hard code user id until profiles are working
-    user_id = 1
+    user_id = g.user['id']
 
     pipeline = SchedulePipeline(user_id=user_id)
 
@@ -396,6 +419,7 @@ def submit_schedule_filter():
     TRANSACTION ENDPOINTS
 """
 @app.route("/create_basic_profile", methods=['POST'])
+@auth.login_required
 def create_basic_profile():
     """
         Non-primary method used to create a basic trxn profile for a given user.
@@ -414,6 +438,7 @@ def create_basic_profile():
 
 
 @app.route("/get_accounts", methods=['GET'])
+@auth.login_required
 def get_trxn_accounts():
     user_id = g.user['id']
 
@@ -429,7 +454,9 @@ def get_trxn_accounts():
 
 
 @app.route("/specify_account_use", methods=['POST'])
+@auth.login_required
 def specify_account_types():
+    user_id = g.user['id']
     data = request.get_json()
 
     account_id = data['account_id']

@@ -7,7 +7,6 @@ import pandas as pd
 from utils.db import Cursor
 from utils.es import Connect
 
-
 class Pipeline(object):
     def __init__(self, json_filename):
         # all cursors and connections

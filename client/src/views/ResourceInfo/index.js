@@ -30,7 +30,7 @@ class ResourceInfoView extends Component {
           { ownerId == currentUserId && (
             <FormGroup>
               <ButtonGroup>
-                <Button bsStyle="danger" onClick={onDeleteClick}>Delete Resource</Button>
+                {/*<Button bsStyle="danger" onClick={onDeleteClick}>Delete Resource</Button>*/}
                 <Button onClick={onEditClick}>Edit Resource</Button>
                 <Button onClick={onRequestClick}>Request Resource</Button>
               </ButtonGroup>

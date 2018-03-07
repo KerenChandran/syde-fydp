@@ -1,21 +1,17 @@
 import React from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import { Redirect } from 'react-router-dom';
-import {Form, FormGroup, FormControl, ControlLabel, Col, Button} from 'react-bootstrap'
+import {Grid, Form, FormGroup, FormControl, ControlLabel, Row, Col, Button} from 'react-bootstrap'
+import { bootstrapUtils } from 'react-bootstrap/lib/utils'
 import {userActions} from '../modules/users'
+import {Redirect} from 'react-router-dom'
 
-class Login extends React.Component {
-
-    componentWillMount() {
-        if (localStorage.getItem('id_token') != null) {
-          this.props.authUser();
-        }
-      }
+class SignUp extends React.Component {
 
     state = {
         email: "",
         password: "",
+        redirect: false
     };
 
     handleChange = name => event => {
@@ -23,7 +19,7 @@ class Login extends React.Component {
     };
 
     handleSubmit = () => {
-        this.props.login(this.state, this.props.history);
+        let success = this.props.signUp(this.state, this.props.history);
     };
 
     render() {
@@ -54,7 +50,7 @@ class Login extends React.Component {
 
                 <div class="row">
                     <div class="col-sm-8" style={{textAlign: 'center', marginTop: 10+'px'}}>
-                        <button type="submit" onClick={this.handleSubmit} class="btn btn-primary">Login</button>
+                        <button type="submit" onClick={this.handleSubmit} class="btn btn-primary">Sign up</button>
                     </div>
                 </div>
             </div>
@@ -63,8 +59,8 @@ class Login extends React.Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-    login: bindActionCreators(userActions.login, dispatch),
-    authUser: bindActionCreators(userActions.authUser, dispatch),
+    signUp: bindActionCreators(userActions.signUp, dispatch)
 });
 
-export default connect(null, mapDispatchToProps)(Login)
+
+export default connect(null, mapDispatchToProps)(SignUp)
