@@ -39,9 +39,9 @@ class RequestResource extends Component {
   }
 
   handleAccept = () => {
-    const { history, saveRequest, match: { params } } = this.props;
+    const { history, saveIncentive, match: { params } } = this.props;
     
-    saveRequest(this.state);
+    saveIncentive(this.state);
     history.push(`/resources/${params.id}/request`);
   }
 
@@ -125,7 +125,7 @@ const mapStateToProps = (state, props) => ({
 
 const mapDispatchToProps = dispatch => ({
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
-  saveRequest: bindActionCreators(requestActions.saveRequest, dispatch)
+  saveIncentive: bindActionCreators(requestActions.saveIncentive, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RequestResource);

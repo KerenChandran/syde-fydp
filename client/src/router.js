@@ -15,6 +15,8 @@ import RequestResource from './containers/RequestResource';
 import RequestInfo from './containers/RequestInfo';
 import ScheduleResource from './containers/ScheduleResource';
 import ResourceAvailability from './containers/ResourceAvailability';
+import Requests from './containers/Requests';
+import RequestReview from './containers/RequestReview';
 
 import EditProfile from './containers/EditProfile';
 import Login from './containers/Login';
@@ -24,11 +26,24 @@ import { resourceActions } from './modules/resources';
 import { userActions } from './modules/users';
 
 class ApplicationRouter extends Component {
+  state = {
+    loading: localStorage.getItem('id_token') != null
+  }
+  componentDidMount() {
+    if (localStorage.getItem('id_token')) {
+      this.props.authUser(this.setState({ loading: false}));
+    }
+  }
+
   componentWillUnmount() {
     localStorage.removeItem('id_token');
   }
 
   render() {
+    if (this.state.loading) {
+      return null;
+    }
+
     return (
       <ConnectedRouter {...this.props}>
         <Switch>
@@ -36,6 +51,8 @@ class ApplicationRouter extends Component {
           <Route exact path="/login" component={Login} />
           <Route exact path="/signup" component={SignUp} />
           <Route exact path="/profile/edit" component={EditProfile} />
+          <Route exact path="/requests" component={Requests}/>
+          <Route exact path="/requests/:id" component={RequestReview}/>
           <div className="App-root">
             <Header />
             <div className="App-content">

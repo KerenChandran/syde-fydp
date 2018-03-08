@@ -24,7 +24,7 @@ export const fetchResources = () => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/get_resources', {
       method: 'post',
-      headers: ApiHeaders,
+      headers: ApiHeaders(),
       body: JSON.stringify({ resource_list: [] })
     });
     let data = await response.json();
@@ -38,7 +38,7 @@ export const fetchResource = (id) => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/get_resources', {
       method: 'post',
-      headers: ApiHeaders,
+      headers: ApiHeaders(),
       body: JSON.stringify({ resource_list: [id] })
     });
     let data = await response.json();
@@ -57,7 +57,7 @@ export const addDataImport = (resource) => async dispatch => {
     }
     let response = await fetch('http://localhost:3000/api/upload_resource', {
       method: 'post',
-      headers: ApiHeaders,
+      headers: ApiHeaders(),
       body: JSON.stringify({ resource: resource })
     });
     let data = await response.json();
@@ -94,7 +94,7 @@ export const initialAvailability = (availability) => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/submit_initial_availability', {
       method: 'post',
-      headers: ApiHeaders,
+      headers: ApiHeaders(),
       body: JSON.stringify(availability)
     });
     let data = await response.json();
@@ -108,7 +108,7 @@ export const fetchScheduleFilterResources = (filters) => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/submit_schedule_filter', {
       method: 'post',
-      headers: ApiHeaders,
+      headers: ApiHeaders(),
       body: JSON.stringify(filters)
     });
     let data = await response.json();

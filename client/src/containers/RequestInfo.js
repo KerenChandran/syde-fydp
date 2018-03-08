@@ -30,23 +30,17 @@ class RequestInfo extends Component {
   }
 
   componentWillUnmount() {
-    this.props.clearRequest();
+    this.props.clearIncentive();
   }
 
   handleSubmit = () => {
-    const { currentUser, resource, request, requestedEvents, submitRequest } = this.props;
+    const { currentUser, resource, incentive, requestedEvents, submitRequest } = this.props;
     const { source_account, message } = this.state;
+    
+    const { new_incentive, ...others } = incentive;
+    const incentive_data = new_incentive ? { new_incentive, ...others } : { new_incentive, incentive_id: resource.incentive_id };
 
-    const { new_incentive, incentive_id, ...others } = request;
-    const incentive_data = new_incentive ? {
-      new_incentive,
-      ...others
-    } : {
-      new_incentive,
-      incentive_id
-    };
-
-  submitRequest({
+    submitRequest({
       resource_id: resource.resource_id,
       user_id: currentUser.id,
       requested_blocks: requestedEvents,
@@ -97,14 +91,14 @@ class RequestInfo extends Component {
 
 const mapStateToProps = (state, props) => ({
   currentUser: userSelectors.currentUser(state),
-  request: requestSelectors.getRequest(state),
+  incentive: requestSelectors.getRequestIncentive(state),
   requestedEvents: scheduleSelectors.getRequestedEvents(state),
   resource: resourceSelectors.getResource(state, props.match.params.id),
   accounts: userSelectors.currentUserAccounts(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-  clearRequest: bindActionCreators(requestActions.clearRequest, dispatch),
+  clearIncentive: bindActionCreators(requestActions.clearIncentive, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
   submitRequest: bindActionCreators(requestActions.submitRequest, dispatch)
 });

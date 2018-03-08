@@ -1,23 +1,43 @@
 import * as RequestConstants from './constants';
 
 const initialState = {
-  fee_amount: null,
-  fee_cadence: null,
-  incentive_type: null,
-  new_incentive: false
+  incentive: {
+    fee_amount: null,
+    fee_cadence: null,
+    incentive_type: null,
+    new_incentive: false,
+  },
+  requests: []
 };
 
 export default (state = initialState, { type, payload }) => {
   switch(type) {
-    case RequestConstants.SAVE_REQUEST: {
+    case RequestConstants.FETCH_REQUESTS: {
       return {
         ...state,
-        ...payload.request
+        requests: payload.request_data
+      } 
+    }
+
+    case RequestConstants.SAVE_INCENTIVE: {
+      return {
+        ...state,
+        incentive: payload.incentive
       }
     }
 
-    case RequestConstants.CLEAR_REQUEST: {
-      return initialState;
+    case RequestConstants.CLEAR_INCENTIVE: {
+      return {
+        ...state,
+        incentive: initialState.incentive
+      }
+    }
+
+    case RequestConstants.CLEAR_REQUESTS: {
+      return {
+        ...state,
+        requests: []
+      }
     }
 
     default: {
