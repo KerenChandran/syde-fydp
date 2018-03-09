@@ -4,6 +4,7 @@
 
 from utils.db import Cursor
 
+
 class NotificationUtil:
     def __init__(self):
         self.crs = Cursor()
@@ -29,7 +30,7 @@ class NotificationUtil:
         notification_insert_query = \
         """
             INSERT INTO notification (message, read_flag)
-            VALUES ('{msg}', False)
+            VALUES ({msg}, False)
             RETURNING id;
         """.format(msg=message)
 
