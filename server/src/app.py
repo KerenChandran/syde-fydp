@@ -20,6 +20,8 @@ from lib.accounts import TransactionUtil
 from lib.resource import ResourceUtil
 from lib.request import RequestUtil
 
+import pdb
+
 # global application instance
 app = Flask(__name__, static_url_path='')
 # bcrypt for encryption
@@ -47,7 +49,6 @@ def shutdown_server():
 # TODO: Need to verify that token is passed through properly here
 @auth.verify_token
 def verify_token(token):
-    pdb.set_trace()
     user = User()
     user_info = user.verify_token(token)
     if user_info:
