@@ -642,8 +642,9 @@ class RequestUtil(Pipeline):
         request_retrieval_query = \
         """
             SELECT 
-                req.id, req.resource_id, inc.type as incentive_type,
-                uf.fee_amount, uf.cadence as fee_cadence
+                req.id, req.resource_id, req.user_id as requester_id
+                inc.type as incentive_type, uf.fee_amount, 
+                uf.cadence as fee_cadence
             FROM request req
             INNER JOIN resource_user rus
                 ON req.resource_id = rus.resource_id
