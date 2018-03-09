@@ -660,13 +660,22 @@ class RequestUtil(Pipeline):
 
         request_data = self.crs.fetch_dict(request_retrieval_query)
 
+        # special handling of decimal fields
+        decimal_fields = ['fee_amount']
+
+        for req in request_data:
+            for fld, val in req.iteritems():
+                if fld in decimal_fields:
+                    req[fld] = float(val)
+
+        # restructure data to allow eventual merge
         placeholder = {}
 
         for elem in request_data:
             if elem['id'] not in placeholder:
                 placeholder[elem['id']] = elem
 
-        request_data = placeholder
+        request_data = placeholder.values()
 
         # retrieve block list for all requests
         block_retrieval_query = \
@@ -681,6 +690,13 @@ class RequestUtil(Pipeline):
         """.format(owner_id=owner_id)
 
         block_data = self.crs.fetch_dict(block_retrieval_query)
+
+        # special handling of datetime objects
+        for block in block_data:
+            for fld, val in block.iteritems():
+                if isinstance(val, dt.datetime):
+                    # convert datetime objects to iso strings
+                    block[fld] = val.isoformat()
 
         placeholder = {}
 
@@ -698,7 +714,7 @@ class RequestUtil(Pipeline):
             elem['block_list'] = \
                 block_data[elem['id']] if elem['id'] in block_data else []
 
-        return request_data.values()
+        return request_data
 
 
 if __name__ == '__main__':
