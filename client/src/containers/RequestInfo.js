@@ -15,7 +15,8 @@ import {
   Col,
   ControlLabel,
   FormControl,
-  Button
+  Button,
+  Row
 } from 'react-bootstrap';
 
 class RequestInfo extends Component {
@@ -59,14 +60,19 @@ class RequestInfo extends Component {
   );
 
   render() {
-    const { accounts } = this.props;
-    const { message } = this.state;
+    const { accounts, resource } = this.props;
+    const { message, source_account } = this.state;
 
     return (
-      <div className="form-horizontal">
-        Choose account
+      <div className="container form-horizontal">
+        <h2 style={{ textAlign: 'center' }}>Final Review</h2>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Fee</Col>
+          <Col sm={10}>${resource.fee_amount} / {resource.fee_cadence} </Col>
+        </Row>
+        <h4>Choose account</h4>
         <ButtonToolbar vertical>
-          <ToggleButtonGroup type="radio" name="options" defaultValue={1} onChange={this.handleRadioChange('source_account')}>
+          <ToggleButtonGroup type="radio" name="options" onChange={this.handleRadioChange('source_account')} value={source_account}>
             { accounts.map(account => (
               <ToggleButton key={account.id} value={account.id}>ID: {account.id} - {account.type}, ${account.balance}</ToggleButton>
             ))}
@@ -83,7 +89,7 @@ class RequestInfo extends Component {
             />
           </Col>
         </FormGroup>
-        <Button bsStyle="primary" onClick={this.handleSubmit}>Submit</Button>
+        {source_account != null && <Button bsClass="col-sm-12 btn" bsStyle="primary" onClick={this.handleSubmit}>Submit</Button>}
       </div>
     );
   }
