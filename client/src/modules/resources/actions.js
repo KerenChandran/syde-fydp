@@ -53,7 +53,7 @@ export const fetchResource = (id, callback) => async dispatch => {
 
 export const saveResource = resource => async dispatch => {
   dispatch(createAction(ResourceConstants.SAVE_NEW_RESOURCE, resource => ({ resource }))(resource));
-  dispatch(push('/resources/new/availability'));
+  (resource.resource_id == undefined) ? dispatch(push('/resources/new/availability')) : dispatch(push(`/resources/${resource.resource_id}/availability`));
 }
 
 export const updateResource = resource => async dispatch => {
@@ -77,10 +77,10 @@ export const addDataImport = (resource) => async dispatch => {
     resource.resource_id = data.resource_id;
     if (updateFlag) {
       dispatch(updateResourceSucesses(resource));
-      dispatch(push('/resources/'));
+      dispatch(push(`/resources/${data.resource_id}/availability`));
     }
     dispatch(addResourceSuccess(resource));
-    return dispatch(push(`/resources/${data.resource_id}/availability`));
+    return data.resource_id;
   } catch (error) {
     throw new Error(error);
   }

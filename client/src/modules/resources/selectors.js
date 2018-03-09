@@ -60,3 +60,5 @@ export const resourceOwnedByCurrentUser = (state, id) => {
     return resource.ownerId === currentUserId(state)
   }
 };
+
+export const getNewResource = state => state.resources.newResource;

@@ -252,8 +252,8 @@ class RequestResource extends Component {
           onSelectSlot={this.handleSelectSlot}
           onNavigate={this.handleNavigate}
           titleAccessor={event => event.user_id === currentUser.id ? `${currentUser.first_name} ${currentUser.last_name}` : "Unavailable"}
-          startAccessor="block_start"
-          endAccessor="block_end"
+          startAccessor={event => new Date(event.block_start)}
+          endAccessor={event => new Date(event.block_end)}
           allDayAccessor={this.allDayCheck}
         />
         <Modal show={showEventDetails} onHide={this.handleEventDetailClose}>

@@ -5,7 +5,7 @@ import { withRouter } from 'react-router';
 import moment from 'moment';
 import momentLocalizer from 'react-widgets-moment';
 
-import { resourceActions } from '../modules/resources'; 
+import { resourceActions, resourceSelectors } from '../modules/resources'; 
 
 import { DateTimePicker } from 'react-widgets';
 import {
@@ -50,16 +50,21 @@ class ResourceAvailability extends Component {
     this.setState({ [name]: event.target.value })
   )
 
-  handleSubmit = () => {
-    const { history, initialAvailability } = this.props;
-    const { resource_id, start, end } = this.state;
-    if (resource_id !== 'new') {
-      initialAvailability({
-        resource_id,
-        availability_start: moment(start).format('YYYY-MM-DD'),
-        availability_end: moment(end).format('YYYY-MM-DD'),
-      });
-    }
+  handleSubmit = async () => {
+    const { history, initialAvailability, newResource, addResource } = this.props;
+    const { resource_id, start, end, incentive_type, fee_amount, fee_cadence, available } = this.state;
+    const newId = await addResource({
+      ...newResource,
+      incentive_type,
+      fee_amount,
+      fee_cadence,
+      available
+    });
+    await initialAvailability({
+      resource_id: resource_id === 'new' ? newId : resource_id,
+      availability_start: moment(start).format('YYYY-MM-DD'),
+      availability_end: moment(end).format('YYYY-MM-DD'),
+    });
   }
 
   render() {
@@ -135,8 +140,13 @@ class ResourceAvailability extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  newResource: resourceSelectors.getNewResource(state)
+});
+
 const mapDispatchToProps = (dispatch) => ({
+  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
   initialAvailability: bindActionCreators(resourceActions.initialAvailability, dispatch)
 })
 
-export default withRouter(connect(null, mapDispatchToProps)(ResourceAvailability));
+export default connect(mapStateToProps, mapDispatchToProps)(ResourceAvailability);

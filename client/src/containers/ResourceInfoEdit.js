@@ -20,13 +20,12 @@ class ResourceInfoEdit extends Component {
   )
 
   handleSubmit = (state) => {
-    const { addResource } = this.props;
-    addResource(state);
+    const { saveResource } = this.props;
+    saveResource(state);
   }
 
   render() {
     const {
-      addResource,
       resource,
       updateResource,
       match: { params }
@@ -50,7 +49,7 @@ const mapStateToProps = (state, props) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
+  saveResource: bindActionCreators(resourceActions.saveResource, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch)
 })
 

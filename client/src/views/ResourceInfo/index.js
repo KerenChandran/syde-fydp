@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Form, FormGroup, FormControl, ControlLabel, Col, Button, ButtonGroup } from 'react-bootstrap';
+import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup } from 'react-bootstrap';
 
 class ResourceInfoView extends Component {
   render() {
@@ -25,87 +25,76 @@ class ResourceInfoView extends Component {
     const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';
 
     return (
-      <div style={{ display: 'block', width: '100%'}}>
-        <Form horizontal>
-          { currentUser != null && (
-            <FormGroup>
-              <ButtonGroup>
-                {/*<Button bsStyle="danger" onClick={onDeleteClick}>Delete Resource</Button>*/}
-                {isMyResource && <Button onClick={onEditClick}>Edit Resource</Button>}
-                <Button onClick={onRequestClick}>{isMyResource ? "Block Resource" : "Request Resource"}</Button>
-              </ButtonGroup>
-            </FormGroup>
-          )}
-          <FormGroup controlId="formCategory">
-            <Col componentClass={ControlLabel} sm={2}>Category</Col>
-            <Col sm={10}><FormControl.Static>{category}</FormControl.Static></Col>
-          </FormGroup>
-      
-          <FormGroup controlId="formCompany">
-            <Col componentClass={ControlLabel} sm={2}>Company</Col>
-            <Col sm={10}><FormControl.Static>{company}</FormControl.Static></Col>
-          </FormGroup>
+      <div className="container">
+        { currentUser != null && (
+          <Row>
+            {isMyResource && <Button bsClass="col-sm-6 btn" onClick={onEditClick}>Edit Resource</Button>}
+            <Button bsClass={isMyResource ? "col-sm-6 btn" : "col-sm-6 col-sm-offset-6 btn"} bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Block Resource" : "Request Resource"}</Button>
+          </Row>
+        )}
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Category</Col>
+          <Col sm={10}><FormControl.Static>{category}</FormControl.Static></Col>
+        </Row>
 
-          <FormGroup controlId="formFaculty">
-            <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
-            <Col sm={10}><FormControl.Static>{faculty}</FormControl.Static></Col>
-          </FormGroup>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Model</Col>
+          <Col sm={10}><FormControl.Static>{model}</FormControl.Static></Col>
+        </Row>
 
-          <FormGroup controlId="formLocation">
-            <Col componentClass={ControlLabel} sm={2}>Location</Col>
-            <Col sm={10}><FormControl.Static>{location.name}</FormControl.Static></Col>
-          </FormGroup>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Description</Col>
+          <Col sm={10}><FormControl.Static>{description}</FormControl.Static></Col>
+        </Row>
+    
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
+          <Col sm={10}><FormControl.Static>{company}</FormControl.Static></Col>
+        </Row>
 
-          <FormGroup controlId="formModel">
-            <Col componentClass={ControlLabel} sm={2}>Model</Col>
-            <Col sm={10}><FormControl.Static>{model}</FormControl.Static></Col>
-          </FormGroup>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
+          <Col sm={10}><FormControl.Static>{mobile ? 'Yes' : 'No'}</FormControl.Static></Col>
+        </Row>
 
-          <FormGroup controlId="formMobile">
-            <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
-            <Col sm={10}><FormControl.Static>{mobile ? 'Yes' : 'No'}</FormControl.Static></Col>
-          </FormGroup>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Location</Col>
+          <Col sm={10}><FormControl.Static>{location.name}</FormControl.Static></Col>
+        </Row>
 
-          <FormGroup controlId="formAvailable">
-            <Col componentClass={ControlLabel} sm={2}>Available</Col>
-            <Col sm={10}><FormControl.Static>{available ? 'Yes' : 'No'}</FormControl.Static></Col>
-          </FormGroup>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Rules for Use</Col>
+          <Col sm={10}><FormControl.Static>{rules_restrictions}</FormControl.Static></Col>
+        </Row>
 
-          <FormGroup controlId="formDescription">
-            <Col componentClass={ControlLabel} sm={2}>Description</Col>
-            <Col sm={10}><FormControl.Static>{description}</FormControl.Static></Col>
-          </FormGroup>
+        {/* <Row>
+          <Col componentClass={ControlLabel} sm={2}>Application</Col>
+          <Col sm={10}><FormControl.Static>{application}</FormControl.Static></Col>
+        </Row> */}
 
-          <FormGroup controlId="formRules">
-            <Col componentClass={ControlLabel} sm={2}>Rules</Col>
-            <Col sm={10}><FormControl.Static>{rules_restrictions}</FormControl.Static></Col>
-          </FormGroup>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Available</Col>
+          <Col sm={10}><FormControl.Static>{available ? 'Yes' : 'No'}</FormControl.Static></Col>
+        </Row>
 
-          <FormGroup controlId="formApplication">
-            <Col componentClass={ControlLabel} sm={2}>Application</Col>
-            <Col sm={10}><FormControl.Static>{application}</FormControl.Static></Col>
-          </FormGroup>
+        {/* <Row>
+          <Col componentClass={ControlLabel} sm={2}>Incentive</Col>
+          <Col sm={10}><FormControl.Static>{incentive}</FormControl.Static></Col>
+        </Row> */}
 
-          <FormGroup controlId="formIncentive">
-            <Col componentClass={ControlLabel} sm={2}>Incentive</Col>
-            <Col sm={10}><FormControl.Static>{incentive}</FormControl.Static></Col>
-          </FormGroup>
-
-          {
-            incentive_type === 'user_fees' && 
-            <div>
-              <FormGroup controlId="formIncentive">
-                <Col componentClass={ControlLabel} sm={2}>Fee Amount</Col>
-                <Col sm={10}><FormControl.Static>{fee_amount}</FormControl.Static></Col>
-              </FormGroup>
-              <FormGroup controlId="form">
-                <Col componentClass={ControlLabel} sm={2}>Fee Cadence</Col>
-                <Col sm={10}><FormControl.Static>{fee_cadence}</FormControl.Static></Col>
-              </FormGroup>
-            </div>
-          }
-
-        </Form>
+        {
+          available && incentive_type === 'user_fee' && 
+          <div>
+            <Row>
+              <Col componentClass={ControlLabel} sm={2}>Fee Amount</Col>
+              <Col sm={10}><FormControl.Static>{fee_amount}</FormControl.Static></Col>
+            </Row>
+            <Row>
+              <Col componentClass={ControlLabel} sm={2}>Fee Cadence</Col>
+              <Col sm={10}><FormControl.Static>{fee_cadence}</FormControl.Static></Col>
+            </Row>
+          </div>
+        }
       </div>
     );
   }
