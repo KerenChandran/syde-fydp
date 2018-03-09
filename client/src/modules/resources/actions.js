@@ -48,6 +48,16 @@ export const fetchResource = (id) => async dispatch => {
   }
 };
 
+export const saveResource = resource => async dispatch => {
+  dispatch(createAction(ResourceConstants.SAVE_NEW_RESOURCE, resource => ({ resource }))(resource));
+  dispatch(push('/resources/new/availability'));
+}
+
+export const updateResource = resource => async dispatch => {
+  dispatch(createAction(ResourceConstants.UPDATE_RESOURCE, resource => ({ resource }))(resource));
+  dispatch(push(`/resources/${resource.resource_id}/availability`));
+}
+
 export const addDataImport = (resource) => async dispatch => {
   try {
     let updateFlag = true;

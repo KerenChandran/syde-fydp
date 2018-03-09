@@ -2,9 +2,8 @@ import * as ResourceConstants from './constants';
 
 const initialState = {
   resources: [],
-  showDataImport: false,
   showBulkImport: false,
-  editResourceId: null
+  newResource: {}
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -120,6 +119,13 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         resources: []
       }
+    }
+
+    case ResourceConstants.SAVE_NEW_RESOURCE: {
+      return {
+        ...state,
+        newResource: payload.resource
+      };
     }
 
     default:

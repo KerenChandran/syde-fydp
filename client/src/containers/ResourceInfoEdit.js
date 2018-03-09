@@ -20,8 +20,8 @@ class ResourceInfoEdit extends Component {
   )
 
   handleSubmit = (state) => {
-    const { addResource, history } = this.props;
-    addResource(state, history);
+    const { addResource } = this.props;
+    addResource(state);
   }
 
   render() {
@@ -54,4 +54,4 @@ const mapDispatchToProps = (dispatch) => ({
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch)
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResourceInfoEdit));
+export default connect(mapStateToProps, mapDispatchToProps)(ResourceInfoEdit);

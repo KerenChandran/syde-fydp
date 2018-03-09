@@ -47,7 +47,7 @@ export const login = (user) => async dispatch => {
     data = await response.json();
     console.log('accounts data', data);
     dispatch(fetchAccountsSuccess(data));
-    dispatch(push('/resources'));
+    // dispatch(push('/resources'));
   } catch (error) {
     throw new Error(error);
   }

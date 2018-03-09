@@ -18,6 +18,7 @@ import {
   FormGroup,
   Modal
 } from 'react-bootstrap';
+import BootstrapSwitch from 'react-bootstrap-switch';
 
 moment.locale('en');
 momentLocalizer();
@@ -29,54 +30,106 @@ class ResourceAvailability extends Component {
     this.state = {
       resource_id: props.match.params.id,
       start: new Date(),
-      end: null
+      end: null,
+      incentive_type: 'user_fee',
+      fee_amount: null,
+      fee_cadence: 'hourly',
+      available: true
     };
   }
+
+  handleSwitchChange = (name) => (event, state) => (
+    this.setState({ [name]: state })
+  )
   
   handleUpdateDateEvent = name => value => {
     this.setState({ [name]: value })
   }
 
+  handleChange = (name) => (event) => (
+    this.setState({ [name]: event.target.value })
+  )
+
   handleSubmit = () => {
     const { history, initialAvailability } = this.props;
     const { resource_id, start, end } = this.state;
-    initialAvailability({
-      resource_id,
-      availability_start: moment(start).format('YYYY-MM-DD'),
-      availability_end: moment(end).format('YYYY-MM-DD'),
-    }, history);
+    if (resource_id !== 'new') {
+      initialAvailability({
+        resource_id,
+        availability_start: moment(start).format('YYYY-MM-DD'),
+        availability_end: moment(end).format('YYYY-MM-DD'),
+      });
+    }
   }
 
   render() {
-    const { start, end } = this.state;
+    const { start, end, incentive_type, fee_amount, fee_cadence, available } = this.state;
     return (
-      <div className="form-horizontal">
-        <button onClick={this.handleSubmit}>Submit</button>
-        <FormGroup controlId="formStart">
-          <Col componentClass={ControlLabel} sm={2}>Start</Col>
+      <div className="container form-horizontal">
+        <FormGroup controlId="formAvailable">
+          <Col componentClass={ControlLabel} sm={2}>Available</Col>
           <Col sm={10}>
-            <DateTimePicker
-              min={new Date()}
-              format='MMMM DD, YYYY'
-              time={false}
-              onChange={this.handleUpdateDateEvent('start')}
-              value={start}
-            />
+            <BootstrapSwitch offText="No" onText="Yes" onChange={this.handleSwitchChange('available')} value={available} />
           </Col>
         </FormGroup>
 
-        <FormGroup controlId="formEnd">
-          <Col componentClass={ControlLabel} sm={2}>End</Col>
-          <Col sm={10}>
-            <DateTimePicker
-              min={start}
-              format='MMMM DD, YYYY'
-              time={false}
-              onChange={this.handleUpdateDateEvent('end')}
-              value={end}
-            />
-          </Col>
-        </FormGroup>
+        { available && (
+          <div>
+          { 
+            incentive_type === 'user_fee' && 
+            <div>
+              <FormGroup controlId="formFees">
+                <Col componentClass={ControlLabel} sm={2}>Fee Amount</Col>
+                <Col sm={10}>
+                  <FormControl
+                    type="number"
+                    value={fee_amount}
+                    placeholder="Free"
+                    onChange={this.handleChange('fee_amount')}
+                  />
+                </Col>
+              </FormGroup>
+  
+              <FormGroup controlId="formCadence">
+                <Col componentClass={ControlLabel} sm={2}>Fee Cadence</Col>
+                <Col sm={10}>
+                  <FormControl componentClass="select" placeholder="Fee Cadence" onChange={this.handleChange('fee_cadence')} value={fee_cadence}>
+                    <option value="hourly">Hourly</option>
+                    <option value="daily">Daily</option>
+                  </FormControl>
+                </Col>
+              </FormGroup>
+            </div>
+          }
+  
+          <FormGroup controlId="formStart">
+            <Col componentClass={ControlLabel} sm={2}>Start</Col>
+            <Col sm={10}>
+              <DateTimePicker
+                min={new Date()}
+                format='MMMM DD, YYYY'
+                time={false}
+                onChange={this.handleUpdateDateEvent('start')}
+                value={start}
+              />
+            </Col>
+          </FormGroup>
+  
+          <FormGroup controlId="formEnd">
+            <Col componentClass={ControlLabel} sm={2}>End</Col>
+            <Col sm={10}>
+              <DateTimePicker
+                min={start}
+                format='MMMM DD, YYYY'
+                time={false}
+                onChange={this.handleUpdateDateEvent('end')}
+                value={end}
+              />
+            </Col>
+          </FormGroup>
+          </div>
+        )}
+        <Button bsClass="col-sm-10 col-sm-offset-2 btn" bsStyle="primary" onClick={this.handleSubmit}>Continue</Button>
       </div>
     );
   }

@@ -8,12 +8,18 @@ import {
   Button
 } from 'react-bootstrap';
 
+import BootstrapSwitch from 'react-bootstrap-switch';
+
 import LocationSearch from '../../components/LocationSearch';
 
 class ResourceInfoEditView extends Component {
   constructor(props) {
     super(props);
-    this.state = { ...this.props.resource }
+    this.state = {
+      incentive_type: 'user_fee',
+      mobile: true,
+      ...this.props.resource
+    }
   }
 
   handleChange = (name) => (event) => (
@@ -24,8 +30,8 @@ class ResourceInfoEditView extends Component {
     this.setState({ [name]: parseInt(event.target.value, 10) })
   )
 
-  handleSwitchChange = (name) => (event, checked) => (
-    this.setState({ [name]: checked })
+  handleSwitchChange = (name) => (event, state) => (
+    this.setState({ [name]: state })
   )
 
   handleLocationChange = (location) => {
@@ -56,16 +62,8 @@ class ResourceInfoEditView extends Component {
     return (
       <div style={{ display: 'block', width: '100%'}}>
         <div className="form-horizontal">
-          <FormGroup>
-            <Col smOffset={10} sm={2}>
-              <Button type="button" onClick={this.props.onBackClick}>Go Back</Button>
-              <Button bsStyle="primary" type="submit" onClick={this.handleSubmit}>Submit</Button>
-            </Col>
-          </FormGroup>
           <FormGroup controlId="formCategory">
-            <Col componentClass={ControlLabel} sm={2}>
-              Category
-            </Col>
+            <Col componentClass={ControlLabel} sm={2}>Category</Col>
             <Col sm={10}>
               <FormControl
                 type="text"
@@ -74,40 +72,6 @@ class ResourceInfoEditView extends Component {
                 onChange={this.handleChange('category')}
               />
             </Col>
-          </FormGroup>
-
-          <FormGroup controlId="formCompany">
-            <Col componentClass={ControlLabel} sm={2}>Company</Col>
-            <Col sm={10}>
-              <FormControl
-                type="text"
-                value={company}
-                placeholder="Company"
-                onChange={this.handleChange('company')}
-              />
-            </Col>
-          </FormGroup>
-
-          <FormGroup controlId="formFaculty">
-            <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
-            <Col sm={10}>
-              <FormControl
-                type="text"
-                value={faculty}
-                placeholder="Faculty"
-                onChange={this.handleChange('faculty')}
-              />
-            </Col>
-          </FormGroup>
-
-          <FormGroup controlId="formLocation">
-            <Col componentClass={ControlLabel} sm={2}>Location</Col>
-            <Col sm={10}>
-              <LocationSearch
-                onChange={this.handleLocationChange}
-                location={location}
-              />
-            </Col>            
           </FormGroup>
 
           <FormGroup controlId="formModel">
@@ -122,30 +86,6 @@ class ResourceInfoEditView extends Component {
             </Col>
           </FormGroup>
 
-
-          <FormGroup controlId="formMobile">
-            <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
-            <Col sm={10}>
-              <FormControl componentClass="select" onChange={this.handleChange('mobile')} value={mobile}>
-                <option value="">N/A</option>
-                <option value={false}>False</option>
-                <option value={true}>True</option>
-              </FormControl>
-            </Col>
-          </FormGroup>
-
-          <FormGroup controlId="formAvailable">
-            <Col componentClass={ControlLabel} sm={2}>Available</Col>
-            <Col sm={10}>
-              <FormControl componentClass="select" onChange={this.handleChange('available')} value={available}>
-                <option value="">N/A</option>
-                <option value={false}>False</option>
-                <option value={true}>True</option>
-              </FormControl>
-            </Col>
-          </FormGroup>
-
-
           <FormGroup controlId="formDescription">
             <Col componentClass={ControlLabel} sm={2}>Description</Col>
             <Col sm={10}>
@@ -158,8 +98,38 @@ class ResourceInfoEditView extends Component {
             </Col>
           </FormGroup>
 
+
+          <FormGroup controlId="formManufacturer">
+            <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
+            <Col sm={10}>
+              <FormControl
+                type="text"
+                value={company}
+                placeholder="Manufacturer"
+                onChange={this.handleChange('company')}
+              />
+            </Col>
+          </FormGroup>
+
+          <FormGroup controlId="formMobile">
+            <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
+            <Col sm={10}>
+              <BootstrapSwitch offText="No" onText="Yes" onChange={this.handleSwitchChange('mobile')} />
+            </Col>
+          </FormGroup>
+
+          <FormGroup controlId="formLocation">
+            <Col componentClass={ControlLabel} sm={2}>Location</Col>
+            <Col sm={10}>
+              <LocationSearch
+                onChange={this.handleLocationChange}
+                location={location}
+              />
+            </Col>            
+          </FormGroup>
+
           <FormGroup controlId="formRules">
-            <Col componentClass={ControlLabel} sm={2}>Rules</Col>
+            <Col componentClass={ControlLabel} sm={2}>Rules for Use</Col>
             <Col sm={10}>
               <FormControl
                 componentClass="textarea"
@@ -182,13 +152,27 @@ class ResourceInfoEditView extends Component {
             </Col>
           </FormGroup>
 
-          <FormGroup controlId="formIncentive">
-            <Col componentClass={ControlLabel} sm={2}>Incentive</Col>
+          <FormGroup>
+            <Col sm={6}>
+              <Button type="button" onClick={this.props.onBackClick}>Go Back</Button>
+            </Col>
+            <Col sm={6}>
+              <Button bsStyle="primary" type="submit" onClick={this.handleSubmit}>Continue</Button>
+            </Col>
+          </FormGroup>
+
+
+
+          {/*
+          
+            MOVE THESE TO THE AVAILABILITY PAGE!!!
+        
+          */}
+
+          <FormGroup controlId="formAvailable">
+            <Col componentClass={ControlLabel} sm={2}>Available</Col>
             <Col sm={10}>
-              <FormControl componentClass="select" placeholder="user_fee" onChange={this.handleChange('incentive_type')} value={incentive_type}>
-                <option value="">N/A</option>
-                <option value="user_fee">User Fee</option>
-              </FormControl>
+              <BootstrapSwitch offText="No" onText="Yes" onChange={this.handleSwitchChange('mobile')} />
             </Col>
           </FormGroup>
 
