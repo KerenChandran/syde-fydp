@@ -57,7 +57,7 @@ class MyResources extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  requests: requestSelectors.getRequests(state),
+  requests: requestSelectors.getResourceRequests(state),
   resources: resourceSelectors.currentUserResources(state),
   currentUserId: userSelectors.currentUserId(state)
 });

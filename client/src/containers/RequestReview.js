@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import { userSelectors } from '../modules/users';
+import { requestSelectors } from '../modules/request';
 
 import {
   ButtonToolbar,
@@ -46,10 +48,12 @@ class RequestReview extends Component {
 
   render() {
     const { message, target_account } = this.state;
-    const { accounts } = this.props;
+    const { accounts, request } = this.props;
     return (
       <div className="container form-horizontal">
-        <FormGroup controlId="formDescription">
+        <h4>{request.requester_name}</h4>
+        <Link to={`/resources/${request.resource_id}`}>{request.model}</Link>
+        <FormGroup controlId="formMessage">
           <Col componentClass={ControlLabel} sm={2}>Message</Col>
           <Col sm={10}>
             <FormControl
@@ -60,7 +64,7 @@ class RequestReview extends Component {
             />
           </Col>
         </FormGroup>
-        Choose Account
+        <h4>Choose account</h4>
         <ButtonToolbar vertical>
           <ToggleButtonGroup type="radio" name="options" value={target_account} onChange={this.handleRadioChange('target_account')}>
             { accounts.map(account => (
@@ -77,8 +81,9 @@ class RequestReview extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  accounts: userSelectors.currentUserAccounts(state)
+const mapStateToProps = (state, props) => ({
+  accounts: userSelectors.currentUserAccounts(state),
+  request: requestSelectors.getRequest(state, props.match.params.id)
 });
 
 const mapDispatchToProps = dispatch => ({

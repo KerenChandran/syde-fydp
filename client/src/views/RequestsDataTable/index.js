@@ -55,10 +55,9 @@ class RequestsDataTable extends Component {
     )
   }
 
-  resourceFormat = (cell, row) => {
-    console.log('cell', cell, row);
-    return this.props.resources[row.resource_id].model;
-  }
+  dateFormatter = (cell) => (
+    moment(cell).format('MMMM Do YYYY, h:mm:ss a')
+  )
 
   render() {
     const { requests, resources } = this.props;
@@ -93,8 +92,9 @@ class RequestsDataTable extends Component {
       >
         <TableHeaderColumn dataField='id' isKey hidden>ID</TableHeaderColumn>
         <TableHeaderColumn dataField='requester_name'>Borrower</TableHeaderColumn>
-        {/* <TableHeaderColumn dataField='model' dataFormat={this.resourceFormat}>Model</TableHeaderColumn> */}
-        {/* <TableHeaderColumn dataField='status'>Status</TableHeaderColumn> */}
+        <TableHeaderColumn dataField='model'>Model</TableHeaderColumn>
+        <TableHeaderColumn dataField='block_start' dataFormat={this.dateFormatter}>Start Date</TableHeaderColumn>
+        <TableHeaderColumn dataField='block_end' dataFormat={this.dateFormatter}>End Date</TableHeaderColumn>
       </BootstrapTable>
     );
   }
