@@ -651,7 +651,7 @@ def reject_request():
     payload = {}
 
     # required attributes
-    payload['request_id'] = int(data['request'])
+    payload['request_id'] = int(data['request_id'])
 
     # optional attributes
     payload['message'] = str(data['message']) if 'message' in data else ""
