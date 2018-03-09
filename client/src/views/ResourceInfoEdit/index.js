@@ -18,8 +18,10 @@ class ResourceInfoEditView extends Component {
     super(props);
     this.state = {
       mobile: true,
+      category: 'Battery Chargers',
       ...this.props.resource
     }
+    this.categories = ['Battery Chargers', 'Bio Medical Equipment', 'Breadboards', 'Cables', 'Clamps', 'Counters', 'Data Acquisition', 'Drills', 'Heat Guns', 'Instrumentation (Force)', 'Instrumentation (Light)', 'Instrumentation (Sound)', 'Instrumentation (Torque)', 'Leads', 'Lights', 'Measuring Devices', 'Multimeters', 'Oscilloscopes', 'Pliers', 'Power Supplies', 'Safety Glasses', 'Scanners', 'Signal Generators', 'Socket Sets', 'Solder Suckers', 'Soldering Stations', 'Tachometers', 'Tweezers', 'Vises', 'Wire Cutters', 'Aircrafts', 'Arduino Shields Etc.', 'Arduinos', 'Audio Accessories', 'Batteries', 'Brakes', 'Cameras', 'Clutches (Electric)', 'Computer Accessories', 'Couplings', 'Fans', 'FPGAs', 'Gearboxes', 'Heat Sinks', 'Linear Actuators (Electric)', 'Microcontrollers & DSPs', 'Mobile Platforms/Chassis', 'Motor Controllers', 'Motors (AC)', 'Motors (DC)', 'Motors (Servo)', 'Motors (Stepper)', 'Relays', 'Robotic Arms/Manipulators', 'Sensors (BioMed)', 'Sensors (Color)', 'Sensors (Flex)', 'Sensors (Force)', 'Sensors (Gas)', 'Sensors (Infrared)', 'Sensors (Laser)', 'Sensors (Light)', 'Sensors (Liquid)', 'Sensors (Magnetic)', 'Sensors (Motion, Orientation)', 'Sensors (Pressure)', 'Sensors (Proximity)', 'Sensors (RF)', 'Sensors (Sound)', 'Sensors (Temperature)', 'Sensors (Touch)', 'Sensors (Ultrasonic)', 'Solenoid Actuators (Electric)', 'Speakers', 'Transformers/Inverters', 'Wall Adapters', 'Wheels'];
   }
 
   handleChange = (name) => (event) => (
@@ -60,12 +62,9 @@ class ResourceInfoEditView extends Component {
         <FormGroup controlId="formCategory">
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
           <Col sm={10}>
-            <FormControl
-              type="text"
-              value={category}
-              placeholder="Category"
-              onChange={this.handleChange('category')}
-            />
+            <FormControl componentClass="select" placeholder="Category" onChange={this.handleChange('category')} value={category}>
+              {this.categories.map(category => <option key={category} value={category}>{category}</option>)}
+            </FormControl>
           </Col>
         </FormGroup>
 

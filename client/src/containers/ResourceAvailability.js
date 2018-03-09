@@ -19,6 +19,7 @@ import {
   Modal
 } from 'react-bootstrap';
 import BootstrapSwitch from 'react-bootstrap-switch';
+import { userSelectors } from '../modules/users';
 
 moment.locale('en');
 momentLocalizer();
@@ -51,14 +52,15 @@ class ResourceAvailability extends Component {
   )
 
   handleSubmit = async () => {
-    const { history, initialAvailability, newResource, addResource } = this.props;
+    const { history, initialAvailability, newResource, addResource, currentUserId } = this.props;
     const { resource_id, start, end, incentive_type, fee_amount, fee_cadence, available } = this.state;
     const newId = await addResource({
       ...newResource,
       incentive_type,
       fee_amount,
       fee_cadence,
-      available
+      available,
+      ownerId: currentUserId
     });
     await initialAvailability({
       resource_id: resource_id === 'new' ? newId : resource_id,
@@ -142,7 +144,8 @@ class ResourceAvailability extends Component {
 }
 
 const mapStateToProps = state => ({
-  newResource: resourceSelectors.getNewResource(state)
+  newResource: resourceSelectors.getNewResource(state),
+  currentUserId: userSelectors.currentUserId(state)
 });
 
 const mapDispatchToProps = (dispatch) => ({
