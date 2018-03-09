@@ -9,6 +9,9 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { userActions } from '../../modules/users';
 
+import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { faBell } from '@fortawesome/fontawesome-free-solid';
+
 class Header extends Component {
   logout = () => {
     this.props.logout();
@@ -28,7 +31,9 @@ class Header extends Component {
           <Search />
         </div>
         <div className="app-links">
-          <Button onClick={this.requests}>My Requests</Button>
+          <Button onClick={this.requests}>
+            <FontAwesomeIcon icon={faBell}  />
+          </Button>
           <Button onClick={this.logout}>Logout</Button>
         </div>
       </header>

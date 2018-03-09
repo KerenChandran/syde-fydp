@@ -71,6 +71,7 @@ class ResourceAvailability extends Component {
     const { start, end, incentive_type, fee_amount, fee_cadence, available } = this.state;
     return (
       <div className="container form-horizontal">
+        { available && <h4 className="row" style={{ textAlign: 'center' }}>Enter range of availability. You'll be able to select specific dates and times later.</h4>}
         <FormGroup controlId="formAvailable">
           <Col componentClass={ControlLabel} sm={2}>Available</Col>
           <Col sm={10}>

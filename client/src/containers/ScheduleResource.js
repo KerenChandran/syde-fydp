@@ -221,7 +221,12 @@ class RequestResource extends Component {
 
   handleSubmitSchedule = () => {
     const { history, match: { params: { id }} } = this.props;
-    history.push(`/resources/${id}/incentive`);
+    history.push(`/resources/${id}/request`);
+    // history.push(`/resources/${id}/incentive`);
+  }
+
+  handleFinish = () => {
+    this.props.history.push('/resources');
   }
 
   allDayCheck = event => {
@@ -238,13 +243,16 @@ class RequestResource extends Component {
 
     const dateFormat = selectedEvent.allDay ? "MMMM DD, YYYY" : "MMMM DD, YYYY - h:mm A";
     return (
-      <div style={{display: 'flex', flexGrow: 1}}>
-        {
-          !isMyResource &&
-          <div>
-            <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Submit</Button>
-          </div>
-        }
+      <div style={{display: 'flex', flexGrow: 1, flexDirection: 'column'}}>
+        <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: 10}}>
+          {
+            isMyResource ?
+            <Button bsStyle="primary" onClick={this.handleFinish}>Finish</Button> :
+            requestedEvents.length ? 
+            <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Continue</Button> :
+            null
+          }
+        </div>
         <Calendar
           events={[...events, ...requestedEvents]}
           onEventResize={this.handleEventResize}
