@@ -34,7 +34,7 @@ export const fetchResources = () => async dispatch => {
   }
 };
 
-export const fetchResource = (id) => async dispatch => {
+export const fetchResource = (id, callback) => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/get_resources', {
       method: 'post',
@@ -42,7 +42,10 @@ export const fetchResource = (id) => async dispatch => {
       body: JSON.stringify({ resource_list: [id] })
     });
     let data = await response.json();
-    return dispatch(fetchResourceSuccess(data));
+    dispatch(fetchResourceSuccess(data));
+    if (callback) {
+      callback();
+    }
   } catch (error) {
     throw new Error(error);
   }

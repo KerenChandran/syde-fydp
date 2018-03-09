@@ -6,7 +6,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 import ScheduleFIlters from '../../containers/ScheduleFilters';
 
-class ResourcesDataTable extends Component {
+class RequestsDataTable extends Component {
   handleRowDoubleClick = (row) => {
     this.props.showRequestDetails(row.id);
   }
@@ -55,8 +55,13 @@ class ResourcesDataTable extends Component {
     )
   }
 
+  resourceFormat = (cell, row) => {
+    console.log('cell', cell, row);
+    return this.props.resources[row.resource_id].model;
+  }
+
   render() {
-    const { requests } = this.props;
+    const { requests, resources } = this.props;
     const options = {
       sizePerPage: 25,
       sizePerPageList: [{
@@ -87,12 +92,12 @@ class ResourcesDataTable extends Component {
         selectRow={selectRowOptions}
       >
         <TableHeaderColumn dataField='id' isKey hidden>ID</TableHeaderColumn>
-        <TableHeaderColumn dataField='id'>Borrower</TableHeaderColumn>
-        <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>
-        <TableHeaderColumn dataField='status'>Status</TableHeaderColumn>
+        <TableHeaderColumn dataField='requester_name'>Borrower</TableHeaderColumn>
+        {/* <TableHeaderColumn dataField='model' dataFormat={this.resourceFormat}>Model</TableHeaderColumn> */}
+        {/* <TableHeaderColumn dataField='status'>Status</TableHeaderColumn> */}
       </BootstrapTable>
     );
   }
 }
 
-export default ResourcesDataTable;
+export default RequestsDataTable;

@@ -12,16 +12,27 @@ import RequestsView from '../views/RequestsDataTable';
 import { requestSelectors } from '../modules/request';
 
 class MyResources extends Component {
-  componentDidMount() {
-    const { currentUserId, fetchRequests, fetchResources } = this.props;
-    fetchResources();
-    fetchRequests(currentUserId);
+  state = {
+    loadingResources: true,
+    loadingRequests: true
   }
 
-  componentWillUnmount() {
-    this.props.clearResources();
-    this.props.clearRequests();
+  componentDidMount() {
+    const { currentUserId, fetchRequests, fetchResources } = this.props;
+    fetchResources(() => this.setState({
+      loadingResources: false
+    }));
+    fetchRequests(currentUserId, () => {
+      this.setState({
+        loadingRequests: false
+      })
+    });
   }
+
+  // componentWillUnmount() {
+  //   this.props.clearResources();
+  //   this.props.clearRequests();
+  // }
 
   showRequestDetails = (id) => {
     this.props.history.push(`/requests/${id}`);
@@ -30,11 +41,13 @@ class MyResources extends Component {
   render() {
     const {
       currentUserId,
+      resources,
       requests
     } = this.props;
     return (
       <div style={{ display: 'flex', width: '100%' }}>
         <RequestsView
+          resources={resources}
           requests={requests}
           showRequestDetails={this.showRequestDetails}
         />

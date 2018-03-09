@@ -47,7 +47,7 @@ export const login = (user) => async dispatch => {
     data = await response.json();
     console.log('accounts data', data);
     dispatch(fetchAccountsSuccess(data));
-    // dispatch(push('/resources'));
+    dispatch(push('/resources'));
   } catch (error) {
     throw new Error(error);
   }
@@ -76,7 +76,6 @@ export const authUser = () => async dispatch => {
     });
     let data = await response.json();
     dispatch(editProfileSuccess(data));
-    dispatch(push('/resources'));
   } catch (error) {
     localStorage.removeItem('id_token');
     throw new Error(error);
