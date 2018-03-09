@@ -383,9 +383,9 @@ class RequestUtil(Pipeline):
         #    divisibility factors based on the cadence.
 
         cadence_divisibility_map = {
-            'hours': 60**2,
-            'days': 60**2 * 24,
-            'weeks': 60**2 * 24 * 7
+            'hourly': 60**2,
+            'daily': 60**2 * 24,
+            'weekly': 60**2 * 24 * 7
         }
 
         total_duration = 0
@@ -405,11 +405,11 @@ class RequestUtil(Pipeline):
                 ON incentive.fee_id = uf.id
         """.format(rid=request_id)
 
-        result = self.crs.fetch_first(cadence_retrieval_query)[0]
+        result = self.crs.fetch_dict(cadence_retrieval_query)[0]
 
-        fee_amount = result['fee_amount']
+        fee_amount = float(result['fee_amount'])
 
-        fee_cadence = result['cadence']
+        fee_cadence = str(result['cadence'])
 
         total_duration = total_duration / cadence_divisibility_map[fee_cadence]
 
@@ -434,7 +434,7 @@ class RequestUtil(Pipeline):
             SELECT user_id
             FROM request
             WHERE id = {rid}
-        """.format(id=request_id)
+        """.format(rid=request_id)
 
         receiver_id = self.crs.fetch_first(receiver_info_retrieval_query)
 
@@ -482,7 +482,9 @@ class RequestUtil(Pipeline):
                 UPDATE request
                 SET target_account={tacc}
                 WHERE id = {rid}
-            """.format(rid=request_id)
+            """.format(rid=request_id, tacc=target_account)
+
+            self.crs.execute(update_request_query)
 
             # invoke fund transfer operation and send notif to receiver
             success = self.transfer_funds(request_id)
