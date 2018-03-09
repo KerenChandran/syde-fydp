@@ -57,8 +57,8 @@ class ScheduleFilters extends Component {
     return (
       <div className="form-inline">
         <FormGroup controlId="windowStart">
-          <Col componentClass={ControlLabel} sm={4}>Available</Col>
-          <Col sm={4}>
+          <Col componentClass={ControlLabel} sm={1}>Available</Col>
+          <Col sm={3}>
             <DateTimePicker
               time={false}
               min={new Date()}
@@ -67,7 +67,7 @@ class ScheduleFilters extends Component {
               value={window_start}
             />
           </Col>
-          <Col sm={4}>
+          <Col sm={3}>
             <DateTimePicker
               time={false}
               min={window_start}
@@ -76,23 +76,21 @@ class ScheduleFilters extends Component {
               value={window_end}
             />
           </Col>
-        </FormGroup>
-        <FormGroup controlId="quantity">
-          <Col componentClass={ControlLabel} sm={4}>Duration</Col>
-          <Col sm={4}>
+          <Col componentClass={ControlLabel} sm={1}>Duration</Col>
+          <Col sm={1}>
             <FormControl placeholder="Quantity" onChange={this.handleDurationChange('quantity')} value={quantity} />
           </Col>
-          <Col sm={4}>
+          <Col sm={1}>
             <FormControl componentClass="select" value={type} onChange={this.handleDurationChange('type')}>
               <option value='hours'>Hours</option>
               <option value='days'>Days</option>
               <option value='weeks'>Weeks</option>
             </FormControl>
           </Col>
+          <Col sm={2}>
+            <Button bsStyle="primary" onClick={this.handleSubmit}>GO</Button>
+          </Col>
         </FormGroup>
-        <ButtonGroup>
-          <Button bsStyle="primary" onClick={this.handleSubmit}>GO</Button>
-        </ButtonGroup>
       </div>
     )
   }

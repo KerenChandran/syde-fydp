@@ -4,7 +4,6 @@ import moment from 'moment'
 
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
-import ScheduleFIlters from '../../containers/ScheduleFilters';
 
 class ResourcesDataTable extends Component {
   handleRowDoubleClick = (row) => {
@@ -88,23 +87,20 @@ class ResourcesDataTable extends Component {
     };
 
     return (
-      <div>
-        <ScheduleFIlters />
-        <BootstrapTable
-          pagination
-          data={resources}
-          options={options}
-          selectRow={selectRowOptions}
-        >
-          <TableHeaderColumn dataField='resource_id' isKey hidden>ID</TableHeaderColumn>
-          <TableHeaderColumn dataField='category' dataSort caretRender={this.caretRender}>Category</TableHeaderColumn>
-          <TableHeaderColumn dataField='company' dataSort caretRender={this.caretRender}>Company</TableHeaderColumn>
-          <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>
-          <TableHeaderColumn dataField='location' dataFormat={this.locationFormatter} dataSort caretRender={this.caretRender}>Location</TableHeaderColumn>
-          <TableHeaderColumn dataField='available' dataFormat={this.availableFormatter} dataSort caretRender={this.caretRender}>Availability</TableHeaderColumn>
-          <TableHeaderColumn hidden={resources.length && resources[0].first_available == null} dataField='first_available' dataFormat={this.firstAvailableFormatter} dataSort caretRender={this.caretRender}>First Available</TableHeaderColumn>
-        </BootstrapTable>
-      </div>
+      <BootstrapTable
+        pagination
+        data={resources}
+        options={options}
+        selectRow={selectRowOptions}
+      >
+        <TableHeaderColumn dataField='resource_id' isKey hidden>ID</TableHeaderColumn>
+        <TableHeaderColumn dataField='category' dataSort caretRender={this.caretRender}>Category</TableHeaderColumn>
+        <TableHeaderColumn dataField='company' dataSort caretRender={this.caretRender}>Company</TableHeaderColumn>
+        <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>
+        <TableHeaderColumn dataField='location' dataFormat={this.locationFormatter} dataSort caretRender={this.caretRender}>Location</TableHeaderColumn>
+        <TableHeaderColumn dataField='available' dataFormat={this.availableFormatter} dataSort caretRender={this.caretRender}>Availability</TableHeaderColumn>
+        <TableHeaderColumn hidden={resources.length && resources[0].first_available == null} dataField='first_available' dataFormat={this.firstAvailableFormatter} dataSort caretRender={this.caretRender}>First Available</TableHeaderColumn>
+      </BootstrapTable>
     );
   }
 }

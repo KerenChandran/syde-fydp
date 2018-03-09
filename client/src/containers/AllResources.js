@@ -10,6 +10,7 @@ import { searchActions } from '../modules/search';
 import ResourcesView from '../views/ResourcesDataTable';
 import LocationMap from '../components/LocationMap';
 import Sidebar from '../components/ResourceSidebar';
+import ScheduleFilters from './ScheduleFilters';
 
 const LIST = 'list';
 const MAP = 'map';
@@ -48,14 +49,13 @@ class AllResources extends Component {
         <Sidebar />
         <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <ButtonGroup>
-              <Button bsStyle={view === LIST ? 'primary' : 'default'} onClick={this.handleViewToggle(LIST)}>
-                <Glyphicon glyph="list" />
-              </Button>
-              <Button bsStyle={view === MAP ? 'primary' : 'default'} onClick={this.handleViewToggle(MAP)}>
-                <Glyphicon glyph="map-marker" />
-              </Button>
-            </ButtonGroup>
+            <ScheduleFilters />
+            <Button bsStyle={view === LIST ? 'primary' : 'default'} onClick={this.handleViewToggle(LIST)}>
+              <Glyphicon glyph="list" />
+            </Button>
+            <Button bsStyle={view === MAP ? 'primary' : 'default'} onClick={this.handleViewToggle(MAP)}>
+              <Glyphicon glyph="map-marker" />
+            </Button>
           </div>
           {
             view === LIST ? (
