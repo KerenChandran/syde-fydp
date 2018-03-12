@@ -42,16 +42,8 @@ class Search extends Component {
     const { resourceSearch, history } = this.props;
     let { searchText, ...filters } = resourceSearch;
     let { pathname } = history.location;
-
-    console.log('matchPath', matchPath(pathname, {
-      path: '/resources/myresources',
-      exact: true,
-      strict: false
-    }));
-
-    console.log('this.props', this.props);
     
-    if (pathname.indexOf('new') > -1 || pathname.indexOf('edit') > -1) {
+    if (pathname !== '/resources/myresources' && pathname !== '/resources') {
       return null;
     }
 

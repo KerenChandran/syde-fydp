@@ -6,7 +6,7 @@ import { withRouter } from 'react-router';
 import { resourceActions, resourceSelectors } from '../modules/resources'; 
 
 import ResourceInfoEditView from '../views/ResourceInfoEdit';
-
+  
 class ResourceInfoEdit extends Component {
   componentDidMount() {
     const id = this.props.match.params.ids;
@@ -20,8 +20,8 @@ class ResourceInfoEdit extends Component {
   )
 
   handleSubmit = (state) => {
-    const { saveResource } = this.props;
-    saveResource(state);
+    const { addResource } = this.props;
+    addResource(state);
   }
 
   render() {
@@ -49,6 +49,7 @@ const mapStateToProps = (state, props) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+  addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
   saveResource: bindActionCreators(resourceActions.saveResource, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch)
 })

@@ -75,11 +75,10 @@ export const addDataImport = (resource) => async dispatch => {
     });
     let data = await response.json();
     resource.resource_id = data.resource_id;
-    if (updateFlag) {
-      dispatch(updateResourceSucesses(resource));
-      dispatch(push(`/resources/${data.resource_id}/availability`));
-    }
-    dispatch(addResourceSuccess(resource));
+
+    updateFlag ? dispatch(updateResourceSucesses(resource)) : dispatch(addResourceSuccess(resource));
+    dispatch(push(`/resources/${data.resource_id}/schedule`));
+    
     return data.resource_id;
   } catch (error) {
     throw new Error(error);

@@ -51,8 +51,6 @@ class ApplicationRouter extends Component {
           <Route exact path="/login" component={Login} />
           <Route exact path="/signup" component={SignUp} />
           <Route exact path="/profile/edit" component={EditProfile} />
-          <Route exact path="/requests" component={Requests}/>
-          <Route exact path="/requests/:id" component={RequestReview}/>
           <div className="App-root">
             <Header />
             <div className="App-content">
@@ -67,6 +65,8 @@ class ApplicationRouter extends Component {
               <Route exact path="/resources/:id/schedule" component={ScheduleResource} />
               <Route exact path="/resources/:id/incentive" component={RequestResource} />
               <Route exact path="/resources/:id/request" component={RequestInfo} />
+              <Route exact path="/requests" component={Requests}/>
+              <Route exact path="/requests/:id" component={RequestReview}/>
             </div>
           </div>
         </Switch>
