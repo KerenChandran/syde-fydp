@@ -17,10 +17,6 @@ class Header extends Component {
     this.props.logout();
   }
 
-  requests = () => {
-    this.props.history.push('/requests');
-  }
-
   render() {
     return (
       <header className="app-header">
@@ -31,9 +27,9 @@ class Header extends Component {
           <Search />
         </div>
         <div className="app-links">
-          <Button onClick={this.requests}>
-            <FontAwesomeIcon icon={faBell}  />
-          </Button>
+          <Link to="/requests">
+            <span className="app-logo">My Requests</span>
+          </Link>
           <Button onClick={this.logout}>Logout</Button>
         </div>
       </header>
