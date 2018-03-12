@@ -1,3 +1,4 @@
+/* global google */
 import React, { Component } from 'react';
 import PlacesAutocomplete, { geocodeByPlaceId, getLatLng } from 'react-places-autocomplete';
 
@@ -37,6 +38,12 @@ class LocationSearch extends Component {
       autocompleteContainer: 'location__autocomplete-container',
     };
 
+    const options = {
+      location: new google.maps.LatLng(43.467998128, -80.537331184),
+      radius: 2000,
+      types: ['address']
+    };
+
     return (
       <PlacesAutocomplete
         inputProps={inputProps}
@@ -44,6 +51,7 @@ class LocationSearch extends Component {
         onSelect={this.handleSelect}
         renderSuggestion={LocationSuggestion}
         renderFooter={LocationFooter}
+        options={options}
       />
     );
   }
