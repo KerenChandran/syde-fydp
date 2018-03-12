@@ -9,6 +9,8 @@ import {
   Row
 } from 'react-bootstrap';
 
+import Select, { Creatable } from 'react-select';
+
 import BootstrapSwitch from 'react-bootstrap-switch';
 
 import LocationSearch from '../../components/LocationSearch';
@@ -21,7 +23,8 @@ class ResourceInfoEditView extends Component {
       category: 'Battery Chargers',
       ...this.props.resource
     }
-    this.categories = ["Aircrafts","Arduino Shields Etc.","Arduinos","Audio Accessories","Batteries","Battery Chargers","Bio Medical Equipment","Brakes","Breadboards","Cables","Cameras","Clamps","Clutches (Electric)","Computer Accessories","Counters","Couplings","Data Acquisition","Drills","FPGAs","Fans","Gearboxes","Heat Guns","Heat Sinks","Instrumentation (Force)","Instrumentation (Light)","Instrumentation (Sound)","Instrumentation (Torque)","Leads","Lights","Linear Actuators (Electric)","Measuring Devices","Microcontrollers & DSPs","Mobile Platforms/Chassis","Motor Controllers","Motors (AC)","Motors (DC)","Motors (Servo)","Motors (Stepper)","Multimeters","Oscilloscopes","Pliers","Power Supplies","Relays","Robotic Arms/Manipulators","Safety Glasses","Scanners","Sensors (BioMed)","Sensors (Color)","Sensors (Flex)","Sensors (Force)","Sensors (Gas)","Sensors (Infrared)","Sensors (Laser)","Sensors (Light)","Sensors (Liquid)","Sensors (Magnetic)","Sensors (Motion, Orientation)","Sensors (Pressure)","Sensors (Proximity)","Sensors (RF)","Sensors (Sound)","Sensors (Temperature)","Sensors (Touch)","Sensors (Ultrasonic)","Signal Generators","Socket Sets","Solder Suckers","Soldering Stations","Solenoid Actuators (Electric)","Speakers","Tachometers","Transformers/Inverters","Tweezers","Vises","Wall Adapters","Wheels","Wire Cutters"];
+    this.categories = [{"category":"Aircrafts"},{"category":"Arduino Shields Etc."},{"category":"Arduinos"},{"category":"Audio Accessories"},{"category":"Batteries"},{"category":"Battery Chargers"},{"category":"Bio Medical Equipment"},{"category":"Brakes"},{"category":"Breadboards"},{"category":"Cables"},{"category":"Cameras"},{"category":"Clamps"},{"category":"Clutches (Electric)"},{"category":"Computer Accessories"},{"category":"Counters"},{"category":"Couplings"},{"category":"Data Acquisition"},{"category":"Drills"},{"category":"FPGAs"},{"category":"Fans"},{"category":"Gearboxes"},{"category":"Heat Guns"},{"category":"Heat Sinks"},{"category":"Instrumentation (Force)"},{"category":"Instrumentation (Light)"},{"category":"Instrumentation (Sound)"},{"category":"Instrumentation (Torque)"},{"category":"Leads"},{"category":"Lights"},{"category":"Linear Actuators (Electric)"},{"category":"Measuring Devices"},{"category":"Microcontrollers & DSPs"},{"category":"Mobile Platforms/Chassis"},{"category":"Motor Controllers"},{"category":"Motors (AC)"},{"category":"Motors (DC)"},{"category":"Motors (Servo)"},{"category":"Motors (Stepper)"},{"category":"Multimeters"},{"category":"Oscilloscopes"},{"category":"Pliers"},{"category":"Power Supplies"},{"category":"Relays"},{"category":"Robotic Arms/Manipulators"},{"category":"Safety Glasses"},{"category":"Scanners"},{"category":"Sensors (BioMed)"},{"category":"Sensors (Color)"},{"category":"Sensors (Flex)"},{"category":"Sensors (Force)"},{"category":"Sensors (Gas)"},{"category":"Sensors (Infrared)"},{"category":"Sensors (Laser)"},{"category":"Sensors (Light)"},{"category":"Sensors (Liquid)"},{"category":"Sensors (Magnetic)"},{"category":"Sensors (Motion, Orientation)"},{"category":"Sensors (Pressure)"},{"category":"Sensors (Proximity)"},{"category":"Sensors (RF)"},{"category":"Sensors (Sound)"},{"category":"Sensors (Temperature)"},{"category":"Sensors (Touch)"},{"category":"Sensors (Ultrasonic)"},{"category":"Signal Generators"},{"category":"Socket Sets"},{"category":"Solder Suckers"},{"category":"Soldering Stations"},{"category":"Solenoid Actuators (Electric)"},{"category":"Speakers"},{"category":"Tachometers"},{"category":"Transformers/Inverters"},{"category":"Tweezers"},{"category":"Vises"},{"category":"Wall Adapters"},{"category":"Wheels"},{"category":"Wire Cutters"}];
+    this.rules=[{"rule" : "No weekend use"},{"rule": "Operators must be present"},{"rule": "Safety training required"},{"rule": "No undergrad students"}];
   }
 
   handleChange = (name) => (event) => (
@@ -38,6 +41,10 @@ class ResourceInfoEditView extends Component {
 
   handleLocationChange = (location) => {
     this.setState({ location: location });
+  }
+
+  handleSelectChange = name => value => {
+    this.setState({ [name]: value })
   }
   
   handleSubmit = () => {
@@ -62,9 +69,7 @@ class ResourceInfoEditView extends Component {
         <FormGroup controlId="formCategory">
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
           <Col sm={10}>
-            <FormControl componentClass="select" placeholder="Category" onChange={this.handleChange('category')} value={category}>
-              {this.categories.map(category => <option key={category} value={category}>{category}</option>)}
-            </FormControl>
+            <Select simpleValue required value={category} onChange={this.handleSelectChange('category')} options={this.categories} labelKey="category" valueKey="category" />
           </Col>
         </FormGroup>
 
@@ -125,12 +130,7 @@ class ResourceInfoEditView extends Component {
         <FormGroup controlId="formRules">
           <Col componentClass={ControlLabel} sm={2}>Rules for Use</Col>
           <Col sm={10}>
-            <FormControl
-              componentClass="textarea"
-              value={rules_restrictions}
-              placeholder="Rules"
-              onChange={this.handleChange('rules_restrictions')}
-            />
+            <Creatable simpleValue multi options={this.rules} onChange={this.handleSelectChange('rules_restrictions')} value={rules_restrictions} labelKey="rule" valueKey="rule"/>
           </Col>
         </FormGroup>
 
