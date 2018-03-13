@@ -14,9 +14,12 @@
         },
         "department": {
             "data_type": "text"
+        },
+        "role": {
+            "data_type": "text"
         }
     },
     "database_fields": {
-        "platform_user": ["first_name", "last_name", "phone", "faculty", "department"]
+        "platform_user": ["first_name", "last_name", "phone", "faculty", "department", "role"]
     }
 }
