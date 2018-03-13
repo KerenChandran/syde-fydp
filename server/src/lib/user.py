@@ -166,4 +166,5 @@ class User:
         self.crs.execute(query)
 
         result = self.crs.fetch_all()
+
         return result

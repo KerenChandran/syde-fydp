@@ -28,7 +28,8 @@ class EditProfile extends React.Component {
         phone: phone,
         department: department,
         faculty: faculty,
-        role: role
+        role: role,
+        department_options: []
         };
     this.faculties = [{"faculty": "Applied Health Sciences"}, {"faculty": "Arts"}, {"faculty": "Engineering"}, {"faculty": "Environment"}, {"faculty": "Mathematics"}, {"faculty": "Science"}];
     this.eng_departments = [{"department": "Chemical Engineering"}, {"department": "Civil & Environmental Engineering"}, {"department": "Electrical & Computer Engineering"}, {"department": "Management Sciences"}, {"department": "Mechanical & Mechatronics Engineering"}, {"department": "Systems Design Engineering"}, {"department": "School of Architecture"}, {"department": "Conrad Business, Entrepreneurship and Technology Centre"}];
@@ -42,10 +43,46 @@ class EditProfile extends React.Component {
     handleChange = name => event => {
         this.setState({ [name]: event.target.value })
     };
+
+
     handleSelectChange = name => value => {
-        this.setState({ [name]: value })
-        // change faculty options to the departments for that faculty
+        this.setState({ [name]: value });
     };
+
+    handleFacultyChange = value => {
+        let department_options = [];
+
+        // change faculty options to the departments for that faculty
+        switch (value) {
+            case "Applied Health Sciences": {
+                department_options = this.ahs_departments;
+                break;
+            };
+            case "Engineering": {
+                department_options = this.eng_departments;
+                break;
+            };
+            case "Arts": {
+                department_options = this.arts_departments;
+                break;
+            };
+            case "Science": {
+                department_options = this.science_departments;
+                break;
+            };
+            case "Environment": {
+                department_options = this.env_departments;
+                break;
+            };
+            case "Mathematics": {
+                department_options = this.math_departments;
+                break;
+            };
+        };
+
+        this.setState({faculty: value, department_options});
+    };
+
     handleSubmit = () => {
         this.props.editProfile(this.state, this.props.history);
     };
@@ -58,7 +95,8 @@ class EditProfile extends React.Component {
             phone,
             department,
             faculty,
-            role
+            role,
+            department_options
         } = this.state;
 
         const {currentUserAccounts} = this.props;
@@ -102,22 +140,23 @@ class EditProfile extends React.Component {
                     </div>
                 </div>
 
-                <div class="row" controlId="formHorizontalDepartment">
-                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
-                        Department
-                    </label>
-                    <div class="col-sm-4">
-                        <FormControl type="department" placeholder="Department" value={department} onChange={this.handleChange('department')} />
-                    </div>
-                </div>
 
                 <div class="row" controlId="formHorizontalFaculty">
                     <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Faculty
                     </label>
                     <div class="col-sm-4">
-                        <Select simpleValue value={faculty} onChange={this.handleSelectChange('faculty')} options={this.faculties} labelKey="faculty" valueKey="faculty" />
+                        <Select simpleValue value={faculty} onChange={this.handleFacultyChange} options={this.faculties} labelKey="faculty" valueKey="faculty" />
 
+                    </div>
+                </div>
+
+                <div class="row" controlId="formHorizontalDepartment">
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                        Department
+                    </label>
+                    <div class="col-sm-4">
+                        <Select simpleValue value={department} onChange={this.handleSelectChange('department')} options={department_options} labelKey="department" valueKey="department" />
                     </div>
                 </div>
 

@@ -7,7 +7,8 @@ CREATE TABLE platform_user (
     email TEXT,
     phone VARCHAR(15),
     faculty TEXT,
-    department TEXT
+    department TEXT,
+    role TEXT
 );
 
 CREATE TABLE lab (
