@@ -163,7 +163,5 @@ class User:
             FROM platform_user
         """
 
-        self.crs.execute(query)
-
-        result = self.crs.fetch_all()
+        result = self.crs.fetch_dict(query)
         return result
