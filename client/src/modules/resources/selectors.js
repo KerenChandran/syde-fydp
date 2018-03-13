@@ -46,6 +46,9 @@ export const userResources = (resources, userId) => (
 export const currentUserResources = createSelector(filteredResources, currentUserId, userResources);
 
 export const getResource = (state, id) => {
+  if (id == null) {
+    return {};
+  }
   let allResources = resources(state);
   return allResources.find((resource) => resource.resource_id == id);
 }

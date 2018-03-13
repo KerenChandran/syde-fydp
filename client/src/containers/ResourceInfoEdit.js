@@ -20,8 +20,8 @@ class ResourceInfoEdit extends Component {
   )
 
   handleSubmit = (state) => {
-    const { addResource } = this.props;
-    addResource(state);
+    const { saveResource } = this.props;
+    saveResource(state);
   }
 
   render() {

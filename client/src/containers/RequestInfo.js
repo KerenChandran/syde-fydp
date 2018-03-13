@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { requestActions, requestSelectors } from '../modules/request';
 import { resourceSelectors, resourceActions } from '../modules/resources';
-import { scheduleSelectors } from '../modules/schedule';
+import { scheduleSelectors, scheduleActions } from '../modules/schedule';
 import { userSelectors } from '../modules/users';
 
 import {
@@ -26,8 +26,9 @@ class RequestInfo extends Component {
   }
 
   componentDidMount() {
-    const { fetchResource, match: { params } } = this.props;
+    const { fetchResource, match: { params }, clearSchedule } = this.props;
     fetchResource(params.id);
+    clearSchedule();
   }
 
   componentWillUnmount() {
@@ -89,7 +90,7 @@ class RequestInfo extends Component {
             />
           </Col>
         </FormGroup>
-        {source_account != null && <Button bsClass="col-sm-12 btn" bsStyle="primary" onClick={this.handleSubmit}>Submit</Button>}
+        <Button bsClass="col-sm-12 btn" bsStyle="primary" disabled={source_account == null} onClick={this.handleSubmit}>Submit</Button>
       </div>
     );
   }
@@ -106,7 +107,8 @@ const mapStateToProps = (state, props) => ({
 const mapDispatchToProps = dispatch => ({
   clearIncentive: bindActionCreators(requestActions.clearIncentive, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
-  submitRequest: bindActionCreators(requestActions.submitRequest, dispatch)
+  submitRequest: bindActionCreators(requestActions.submitRequest, dispatch),
+  clearSchedule: bindActionCreators(scheduleActions.clearSchedule, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RequestInfo)

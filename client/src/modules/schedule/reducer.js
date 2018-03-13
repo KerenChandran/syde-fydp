@@ -4,6 +4,7 @@ import moment from 'moment';
 const initialState = {
   events: [],
   requestedEvents: [],
+  availableEvents: [],
   errors: [],
   availability_start: null,
   availability_end: null
@@ -12,12 +13,10 @@ const initialState = {
 export default (state = initialState, { type, payload }) => {
   switch(type) {
     case ScheduleConstants.FETCH_SCHEDULE: {
-      const { availability_end, availability_start, block_list } = payload.schedule.resource_data[0];
+      const { block_list } = payload.schedule.resource_data[0];
       return {
         ...state,
-        events: block_list || [],
-        availability_end: moment(availability_end),
-        availability_start: moment(availability_start)
+        events: block_list || []
       };
     }
 
@@ -44,6 +43,38 @@ export default (state = initialState, { type, payload }) => {
 
     case ScheduleConstants.CLEAR_SCHEDULE: {
       return initialState;
+    }
+
+    case ScheduleConstants.SAVE_AVAILABLE_EVENT: {
+      return {
+        ...state,
+        availableEvents: [
+          ...state.availableEvents,
+          payload.event
+        ]
+      };
+    }
+
+    case ScheduleConstants.DELETE_AVAILABLE_EVENT: {
+      const { availableEvents, ...others } = state;
+      return {
+        availableEvents: availableEvents.filter((event, idx) => idx != payload.idx),
+        ...others
+      };
+    }
+
+    case ScheduleConstants.CLEAR_AVAILABLE_EVENTS: {
+      return {
+        ...state,
+        availableEvents: []
+      };
+    }
+
+    case ScheduleConstants.CLEAR_EVENTS: {
+      return {
+        ...state,
+        events: []
+      }
     }
 
     default:
