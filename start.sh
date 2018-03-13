@@ -55,6 +55,7 @@ bash exec.sh scripts/2017_11_23/release.sql
 bash exec.sh scripts/2018_01_24/release.sql
 bash exec.sh scripts/2018_01_28/release.sql
 bash exec.sh scripts/2018_03_04/release.sql
+bash exec.sh scripts/2018_03_11/release.sql
 
 echo "creating transaction database tables..."
 cd ../trxn_db

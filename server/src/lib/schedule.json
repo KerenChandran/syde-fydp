@@ -6,12 +6,6 @@
         "user_id": {
             "data_type": "integer"
         },
-        "availability_start": {
-            "data_type": "date"
-        },
-        "availability_end": {
-            "data_type": "date"
-        },
         "block_start": {
             "data_type": "datetime"
         },

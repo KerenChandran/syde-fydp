@@ -52,13 +52,15 @@ docker exec -it es bash es_util/setup.sh
 echo "creating database tables..."
 cd ../database
 # relative file paths from database directory
-bash exec.sh scripts/2017_23_11/release.sql
-bash exec.sh scripts/2018_24_01/release.sql
-bash exec.sh scripts/2018_28_01/release.sql
+bash exec.sh scripts/2017_11_23/release.sql
+bash exec.sh scripts/2018_01_24/release.sql
+bash exec.sh scripts/2018_01_28/release.sql
+bash exec.sh scripts/2018_03_04/release.sql
+bash exec.sh scripts/2018_03_11/release.sql
 
 echo "creating transaction database tables..."
 cd ../trxn_db
-bash exec.sh scripts/2018_22_01/release.sql
+bash exec.sh scripts/2018_01_22/release.sql
 
 echo "starting app server..."
 

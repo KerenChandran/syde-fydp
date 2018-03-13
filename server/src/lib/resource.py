@@ -146,47 +146,37 @@ class ResourceUtil(Pipeline):
 
         return
 
-    def _get_schedule_data(self):
+    def _get_schedule_data(self, target="resource_schedule_blocks"):
         """
             Underlying method to retrieve scheduling information for specified
             resources.
+
+            Parameters
+            ----------
+            target : {str}
+                name of schedule-based table that blocks are being pulled from
         """
-        avail_where_clause = ""
         block_where_clause = ""
 
         if len(self.resource_list) > 0:
             res_list = ",".join([str(res) for res in self.resource_list])
 
-            avail_where_clause = "WHERE resource_id IN (%s)" % res_list
             block_where_clause = "WHERE resource_id IN (%s)" % res_list
 
-        avail_fields = ",".join(self.database_fields['resource_availability'])
-
-        avail_retrieval_query = \
-        """
-            SELECT {fields}
-            FROM resource_availability
-            {where_clause}
-        """.format(fields=avail_fields, where_clause=avail_where_clause)
-
-        avail_result = self.crs.fetch_dict(avail_retrieval_query)
-
         placeholder_dict = {}
-
-        for dct in avail_result:
-            placeholder_dict[dct['resource_id']] = dct
 
         self.resource_data = placeholder_dict
 
         block_fields = \
-            ",".join(self.database_fields['resource_schedule_blocks'])
+            ",".join(self.database_fields[target])
 
         block_retrieval_query = \
         """
             SELECT {fields}
-            FROM resource_schedule_blocks
+            FROM {target}
             {where_clause}
-        """.format(fields=block_fields, where_clause=block_where_clause)
+        """.format(target=target, fields=block_fields, 
+                   where_clause=block_where_clause)
 
         block_result = self.crs.fetch_dict(block_retrieval_query)
 
@@ -207,32 +197,12 @@ class ResourceUtil(Pipeline):
 
                 dp[key] = val
 
-            if 'block_list' not in self.resource_data[resid]:
-                self.resource_data[resid]['block_list'] = []
+            if resid not in self.resource_data:
+                self.resource_data[resid] = []
 
-            self.resource_data[resid]['block_list'].append(dp)
+            self.resource_data[resid].append(dp)
 
-        self.resource_data = self.resource_data.values()
-        
-        placeholder_store = []
-
-        # schedule-specific cleanup and transformations
-        for dct in self.resource_data:
-            dp = {}
-
-            for key in dct:
-                if isinstance(dct[key], dt.datetime) or \
-                    isinstance(dct[key], dt.date):
-                    dp[key] = dct[key].isoformat()
-                    continue
-
-                dp[key] = dct[key]
-
-            placeholder_store.append(dp)
-
-        self.resource_data = placeholder_store
-
-        return
+        return self.resource_data
 
     def get_common_data_points(self):
         """
@@ -246,7 +216,22 @@ class ResourceUtil(Pipeline):
             Propagation method used to invoke underlying methods for retrieval
             of scheduling-related data points.
         """
-        self._get_schedule_data()
+        schedule_data = self._get_schedule_data()
+
+        availability_data = \
+            self._get_schedule_data(target="resource_availability_blocks")
+
+        placeholder = {}
+
+        for resid, blocks in availability_data.iteritems():
+            placeholder[resid] = {
+                'availability_blocks': blocks
+            }
+
+            if resid in schedule_data:
+                placeholder[resid]['usage_blocks'] = schedule_data[resid]
+
+        self.resource_data = placeholder
 
     def get_resource_data(self, resource_list, dataset="common"):
         """

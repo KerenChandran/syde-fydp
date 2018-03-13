@@ -8,8 +8,7 @@ import datetime as dt
 from pipeline import Pipeline
 from notification import NotificationUtil
 from accounts import TransactionUtil
-
-import pdb
+from schedule import SchedulePipeline
 
 
 class RequestUtil(Pipeline):
@@ -494,6 +493,38 @@ class RequestUtil(Pipeline):
                     "Fund transfer was unable to take place.")
 
                 return False
+
+        # retrieve all blocks for this particular request
+        block_retrieval_query = \
+        """
+            SELECT req.resource_id, rsb.block_start, rsb.block_end
+            FROM request req
+            INNER JOIN request_schedule_blocks rsb
+                ON req.id = rsb.request_id
+            WHERE req.id = {rid}
+        """.format(rid=request_id)
+
+        retrieved_blocks = self.crs.fetch_dict(block_retrieval_query)
+
+        # transform retrieved blocks
+        expected_dt_format = '%Y-%m-%d %H:%M'
+
+        for block in retrieved_blocks:
+            for fld, val in block.iteritems():
+                if fld == 'block_start' or fld == 'block_end':
+                    # convert datetime object to string
+                    block[fld] = val.strftime(expected_dt_format)
+
+        # use scheduling pipeline to upload blocks
+        schedpipe = SchedulePipeline(user_id=self.get_requester_id(request_id))
+
+        success, errors = \
+            schedpipe.run(retrieved_blocks, init_availability=False, block_availability=False)
+
+        if not success:
+            return False
+
+        self.error_logs += errors
 
         # create notification to requester that request has been accepted
         message = "Request with id %s has been accepted by owner." % request_id

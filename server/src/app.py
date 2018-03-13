@@ -377,13 +377,15 @@ def submit_initial_availability():
 @app.route("/submit_schedule_blocks", methods=['POST'])
 @auth.login_required
 def submit_schedule_blocks():
+    # list of block data points
     data = request.get_json()
 
     user_id = g.user['id']
 
     pipeline = SchedulePipeline(user_id=user_id)
 
-    success, errors = pipeline.run([data], init_availability=False)
+    success, errors = pipeline.run(data, init_availability=False, 
+                                   block_availability=False)
 
     ret_val = {
         "success": success,
@@ -391,6 +393,28 @@ def submit_schedule_blocks():
     }
 
     return jsonify(ret_val)
+
+
+@app.route("/submit_availability_blocks", methods=['POST'])
+@auth.login_required
+def submit_availability_blocks():
+    # list of block data points
+    data = request.get_json()
+
+    user_id = g.user['id']
+
+    pipeline = SchedulePipeline(user_id=user_id)
+
+    success, errors = pipeline.run(data, init_availability=False, 
+                                   block_scheduling=False)
+
+    ret_val = {
+        'success': success,
+        'errors': errors
+    }
+
+    return jsonify(ret_val)
+
 
 @app.route("/submit_schedule_filter", methods=['POST'])
 def submit_schedule_filter():
@@ -539,10 +563,14 @@ def validate_request_block():
     final_blocks = []
 
     for block in generated_blocks:
-        no_overlap = schedpipe.check_block_overlap(
+        reg_overlap = schedpipe.check_block_overlap(
             block['resource_id'], block['block_start'], block['block_end'])
 
-        if no_overlap:
+        avail_overlap = schedpipe.check_block_overlap(
+            block['resource_id'], block['block_start'], block['block_end'],
+            availability=True)
+
+        if reg_overlap and avail_overlap:
             block['user_id'] = user_id
 
             final_blocks.append(block)

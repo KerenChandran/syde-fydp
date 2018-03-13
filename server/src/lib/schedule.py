@@ -120,7 +120,8 @@ class SchedulePipeline(Pipeline):
         """
         return self.generated_blocks
 
-    def check_block_overlap(self, resource_id, block_start, block_end):
+    def check_block_overlap(self, resource_id, block_start, block_end, 
+        availability=False, custom_target=None):
         """
             Helper method to check if the specified block overlaps with
             an existing one.
@@ -135,14 +136,27 @@ class SchedulePipeline(Pipeline):
 
             block_end : {str}
                 datetime formatted string representing the end of the block
+
+            availability : {bool}
+                flag to specify whether overlap check is being applied to
+                availability blocks (reverse check from regular scheduling)
+
+            custom_target : {str}
+                name of target table. used for custom overlap checks with
+                different target tables and normal schedule overlap check
         """
+        target_table = "resource_availability_blocks" if availability else \
+        "resource_schedule_blocks"
+
+        target_table = custom_target if custom_target else target_table
+
         # safe check of whether overlap is present - could be optimized with SQL
         block_retrieval_query = \
         """
             SELECT block_start, block_end
-            FROM resource_schedule_blocks
+            FROM {target}
             WHERE resource_id = {rid}
-        """.format(rid=resource_id)
+        """.format(target=target_table, rid=resource_id)
 
         existing_blocks = self.crs.fetch_dict(block_retrieval_query)
 
@@ -155,10 +169,35 @@ class SchedulePipeline(Pipeline):
         overlap_flag = False
 
         for block in existing_blocks:
-            if (block['block_start'] <= block_start <= block['block_end']) or \
-                (block['block_start'] <= block_end <= block['block_end']):
-                overlap_flag = True
-                break
+            start_check = \
+                (block['block_start'] <= block_start <= block['block_end'])
+
+            end_check = \
+                (block['block_start'] <= block_end <= block['block_end'])
+
+            if availability:
+                if start_check and end_check:
+                    # check to see whether start and end of block exists
+                    # within an availability block
+                    overlap_flag = True
+                    break
+            else:
+                if start_check or end_check:
+                    # check to see whether start and end of block overlaps
+                    # within a schedule block
+                    overlap_flag = True
+                    break
+
+        if availability:
+            error_msg = \
+                "Resource %s can't be added with block %s => %s as the block" \
+                + "does not lie within an availability zone."
+
+            if not overlap_flag:
+                self.error_logs.append(
+                    error_msg % (resource_id, block_start, block_end))
+
+            return overlap_flag
 
         error_msg = \
             "Resource %s can't be added with block %s => %s due to overlap."
@@ -211,7 +250,7 @@ class SchedulePipeline(Pipeline):
 
         return True
 
-    def block_scheduling_load(self, record):
+    def block_scheduling_load(self, record, availability=False):
         """
             Main method to load block schedule for the passed resource.
 
@@ -219,6 +258,10 @@ class SchedulePipeline(Pipeline):
             ----------
             record : {pandas.Series}
                 Data point for usage block to be uploaded.
+
+            availability : {bool}
+                flag denoting whether it is an availability load, as opposed
+                to schedule
         """
         flds, record_data = self.crs.sanitize(record)
 
@@ -226,18 +269,22 @@ class SchedulePipeline(Pipeline):
         flds.append("user_id")
         record_data.append(str(self.user_id))
 
+        target_table = "resource_availability_blocks" if availability else \
+            "resource_schedule_blocks"
+
         upload_query = \
         """
-            INSERT INTO resource_schedule_blocks ({cols})
+            INSERT INTO {target} ({cols})
             VALUES ({vals})
             RETURNING block_id;
-        """.format(cols=",".join(flds), vals=",".join(record_data))
+        """.format(target=target_table, cols=",".join(flds), 
+                   vals=",".join(record_data))
 
         block_id = self.crs.fetch_first(upload_query)
 
         return block_id
 
-    def load(self, init_availability=True, block_scheduling=True):
+    def load(self, init_availability=True, block_scheduling=True, block_availability=True):
         """
             Main method in which underlying load methods are applied to
             transformed dataframe. Flags are used to determine which underlying
@@ -250,9 +297,13 @@ class SchedulePipeline(Pipeline):
                 flag specifying whether initial availability loading should
                 be conducted.
 
-            block_cheduling : {bool}
+            block_scheduling : {bool}
                 flag specifying whether block scheduling loading should be
                 conducted.
+
+            block_availability : {bool}
+                flag specifying whether availability block loading should be
+                conducted. 
         """
         availability_df = None
         block_sched_df = None
@@ -273,8 +324,8 @@ class SchedulePipeline(Pipeline):
                     update_map[x['resource_id']]), 
                 axis=1)
 
-        if block_scheduling:
-            # block scheduling load
+        if block_scheduling or block_availability:
+            # consistent fields across both available and schedule tables
             db_flds = self.database_fields['resource_schedule_blocks']
 
             # add 'block_recurring' to database fields as it is not a valid col
@@ -282,6 +333,7 @@ class SchedulePipeline(Pipeline):
 
             sched_df = self.df_transform[db_flds]
 
+            # generate blocks for both schedule and availability load
             sched_df.apply(
                 lambda x: self.generate_blocks(
                     x['resource_id'], x['block_start'], x['block_end'], 
@@ -290,21 +342,46 @@ class SchedulePipeline(Pipeline):
 
             block_sched_df = pd.DataFrame(self.generated_blocks)
 
-            block_sched_df = block_sched_df[block_sched_df.apply(
-                lambda x: self.check_block_overlap(
-                    x['resource_id'], x['block_start'], x['block_end']),
-                axis=1)]
+            if block_scheduling:
+                # step which checks that schedule loaded blocks
+                # lie within availability blocks
+                block_sched_df = block_sched_df[block_sched_df.apply(
+                    lambda x: self.check_block_overlap(
+                        x['resource_id'], x['block_start'], x['block_end'],
+                        availability=True),
+                    axis=1)]
+
+                # step to check whether schedule loaded blocks overlap
+                # with existing blocks for that particular resource
+                block_sched_df = block_sched_df[block_sched_df.apply(
+                    lambda x: self.check_block_overlap(
+                        x['resource_id'], x['block_start'], x['block_end']),
+                    axis=1)]
+
+            elif block_availability:
+                # step to check whether availabilty loaded blocks overlap
+                # with existing availability blocks (sanity)
+                target_table = "resource_availability_blocks"
+
+                block_sched_df = block_sched_df[block_sched_df.apply(
+                    lambda x: self.check_block_overlap(
+                        x['resource_id'], x['block_start'], x['block_end'],
+                        custom_target=target_table),
+                    axis=1)]
 
             if not block_sched_df.empty:
-                # only add new cols to non-empty dataframes after overlap check
+                # only add new cols to non-empty dataframes after overlap 
+                # check
                 block_sched_df['block_id'] = block_sched_df.apply(
-                    lambda x: self.block_scheduling_load(x), axis=1)
+                    lambda x: self.block_scheduling_load(
+                        x, availability=block_availability), 
+                    axis=1)
 
         self.crs.commit()
 
         return (availability_df, block_sched_df)
 
-    def run(self, data, init_availability=True, block_scheduling=True):
+    def run(self, data, init_availability=True, block_scheduling=True, block_availability=True):
         """
             Main method to run scheduling pipeline for initial availability
             and bulk scheduling upload.
@@ -320,13 +397,26 @@ class SchedulePipeline(Pipeline):
                 flag specifying whether initial availability loading should
                 be conducted. Propagates to pipeline load method.
 
-            block_cheduling : {bool}
+            block_scheduling : {bool}
                 flag specifying whether block scheduling loading should be
                 conducted. Propagates to pipeline load method.
+
+            block_availability : {bool}
+                flag specifying whether availability block loading should be
+                conducted. Propagates to pipeline load method.
+
+            Mutual Exclusivity
+            ------------------
+            block_scheduling and block_availability flags cannot be set
+            together.
         """
         if not isinstance(data, list) or len(data) == 0:
             self.error_logs.append("Empty data store passed for uploading.")
-            return (False, self.error_logs, None)
+            return (False, self.error_logs)
+        elif block_scheduling and block_availability:
+            self.error_logs.append(
+                "Pipeline only supports either availability or scheduling load.")
+            return (False, self.error_logs)
 
         self.data = data
 
@@ -334,7 +424,8 @@ class SchedulePipeline(Pipeline):
 
         avail_df, bsched_df = \
             self.load(init_availability=init_availability,
-                      block_scheduling=block_scheduling)
+                      block_scheduling=block_scheduling,
+                      block_availability=block_availability)
 
         return (True, self.error_logs)
 
@@ -347,10 +438,16 @@ class ScheduleFilter(Pipeline):
         # use pipeline super class for transformation utils.
         super(ScheduleFilter, self).__init__("schedule_filter.json")
 
-        self.timedelta_map = {
+        self.reldelta_map = {
             'hours': lambda x: relativedelta(hours=x),
             'days': lambda x: relativedelta(days=x),
             'weeks': lambda x: relativedelta(weeks=x)
+        }
+
+        self.timedelta_map = {
+            'hours': lambda x: dt.timedelta(hours=x),
+            'days': lambda x: dt.timedelta(days=x),
+            'weeks': lambda x: dt.timedelta(weeks=x)
         }
 
     def _window_filter(self):
@@ -374,19 +471,11 @@ class ScheduleFilter(Pipeline):
             duration criterion is met. For an hourly duration constraint, there
             must exist x hours within the time frame of 8AM - 8PM.
         """
-        resource_list = self.resource_df['resource_id'].tolist()
-
-        if len(resource_list) == 0:
-            self.final_resources = resource_list
-
-        resource_list = [str(x) for x in resource_list]
-
         retrieve_block_query = \
         """
             SELECT resource_id, block_start, block_end
             FROM resource_schedule_blocks
-            WHERE resource_id IN ({resource_list})
-        """.format(resource_list=",".join(resource_list))
+        """
 
         resource_blocks = self.crs.fetch_dict(retrieve_block_query)
             
@@ -410,16 +499,18 @@ class ScheduleFilter(Pipeline):
             # sanity check
             assert(len(resource_store[res]) % 2 == 0)
 
-        # case handling: no blocks exist for a given resource
-        for resid in map(lambda x: int(x), resource_list):
-            if resid not in resource_store:
-                resource_store[resid] = []
-
         # block overlaps cannot exist so all block start and ends are adjacent
         # iterate through each resource and check to see if there exists
         # at least one contiguous block that matches the filtering criterion
         # only interested in the timedelta between block_end and block_start
-        resource_flags = {res: [False, None] for res in resource_store}
+        resource_flags = {}
+
+        for res in resource_store:
+            if res not in resource_flags:
+                resource_flags[res] = {
+                    'match': False,
+                    'valid_starts': []
+                }
 
         # convert availability start and end dates to datetime objects
         expected_date_format = '%Y-%m-%d'
@@ -432,42 +523,159 @@ class ScheduleFilter(Pipeline):
             # 1) do blocks exist for this particular resource
             # 2) does avail start + timedelta overlap w/ first block
             if len(dtlist) == 0 or \
-                self.start + self.timedelta_map[self.dtype](self.dquantity) < dtlist[0]:
-                resource_flags[res][0] = True
-                resource_flags[res][1] = self.start
-                continue
+                self.start + self.reldelta_map[self.dtype](self.dquantity) < dtlist[0]:
+                resource_flags[res]['match'] = True
+
+                resource_flags[res]['valid_starts'].append(self.start)
 
             for idx in range(1, len(dtlist), 2):
                 if idx == len(dtlist) - 1:
                     # last element
                     # check to see if timedelta exists between last block
                     # and window end
-                    if dtlist[idx] + self.timedelta_map[self.dtype](self.dquantity) < self.end:
-                        resource_flags[res][0] = True
-                        resource_flags[res][1] = dtlist[idx]
+                    if dtlist[idx] + self.reldelta_map[self.dtype](self.dquantity) < self.end:
+                        resource_flags[res]['match'] = True
+
+                        resource_flags[res]['valid_starts'].append(dtlist[idx])
                     
                     continue
-                elif resource_flags[res][0]:
-                    # move to next resource
-                    break
 
                 # check to see if the timedelta between current block_end
                 # and next block_start matches filtering criterion
                 # use strictly less than conditional to allow for small buffers
-                if dtlist[idx] + self.timedelta_map[self.dtype](self.dquantity) < dtlist[idx+1]:
-                    resource_flags[res][0] = True
-                    resource_flags[res][1] = dtlist[idx]
+                if dtlist[idx] + self.reldelta_map[self.dtype](self.dquantity) < dtlist[idx+1]:
+                    resource_flags[res]['match'] = True
+
+                    resource_flags[res]['valid_starts'].append(dtlist[idx])
 
         # retrieve all resources that match the criterion
-        self.final_resources = [(res, resource_flags[res][1]) for res in 
-                                resource_flags if resource_flags[res][0]]
+        self.duration_resources = \
+            {res: data['valid_starts'] for res, data in 
+             resource_flags.iteritems() if data['match']}
 
-        # sort final resources by availability
+        self.duration_resources = {res: sorted(data) for res, data in 
+                                   self.duration_resources.iteritems()}
+
+    def _availability_filter(self):
+        """
+            Helper method to filter resources based on their availability
+            blocks.
+        """
+        block_retrieval_query = \
+        """
+            SELECT resource_id, block_start, block_end
+            FROM resource_availability_blocks
+        """
+
+        avail_dict = self.crs.fetch_dict(block_retrieval_query)
+
+        self.avail_resources = {}
+
+        # iterate through each resource and block to see whether
+        # an availability block exists that corresponds to required duration
+        for block in avail_dict:
+            if block['resource_id'] in self.avail_resources:
+                # this is already a valid resource
+                continue
+
+            # check that the block exists within the required window
+            boundary_check = block['block_start'] > self.start and \
+                block['block_end'] < self.end
+
+            timedelta_check = block['block_end'] - block['block_start'] >= \
+                self.timedelta_map[self.dtype](self.dquantity)
+
+            if (boundary_check and timedelta_check):
+                if block['resource_id'] not in self.avail_resources or \
+                    self.avail_resources[block['resource_id']] > block['block_start']:
+                    # prioritize earlier availability start
+                    self.avail_resources[block['resource_id']] = block['block_start']
+
+        # find all available resources that do not have any usage blocks
+        resource_retrieval_query = \
+        """
+            SELECT DISTINCT resource_id AS rid
+            FROM resource_schedule_blocks
+        """
+
+        resource_list = self.crs.fetch_dict(resource_retrieval_query)
+
+        resource_list = {dp['rid']: None for dp in resource_list}
+
+        store = {}
+
+        for res, block_start in self.avail_resources.iteritems():
+            if res not in resource_list:
+                store[res] = block_start
+
+        self.avail_resources = store
+
+        # transform avail dict to map resources to availability blocks
+        placeholder = {}
+
+        for dp in avail_dict:
+            data = {'start': dp['block_start'], 'end': dp['block_end']}
+
+            if dp['resource_id'] not in placeholder:
+                placeholder[dp['resource_id']] = [data]
+                continue
+
+            placeholder[dp['resource_id']].append(data)
+
+        avail_dict = placeholder
+
+        store = {}
+
+        # iterate through resources that passed the duration criterion
+        for res, blocks in self.duration_resources.iteritems():
+            # check to see that the resource meets first pass availability
+            if res not in avail_dict:
+                continue
+
+            # iterate through each contiguous block
+            for block_start in blocks:
+                
+                valid_block = False
+
+                # iterate through availability blocks for this resource
+                for av_block in avail_dict[res]:
+                    if valid_block:
+                        break
+
+                    # check to see if the contig block fits in avail block
+                    check_1 = block_start >= av_block['start']
+                    check_2 = \
+                        block_start + self.reldelta_map[self.dtype](self.dquantity) \
+                        <= av_block['end']
+
+                    if check_1 and check_2:
+                        valid_block = True
+                        continue
+
+                if valid_block:
+                    if res not in store:
+                        store[res] = [block_start]
+                        continue
+
+                    store[res].append(block_start)
+
+        for res in store:
+            store[res] = sorted(store[res])
+            store[res] = store[res][0]
+
+        self.avail_resources.update(store)
+
+        self.final_resources = self.avail_resources
+
+        self.final_resources = \
+            zip(self.final_resources.keys(), self.final_resources.values())
+
         self.final_resources = \
             sorted(self.final_resources, key=lambda x: x[1])
 
         self.final_resources = \
             [(lst[0], lst[1].isoformat()) for lst in self.final_resources]
+
 
     def _filter(self):
         """
@@ -484,9 +692,11 @@ class ScheduleFilter(Pipeline):
 
         self.dquantity = record['duration_quantity']
 
-        self._window_filter()
+        # self._window_filter()
 
         self._duration_filter()
+
+        self._availability_filter()
 
         return
 
@@ -497,9 +707,7 @@ class ScheduleFilter(Pipeline):
             two parts:
 
             1. Initial Window - a min/max date spec denoting an initial window 
-            in which the user wishes to borrow the resource. This component is 
-            pit against the initial availability of the resource as specified by
-            the resource owner.
+            in which the user wishes to borrow the resource.
 
             2. Duration - a contiguous block of specified type for which the 
             user wishes to block the resource. The method does not currently 
@@ -508,7 +716,7 @@ class ScheduleFilter(Pipeline):
             Parameters
             ----------
             init_window : {tuple}
-                Tuple containing information about the initial window for which 
+                Tuple containing information about the window for which 
                 the user wishes to borrow the resource. Each tuple element must
                 contain strings compatible with the python date.date type.
 
