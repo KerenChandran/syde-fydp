@@ -2,6 +2,7 @@ import React from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 import {Form, FormGroup, FormControl, ControlLabel, Col, Button} from 'react-bootstrap'
+import Select, { Creatable } from 'react-select'
 import {userActions, userSelectors} from '../modules/users'
 import AccountInput from '../components/AccountInput'
 
@@ -16,7 +17,8 @@ class EditProfile extends React.Component {
         email,
         phone,
         department,
-        faculty
+        faculty,
+        role
     } = props.currentUser;
 
     this.state = {
@@ -25,14 +27,25 @@ class EditProfile extends React.Component {
         email: email,
         phone: phone,
         department: department,
-        faculty: faculty
+        faculty: faculty,
+        role: role
         };
+    this.faculties = [{"faculty": "Applied Health Sciences"}, {"faculty": "Arts"}, {"faculty": "Engineering"}, {"faculty": "Environment"}, {"faculty": "Mathematics"}, {"faculty": "Science"}];
+    this.eng_departments = [{"department": "Chemical Engineering"}, {"department": "Civil & Environmental Engineering"}, {"department": "Electrical & Computer Engineering"}, {"department": "Management Sciences"}, {"department": "Mechanical & Mechatronics Engineering"}, {"department": "Systems Design Engineering"}, {"department": "School of Architecture"}, {"department": "Conrad Business, Entrepreneurship and Technology Centre"}];
+    this.science_departments = [{"department": "Biology"}, {"department": "Chemistry"}, {"department": "Earth and Environmental Sciences"}, {"department": "Physics and Astronomy"}, {"department": "School of Optometry and Vision Sciences"}, {"department": "School of Pharmacy"}];
+    this.ahs_departments = [{"department": "Kinesiology"}, {"department": "Recreation and Leisure Studies"}, {"department": "School of Public Health and Health Systems"}];
+    this.arts_departments = [{"department": "Anthropology"}, {"department": "Classical Studies"}, {"department": "Drama & Speech Communication"}, {"department": "Economics"}, {"department": "English Language and Literature"}, {"department": "Fine Arts"}, {"department": "French Studies"}, {"department": "Germanic and Slavic Studies"}, {"department": "History"}, {"department": "Philosophy"}, {"department": "History"}, {"department": "Philosophy"}, {"department": "Political Science"}, {"department": "Psychology"}, {"department": "Religious Studies"}, {"department": "Sociology and Legal Studies"}, {"department": "Spanish and Latin American Studies"}, {"department": "Balsillie School of International Affairs"}, {"department": "School of Accounting and Finance (SAF)"}];
+    this.env_departments = [{"department": "Geography & Environmental Management (GEM)"}, {"department": "Knowledge Integration (KI)"}, {"department": "School of Environment, Enterprise and Development (SEED)"}, {"department": "School of Environment, Resources and Sustainability (SERS)"}, {"department": "School of Planning"}];
+    this.math_departments = [{"department": "David R. Cheriton School of Computer Science"}, {"department": "Applied Mathematics"}, {"department": "Combinatorics and Optimization"}, {"department": "Pure Mathematics"}, {"department": "Statistics and Actuarial Science"}];
     }
 
     handleChange = name => event => {
         this.setState({ [name]: event.target.value })
     };
-
+    handleSelectChange = name => value => {
+        this.setState({ [name]: value })
+        // change faculty options to the departments for that faculty
+    };
     handleSubmit = () => {
         this.props.editProfile(this.state, this.props.history);
     };
@@ -44,7 +57,8 @@ class EditProfile extends React.Component {
             email,
             phone,
             department,
-            faculty
+            faculty,
+            role
         } = this.state;
 
         const {currentUserAccounts} = this.props;
@@ -59,7 +73,9 @@ class EditProfile extends React.Component {
                     <div class="col-sm-4">
                         <FormControl type="firstName" placeholder="First Name" value={first_name} onChange={this.handleChange('first_name')} />
                     </div>
+                </div>
 
+                <div class="row" controlId="formHorizontalLastName">
                     <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Last Name
                     </label>
@@ -68,14 +84,16 @@ class EditProfile extends React.Component {
                     </div>
                 </div>
 
-                <div class="row" controlId="formHorizontalLastName">
+                <div class="row" controlId="formHorizontalEmail">
                     <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Email
                     </label>
                     <div class="col-sm-4">
                         <FormControl readOnly type="email" placeholder="Email" value={email} onChange={this.handleChange('email')} />
                     </div>
+                </div>
 
+                <div class="row" controlId="formHorizontalPhoneNumber">
                     <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Phone Number
                     </label>
@@ -91,22 +109,33 @@ class EditProfile extends React.Component {
                     <div class="col-sm-4">
                         <FormControl type="department" placeholder="Department" value={department} onChange={this.handleChange('department')} />
                     </div>
+                </div>
 
+                <div class="row" controlId="formHorizontalFaculty">
                     <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                         Faculty
                     </label>
                     <div class="col-sm-4">
-                        <FormControl type="faculty" placeholder="Faculty" value={faculty} onChange={this.handleChange('faculty')} />
+                        <Select simpleValue value={faculty} onChange={this.handleSelectChange('faculty')} options={this.faculties} labelKey="faculty" valueKey="faculty" />
+
                     </div>
                 </div>
+
+                <div class="row" controlId="formHorizontalRole">
+                    <label class="col-sm-2 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                        Role
+                    </label>
+                    <div class="col-sm-4">
+                        <FormControl type="role" placeholder="Role" value={role} onChange={this.handleChange('role')} />
+                    </div>
+                </div>
+
 
                 {
                     currentUserAccounts.map((account) => (
                         <AccountInput key={account.id} {...account}/>
                     ))
                 }
-
-
 
                 <div class="row">
                     <div class="container" style={{textAlign: 'center', marginTop: 10+'px'}}>
