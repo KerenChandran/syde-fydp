@@ -7,6 +7,7 @@ import { resourceActions, resourceSelectors } from '../modules/resources';
 import { userSelectors } from '../modules/users';
 
 import ResourceInfoView from '../views/ResourceInfo';
+import { scheduleActions } from '../modules/schedule';
 
 class ResourceInfo extends Component {
   componentDidMount() {
@@ -64,7 +65,8 @@ const mapStateToProps = (state, props) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
-  fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch)
+  fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
+  clearAvailableEvents: bindActionCreators(scheduleActions.clearAvailableEvents, dispatch)
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResourceInfo));

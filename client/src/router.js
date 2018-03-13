@@ -10,6 +10,7 @@ import Home from './containers/Home';
 import AllResources from './containers/AllResources';
 import MyResources from './containers/MyResources';
 import ResourceInfoEdit from './containers/ResourceInfoEdit';
+import ResourceInfoEditConfirm from './containers/ResourceInfoEditConfirm';
 import ResourceInfo from './containers/ResourceInfo';
 import RequestResource from './containers/RequestResource';
 import RequestInfo from './containers/RequestInfo';
@@ -60,9 +61,15 @@ class ApplicationRouter extends Component {
                 <Route exact path="/resources/myresources" component={MyResources} />
                 <Route exact path="/resources/:id" component={ResourceInfo} />
               </Switch>
+              <Switch>
+                <Route exact path="/resources/new/confirm" component={ResourceInfoEditConfirm} />
+                <Route exact path="/resources/:id/confirm" component={ResourceInfoEditConfirm} />
+              </Switch>
               <Route exact path="/resources/:id/edit" component={ResourceInfoEdit} />
-              <Route exact path="/resources/:id/availability" component={ResourceAvailability} />
-              <Route exact path="/resources/:id/schedule" component={ScheduleResource} />
+              <Switch>
+                <Route exact path="/resources/new/schedule" component={ScheduleResource} />
+                <Route exact path="/resources/:id/schedule" component={ScheduleResource} />
+              </Switch>
               <Route exact path="/resources/:id/incentive" component={RequestResource} />
               <Route exact path="/resources/:id/request" component={RequestInfo} />
               <Route exact path="/requests" component={Requests}/>

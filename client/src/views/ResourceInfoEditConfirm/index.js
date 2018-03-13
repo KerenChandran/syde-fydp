@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 
 import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup } from 'react-bootstrap';
 
-class ResourceInfoView extends Component {
+class ResourceInfoEditConfirm extends Component {
   render() {
-    const { currentUser, isMyResource, resource, onDeleteClick, onEditClick, onRequestClick } = this.props;
+    const { resource, newEvents, existingEvents, onConfirm, onCancel } = this.props;
     const {
       category,
       company,
@@ -26,12 +26,6 @@ class ResourceInfoView extends Component {
 
     return (
       <div className="container">
-        { currentUser != null && (
-          <Row>
-            {isMyResource && <Button bsClass="col-sm-6 btn" onClick={onEditClick}>Edit Resource</Button>}
-            <Button bsClass={isMyResource ? "col-sm-6 btn" : "col-sm-6 col-sm-offset-6 btn"} bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Update Availability" : "Request Resource"}</Button>
-          </Row>
-        )}
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
           <Col sm={10}><FormControl.Static>{category}</FormControl.Static></Col>
@@ -95,9 +89,30 @@ class ResourceInfoView extends Component {
             </Row>
           </div>
         }
+
+        {
+          available && existingEvents.length ?
+          <div>
+            <h3>Existing Events</h3>
+            {existingEvents.map((event, index) => <p key={index}>{event.block_start} - {event.block_end}</p>)}
+          </div> : null
+        }
+
+        {
+          available && newEvents.length ?
+          <div>
+            <h3>Updated Availability</h3>
+            {newEvents.map((event, index) => <p key={index}>{event.block_start} - {event.block_end}</p>)}
+          </div> : null
+        }
+
+        <Row>
+            <Button bsClass="col-sm-6 btn" onClick={onCancel}>Cancel</Button>
+            <Button bsClass="col-sm-6 btn" bsStyle="primary" onClick={onConfirm}>Confirm</Button>
+          </Row>
       </div>
     );
   }
 }
 
-export default ResourceInfoView;
+export default ResourceInfoEditConfirm;

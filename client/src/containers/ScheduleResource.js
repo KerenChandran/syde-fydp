@@ -7,7 +7,7 @@ import moment from 'moment';
 import momentLocalizer from 'react-widgets-moment';
 import { isEmpty } from 'lodash';
 
-import { resourceSelectors } from '../modules/resources';
+import { resourceSelectors, resourceActions } from '../modules/resources';
 import { scheduleActions, scheduleSelectors } from '../modules/schedule';
 import { userSelectors } from '../modules/users';
 
@@ -51,7 +51,10 @@ class RequestResource extends Component {
 
   componentDidMount() {
     const { fetchResourceSchedule, match: { params } } = this.props;
-    this.props.fetchResourceSchedule(params.id);
+    if (params.id != null) {
+      this.props.fetchResource(params.id)
+      this.props.fetchResourceSchedule(params.id);
+    }
   }
 
   checkNoOverlap = (event) => {
@@ -90,17 +93,26 @@ class RequestResource extends Component {
   }
 
   handleSelectEvent = (event) => {
-    const { events, requestedEvents, currentUser } = this.props;
+    const { events, availableEvents, requestedEvents, currentUser } = this.props;
     if (event.user_id !== currentUser.id) {
       return false;
     }
+    let requestedEvent = false;
+    let availableEvent = false;
 
     let selectedEventIdx = events.indexOf(event);
     if (selectedEventIdx < 0) {
       selectedEventIdx = requestedEvents.indexOf(event);
+      requestedEvent = selectedEventIdx >= 0;
+    }
+    if (selectedEventIdx < 0) {
+      selectedEventIdx = availableEvents.indexOf(event);
+      availableEvent = selectedEventIdx >= 0;;
     }
 
     this.setState({
+      availableEvent,
+      requestedEvent,
       selectedEventIdx,
       selectedEvent: {
         ...events[selectedEventIdx],
@@ -109,13 +121,12 @@ class RequestResource extends Component {
         allDay: this.allDayCheck(event),
         repeat: !isEmpty(event.block_recurring)
       },
-      showEventDetails: true,
-      requestedEvent: selectedEventIdx < 0
+      showEventDetails: true
     });
   }
 
   handleSelectSlot = ({ start, end }) => {
-    const { isMyResource, match: { params }, submitSchedule, validateRequestBlocks } = this.props;
+    const { isMyResource, match: { params }, currentUser, saveAvailableEvent, validateRequestBlocks } = this.props;
     const { selectedEvent } = this.state;
     const momentEnd = moment(end);
 
@@ -140,7 +151,10 @@ class RequestResource extends Component {
       event.block_recurring = {};
     }
 
-    isMyResource ? submitSchedule(event) : validateRequestBlocks(event);
+    isMyResource || params.id == null ? saveAvailableEvent({
+      ...event,
+      user_id: currentUser.id
+    }) : validateRequestBlocks(event);
   }
 
   handleEventDetailClose = () => {
@@ -151,7 +165,7 @@ class RequestResource extends Component {
   }
 
   handleSaveEvent = () => {
-    const { isMyResource, match: { params }, submitSchedule, validateRequestBlocks } = this.props;
+    const { isMyResource, match: { params }, saveAvailableEvent, validateRequestBlocks } = this.props;
     const { selectedEvent } = this.state;
 
     const event = {
@@ -169,11 +183,7 @@ class RequestResource extends Component {
       event.block_recurring = {};
     }
 
-    if (isMyResource) {
-      submitSchedule(event)
-    } else {
-      validateRequestBlocks(event);
-    }
+    (isMyResource || params.id == null) ? saveAvailableEvent(event) : validateRequestBlocks(event);
 
     this.setState({
       showEventDetails: false
@@ -181,8 +191,12 @@ class RequestResource extends Component {
   }
 
   handleDeleteEvent = () => {
-    const { events, selectedEventIdx, selectedEvent, requestedEvent } = this.state;
-    this.props.deleteEvent(selectedEventIdx, requestedEvent);
+    const { events, selectedEventIdx, selectedEvent, requestedEvent, availableEvent } = this.state;
+    if (availableEvent) {
+      this.props.deleteAvailableEvent(selectedEventIdx);
+    } else if (requestedEvent) {
+      this.props.deleteEvent(selectedEventIdx, requestedEvent);
+    }
     this.setState({
       selectedEventIdx: null,
       selectedEvent: EMPTY_EVENT,
@@ -215,10 +229,6 @@ class RequestResource extends Component {
     this.setState({ selectedEvent });
   }
 
-  handleNavigate = action => {
-    console.log('action', action);
-  }
-
   handleSubmitSchedule = () => {
     const { history, match: { params: { id }} } = this.props;
     history.push(`/resources/${id}/request`);
@@ -226,7 +236,8 @@ class RequestResource extends Component {
   }
 
   handleFinish = () => {
-    this.props.history.push('/resources');
+    const { match: { params }, history } = this.props;
+    params.id == null ? history.push('/resources/new/confirm') : history.push(`/resources/${params.id}/confirm`);
   }
 
   allDayCheck = event => {
@@ -237,29 +248,40 @@ class RequestResource extends Component {
     return start.isSame(end, 'day') && start.hour() === 0 && start.minute() === 0 && end.hour() === 23 && end.minute() === 59;
   }
 
-  render() {
-    const { showEventDetails, selectedEvent } = this.state;
-    const { events, currentUser, isMyResource, requestedEvents } = this.props;
+  titleAccessor = event => {
+    const { currentUser, match: { params }, resource } = this.props;
+    if (params.id == null || event.user_id === resource.ownerId) {
+      return 'Available';
+    }
+    return `${currentUser.first_name} ${currentUser.last_name}`
+  } 
 
+  render() {
+    const { showEventDetails, selectedEvent, requestedEvent, availableEvent } = this.state;
+    const { events, availableEvents, currentUser, isMyResource, requestedEvents, resource, match: { params } } = this.props;
+
+    if (params.id == null && !resource) {
+      return null;
+    }
     const dateFormat = selectedEvent.allDay ? "MMMM DD, YYYY" : "MMMM DD, YYYY - h:mm A";
     return (
       <div style={{display: 'flex', flexGrow: 1, flexDirection: 'column'}}>
         <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: 10}}>
           {
-            isMyResource ?
-            <Button bsStyle="primary" onClick={this.handleFinish}>Finish</Button> :
+            (isMyResource || params.id == null) ?
+            <Button bsStyle="primary" onClick={this.handleFinish}>Continue</Button> :
             requestedEvents.length ? 
             <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Continue</Button> :
             null
           }
         </div>
         <Calendar
-          events={[...events, ...requestedEvents]}
+          events={[...events, ...availableEvents, ...requestedEvents]}
           onEventResize={this.handleEventResize}
           onSelectEvent={this.handleSelectEvent}
           onSelectSlot={this.handleSelectSlot}
           onNavigate={this.handleNavigate}
-          titleAccessor={event => event.user_id === currentUser.id ? `${currentUser.first_name} ${currentUser.last_name}` : "Unavailable"}
+          titleAccessor={this.titleAccessor}
           startAccessor={event => new Date(event.block_start)}
           endAccessor={event => new Date(event.block_end)}
           allDayAccessor={this.allDayCheck}
@@ -357,7 +379,7 @@ class RequestResource extends Component {
           </Modal.Body>
 
           <Modal.Footer>
-            <Button bsStyle="danger" onClick={this.handleDeleteEvent}>Delete Event</Button>
+            { requestedEvent || availableEvent ? <Button bsStyle="danger" onClick={this.handleDeleteEvent}>Delete Event</Button> : null }
             <Button bsStyle="primary" onClick={this.handleSaveEvent}>Save Changes</Button>
           </Modal.Footer>
         </Modal>
@@ -370,14 +392,20 @@ const mapStateToProps = (state, props) => ({
   isMyResource: resourceSelectors.resourceOwnedByCurrentUser(state, props.match.params.id),
   events: scheduleSelectors.getEvents(state),
   requestedEvents: scheduleSelectors.getRequestedEvents(state),
-  currentUser: userSelectors.currentUser(state)
+  currentUser: userSelectors.currentUser(state),
+  availableEvents: scheduleSelectors.getAvailableEvents(state),
+  resource: resourceSelectors.getResource(state, props.match.params.id)
 });
 
 const mapDispatchToProps = (dispatch) => ({
   deleteEvent: bindActionCreators(scheduleActions.deleteRequestedEvent, dispatch),
+  fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
   fetchResourceSchedule: bindActionCreators(scheduleActions.fetchResourceSchedule, dispatch),
   submitSchedule: bindActionCreators(scheduleActions.submitScheduleBlock, dispatch),
-  validateRequestBlocks: bindActionCreators(scheduleActions.validateRequestBlocks, dispatch)
+  validateRequestBlocks: bindActionCreators(scheduleActions.validateRequestBlocks, dispatch),
+  saveAvailableEvent: bindActionCreators(scheduleActions.saveAvailableEvent, dispatch),
+  clearEvents: bindActionCreators(scheduleActions.clearEvents, dispatch),
+  deleteAvailableEvent: bindActionCreators(scheduleActions.deleteAvailableEvent, dispatch)
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(RequestResource));

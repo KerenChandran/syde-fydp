@@ -6,6 +6,7 @@ import { ButtonGroup, Button, Glyphicon } from 'react-bootstrap';
 import { resourceActions, resourceSelectors } from '../modules/resources';
 import { userSelectors } from '../modules/users';
 import { searchActions } from '../modules/search';
+import { scheduleActions } from '../modules/schedule';
 
 import ResourcesView from '../views/ResourcesDataTable';
 import LocationMap from '../components/LocationMap';
@@ -19,6 +20,7 @@ const GRID = 'grid';
 class AllResources extends Component {
   componentDidMount() {
     this.props.fetchResources();
+    this.props.clearSchedule();
   }
 
   componentWillUnmount() {
@@ -47,7 +49,7 @@ class AllResources extends Component {
     return (
       <div style={{ display: 'flex', flexGrow: 1 }}>
         <Sidebar />
-        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+        <div style={{ flexDirection: 'column', flexGrow: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <ScheduleFilters />
             <Button bsStyle={view === LIST ? 'primary' : 'default'} onClick={this.handleViewToggle(LIST)}>
@@ -89,7 +91,8 @@ const mapDispatchToProps = dispatch => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
   fetchResources: bindActionCreators(resourceActions.fetchResources, dispatch),
   clearResources: bindActionCreators(resourceActions.clearResources, dispatch),
-  resetSearch: bindActionCreators(searchActions.resetSearch, dispatch)
+  resetSearch: bindActionCreators(searchActions.resetSearch, dispatch),
+  clearSchedule: bindActionCreators(scheduleActions.clearSchedule, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AllResources);
