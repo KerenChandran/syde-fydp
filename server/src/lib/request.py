@@ -119,6 +119,111 @@ class RequestUtil(Pipeline):
 
         return block_store
 
+    def compute_transfer_amount(self, amount, cadence, blocks):
+        """
+            Helper method to compute the total amount to be transferred
+            based on the amount, cadence, and specified duration blocks.
+
+            Parameters
+            ----------
+            amount : {float}
+                user fee amount being charged for usage of resource
+
+            cadence : {str}
+                fee cadence that corresponds to specified fee amount (i.e.
+                how often is that amount being charged)
+
+            blocks : {list}
+                list of blocks corresponding to times for which a resource will
+                be used
+        """
+        if not isinstance(amount, float) or not isinstance(cadence, str) or \
+            not isinstance(blocks, list):
+            self.error_logs.append("Incorrect parameter type specified")
+            return None
+
+        elif len(blocks) == 0:
+            self.error_logs.append("Empty block list passed as param.")
+            return None
+
+        total_duration = 0
+
+        for block in blocks:
+            total_duration += \
+                (block['block_end'] - block['block_start']).total_seconds()
+
+        total_duration = \
+            total_duration / self.cadence_divisibility_map[cadence]
+
+        transfer_amount = total_duration * amount
+
+        return transfer_amount
+
+    def transform_request_list(self, request_list):
+        """
+            Helper method to apply transformation to a list of requests.
+            Used when retrieving requests for a particular user and sending
+            data back to client.
+
+            Parameters
+            ----------
+            request_list : {list}
+                list of request objects (dictionaries) with underlying
+                request data
+        """
+        # special handling of decimal fields
+        decimal_fields = ['fee_amount']
+
+        for req in request_list:
+            for fld, val in req.iteritems():
+                if fld in decimal_fields:
+                    req[fld] = float(val)
+
+        return request_list
+
+    def transform_merge_block_list(self, block_list, request_list):
+        """
+            Helper method to apply transformations to a list of blocks
+            for compatibility with sending payload back to client. This method
+            also merges a block list with a passed request list to create a
+            final data set that includes request objects with updated 
+            'block_list' attributes.
+
+            Parameters
+            ----------
+            block_list : {list}
+                list of block objects that contain request identifiers and
+                block information
+
+            request_list : {list}
+                list of request objects that contain identifiers and
+                basic request attributes
+        """
+        # special handling of datetime objects
+        for block in block_list:
+            for fld, val in block.iteritems():
+                if isinstance(val, dt.datetime):
+                    # convert datetime objects to iso strings
+                    block[fld] = val.isoformat()
+
+        placeholder = {}
+
+        for elem in block_list:
+            if elem['request_id'] not in placeholder:
+                placeholder[elem['request_id']] = []
+
+            placeholder[elem['request_id']].append(
+                {fld: elem[fld] for fld in elem if fld != 'request_id'})
+
+        block_list = placeholder
+
+        # merge init attributes and block list
+        for elem in request_list:
+            elem['block_list'] = \
+                block_list[elem['id']] if elem['id'] in block_list else []
+
+        return request_list
+
     def basic_attribute_load(self, record):
         """
             Underlying method to load basic attributes for request.
@@ -342,46 +447,6 @@ class RequestUtil(Pipeline):
         self.final_requests = self.final_requests.values()
 
         return
-
-    def compute_transfer_amount(self, amount, cadence, blocks):
-        """
-            Helper method to compute the total amount to be transferred
-            based on the amount, cadence, and specified duration blocks.
-
-            Parameters
-            ----------
-            amount : {float}
-                user fee amount being charged for usage of resource
-
-            cadence : {str}
-                fee cadence that corresponds to specified fee amount (i.e.
-                how often is that amount being charged)
-
-            blocks : {list}
-                list of blocks corresponding to times for which a resource will
-                be used
-        """
-        if not isinstance(amount, float) or not isinstance(cadence, str) or \
-            not isinstance(blocks, list):
-            self.error_logs.append("Incorrect parameter type specified")
-            return None
-
-        elif len(blocks) == 0:
-            self.error_logs.append("Empty block list passed as param.")
-            return None
-
-        total_duration = 0
-
-        for block in blocks:
-            total_duration += \
-                (block['block_end'] - block['block_start']).total_seconds()
-
-        total_duration = \
-            total_duration / self.cadence_divisibility_map[fee_cadence]
-
-        transfer_amount = total_duration * fee_amount
-
-        return transfer_amount
 
     def transfer_funds(self, request_id):
         """
@@ -699,26 +764,33 @@ class RequestUtil(Pipeline):
 
         return success, self.error_logs
 
-    def get_requests(self, owner_id):
+    def get_requests(self, user_id):
         """
-            Main method to retrieve all requests for a given user. This user
-            is the owner of all of the resources for which requests were
-            submitted. The only requests to be returned are ones that are
-            neither accepted nor rejected.
+            Main method to retrieve all requests for a given user.
 
             Parameters
             ----------
+            user_id : {int}
+                unique identifier of user for which requests are being
+                retrieved.
+
             owner_id : {int}
                 unique identifer of resource owner
         """
-        # retrieve basic and incentive-based attributes across all requests
-        request_retrieval_query = \
+        # retrieve basic and incentive-based attributes across owned requests
+        owned_request_retrieval_query = \
         """
             SELECT 
                 req.id, req.resource_id, req.user_id as requester_id,
                 pu.first_name || ' ' || pu.last_name as requester_name,
                 inc.type as incentive_type, uf.fee_amount, 
-                uf.cadence as fee_cadence
+                uf.cadence as fee_cadence,
+                CASE
+                    WHEN req.owner_accepted = True THEN 'accepted'
+                    WHEN req.owner_rejected = True THEN 'rejected'
+                    ELSE 'pending'
+                END as request_status,
+                rn.message AS requester_message
             FROM request req
             INNER JOIN platform_user pu
                 ON req.user_id = pu.id
@@ -730,29 +802,18 @@ class RequestUtil(Pipeline):
                 ON ri.incentive_id = inc.id
             LEFT JOIN user_fee uf
                 ON inc.fee_id = uf.id
+            LEFT JOIN (
+                SELECT reqnotif.request_id, notif.message
+                FROM notification_request reqnotif
+                INNER JOIN notification notif
+                    ON reqnotif.notification_id = notif.id
+            ) rn
+                ON req.id = rn.request_id
             WHERE rus.user_id = {owner_id}
-                AND req.owner_accepted = False
-                AND req.owner_rejected = False
-        """.format(owner_id=owner_id)
+        """.format(owner_id=user_id)
 
-        request_data = self.crs.fetch_dict(request_retrieval_query)
-
-        # special handling of decimal fields
-        decimal_fields = ['fee_amount']
-
-        for req in request_data:
-            for fld, val in req.iteritems():
-                if fld in decimal_fields:
-                    req[fld] = float(val)
-
-        # restructure data to allow eventual merge
-        placeholder = {}
-
-        for elem in request_data:
-            if elem['id'] not in placeholder:
-                placeholder[elem['id']] = elem
-
-        request_data = placeholder.values()
+        owned_request_data = self.transform_request_list(
+            self.crs.fetch_dict(owned_request_retrieval_query))
 
         # retrieve block list for all requests
         block_retrieval_query = \
@@ -764,34 +825,67 @@ class RequestUtil(Pipeline):
             INNER JOIN resource_user rus
                 ON req.resource_id = rus.resource_id
                 AND rus.user_id = {owner_id}
-        """.format(owner_id=owner_id)
+        """.format(owner_id=user_id)
 
         block_data = self.crs.fetch_dict(block_retrieval_query)
 
-        # special handling of datetime objects
-        for block in block_data:
-            for fld, val in block.iteritems():
-                if isinstance(val, dt.datetime):
-                    # convert datetime objects to iso strings
-                    block[fld] = val.isoformat()
+        owned_request_data = \
+            self.transform_merge_block_list(block_list, owned_request_data)
 
-        placeholder = {}
+        # retrieve basic and incentive-based attributes across submitted request
+        submitted_request_retrieval_query = \
+        """
+            SELECT
+                req.id, req.resource_id, rus.user_id as owner_id,
+                pu.first_name || ' ' || pu.last_name as owner_name,
+                inc.type as incentive_type, uf.fee_amount,
+                uf.cadence as fee_cadence,
+                CASE
+                    WHEN req.owner_accepted = True THEN 'accepted'
+                    WHEN req.owner_rejected = True THEN 'rejected'
+                    ELSE 'pending_status'
+                END AS request_status,
+                rn.message as submitted_message
+            FROM requests req
+            INNER JOIN resource_user rus
+                ON req.resource_id = rus.resource_id
+            INNER JOIN platform_user pu
+                ON rus.user_id = pu.id
+            INNER JOIN request_incentive ri
+                ON req.id = ri.request_id
+            INNER JOIN incentive inc
+                ON ri.incentive_id = inc.id 
+            LEFT JOIN user_fee uf
+                ON inc.fee_id = uf.id
+            LEFT JOIN (
+                SELECT reqnotif.request_id, notif.message
+                FROM notification_request reqnotif
+                INNER JOIN notification notif
+                    ON reqnotif.notification_id = notif.id
+            ) rn
+                ON req.id = rn.request_id
+            WHERE req.user_id = {requester_id}
+        """.format(requester_id=user_id)
 
-        for elem in block_data:
-            if elem['request_id'] not in placeholder:
-                placeholder[elem['request_id']] = []
+        submitted_request_data = self.transform_request_list(
+            self.crs.fetch_dict(submitted_request_retrieval_query))
 
-            placeholder[elem['request_id']].append(
-                {fld: elem[fld] for fld in elem if fld != 'request_id'})
+        # retrieve block list fro submitted requests
+        block_retrieval_query = \
+        """
+            SELECT rsb.request_id, rsb.block_start, rsb.block_end
+            FROM request_schedule_blocks rsb
+            INNER JOIN request req
+                ON rsb.request_id = req.id
+                AND req.user_id = {requester_id}
+        """.format(requester_id=user_id)
 
-        block_data = placeholder
+        block_data = self.crs.fetch_dict(block_retrieval_query)
 
-        # merge init attributes and block list
-        for elem in request_data:
-            elem['block_list'] = \
-                block_data[elem['id']] if elem['id'] in block_data else []
+        submitted_request_data = \
+            self.transform_merge_block_list(block_data, submitted_request_data)
 
-        return request_data
+        return owned_request_data, submitted_request_data
 
 
 if __name__ == '__main__':

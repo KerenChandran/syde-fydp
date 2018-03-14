@@ -101,7 +101,7 @@ class ResourcesDataTable extends Component {
         <TableHeaderColumn dataField='company' dataSort caretRender={this.caretRender}>Company</TableHeaderColumn>
         <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>
         <TableHeaderColumn dataField='location' dataFormat={this.locationFormatter} dataSort caretRender={this.caretRender}>Location</TableHeaderColumn>
-        <TableHeaderColumn dataField='available' dataFormat={this.availableFormatter} dataSort caretRender={this.caretRender}>Availability</TableHeaderColumn>
+        <TableHeaderColumn dataField='available' dataFormat={this.availableFormatter} dataSort caretRender={this.caretRender}>Available</TableHeaderColumn>
         <TableHeaderColumn hidden={resources.length && resources[0].first_available == null} dataField='first_available' dataFormat={this.firstAvailableFormatter} dataSort caretRender={this.caretRender}>First Available</TableHeaderColumn>
       </BootstrapTable>
     );

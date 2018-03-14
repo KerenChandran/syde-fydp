@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup } from 'react-bootstrap';
+import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup, Table, ButtonToolbar } from 'react-bootstrap';
+import moment from 'moment';
 
 class ResourceInfoEditConfirm extends Component {
   render() {
@@ -27,6 +28,7 @@ class ResourceInfoEditConfirm extends Component {
 
     return (
       <div className="container">
+        <h3>Resource Info</h3>
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
           <Col sm={10}><FormControl.Static>{category}</FormControl.Static></Col>
@@ -100,7 +102,24 @@ class ResourceInfoEditConfirm extends Component {
           available && existingEvents.length ?
           <div>
             <h3>Existing Events</h3>
-            {existingEvents.map((event, index) => <p key={index}>{event.block_start} - {event.block_end}</p>)}
+            <Table>
+              <thead>
+                <tr>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  existingEvents.map((event, index) => (
+                    <tr>
+                      <td>{moment(event.block_start).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
+                      <td>{moment(event.block_end).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </Table>
           </div> : null
         }
 
@@ -108,14 +127,31 @@ class ResourceInfoEditConfirm extends Component {
           available && newEvents.length ?
           <div>
             <h3>Updated Availability</h3>
-            {newEvents.map((event, index) => <p key={index}>{event.block_start} - {event.block_end}</p>)}
+            <Table>
+              <thead>
+                <tr>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  newEvents.map((event, index) => (
+                    <tr>
+                      <td>{moment(event.block_start).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
+                      <td>{moment(event.block_end).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </Table>
           </div> : null
         }
 
-        <Row>
-            <Button bsClass="col-sm-6 btn" onClick={onCancel}>Cancel</Button>
-            <Button bsClass="col-sm-6 btn" bsStyle="primary" onClick={onConfirm}>Confirm</Button>
-          </Row>
+        <ButtonToolbar className="center">
+          <Button onClick={onCancel}>Cancel</Button>
+          <Button bsStyle="primary" onClick={onConfirm}>Confirm</Button>
+        </ButtonToolbar>
       </div>
     );
   }

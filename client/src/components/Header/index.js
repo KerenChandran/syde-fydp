@@ -21,7 +21,7 @@ class Header extends Component {
     return (
       <header className="app-header">
         <Link to="/resources">
-          <span className="app-logo">Share-It</span>
+          <span className="app-logo">ShareIt</span>
         </Link>
         <div className="app-search">
           <Search />
