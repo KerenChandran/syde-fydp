@@ -602,10 +602,12 @@ def get_requests():
 
     request_util = RequestUtil()
 
-    request_data = request_util.get_requests(owner_id)
+    owned_request_data, submitted_request_data = \
+        request_util.get_requests(owner_id)
 
     ret_val = {
-        "request_data": request_data
+        "owned_requests": owned_request_data,
+        "submitted_requests": submitted_request_data
     }
 
     return jsonify(ret_val)
