@@ -27,8 +27,11 @@ class Header extends Component {
           <Search />
         </div>
         <div className="app-links">
+          <Link to="/resources">
+            <span className="app-logo">Resources</span>
+          </Link>
           <Link to="/requests">
-            <span className="app-logo">My Requests</span>
+            <span className="app-logo">Requests</span>
           </Link>
           <Button onClick={this.logout}>Logout</Button>
         </div>
