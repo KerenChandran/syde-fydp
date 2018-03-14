@@ -6,6 +6,8 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 import ScheduleFIlters from '../../containers/ScheduleFilters';
 
+import './index.css';
+
 class RequestsDataTable extends Component {
   handleRowDoubleClick = (row) => {
     this.props.showRequestDetails(row.id);
@@ -89,6 +91,7 @@ class RequestsDataTable extends Component {
         data={requests}
         options={options}
         selectRow={selectRowOptions}
+        trClassName="request-table-row"
       >
         <TableHeaderColumn dataField='id' isKey hidden>ID</TableHeaderColumn>
         <TableHeaderColumn dataField='requester_name'>Borrower</TableHeaderColumn>

@@ -5,6 +5,8 @@ import moment from 'moment'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 
+import './index.css';
+
 class ResourcesDataTable extends Component {
   handleRowDoubleClick = (row) => {
     this.props.showDetailsForm(row.resource_id);
@@ -92,6 +94,7 @@ class ResourcesDataTable extends Component {
         data={resources}
         options={options}
         selectRow={selectRowOptions}
+        trClassName="resource-table-row"
       >
         <TableHeaderColumn dataField='resource_id' isKey hidden>ID</TableHeaderColumn>
         <TableHeaderColumn dataField='category' dataSort caretRender={this.caretRender}>Category</TableHeaderColumn>

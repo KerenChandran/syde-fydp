@@ -58,7 +58,7 @@ class ScheduleFilters extends Component {
       <div className="form-inline">
         <FormGroup controlId="windowStart">
           <Col componentClass={ControlLabel} sm={1}>Available</Col>
-          <Col sm={3}>
+          <Col sm={2}>
             <DateTimePicker
               time={false}
               min={new Date()}
@@ -67,7 +67,7 @@ class ScheduleFilters extends Component {
               value={window_start}
             />
           </Col>
-          <Col sm={3}>
+          <Col sm={2}>
             <DateTimePicker
               time={false}
               min={window_start}

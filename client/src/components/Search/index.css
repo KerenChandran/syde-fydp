@@ -10,6 +10,7 @@
   position: relative;
   background: #fff;
   border: 1px solid #ddd;
+  border-radius: 2px;
   transition: all 200ms ease-in-out;
 }
 
@@ -64,5 +65,23 @@
 
 .search-filter-close {
   text-align: right;
+  margin-bottom: 15px;
+}
+
+.search-filter-panel {
+  border-top: 0px;
+}
+
+.search-filter-controls {
+  color: black;
+}
+
+.search-box .input-group .input-group-addon {
+  background: none;
+  border: none;
+}
+
+.search-filter-btn-toolbar {
+  float: right;
   margin-bottom: 15px;
 }
