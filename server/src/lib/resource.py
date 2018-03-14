@@ -31,9 +31,6 @@ class ResourceUtil(Pipeline):
                 # use 'resource_id' instead of 'id' for consistency
                 if fld == 'id':
                     fld = 'resource_id'
-                # postgres bug: ownerId camel case does not persist
-                elif fld == 'ownerid':
-                    fld = 'ownerId'
 
                 # assume one-level nesting
                 if isinstance(val, dict):
@@ -84,7 +81,7 @@ class ResourceUtil(Pipeline):
             SELECT 
                 {res_fields}, incentive.id as incentive_id,
                 incentive.type as incentive_type, uf.fee_amount, 
-                uf.cadence as fee_cadence, ru.user_id as ownerId
+                uf.cadence as fee_cadence, ru.user_id as ownerid
 
             FROM resource
             
@@ -126,7 +123,7 @@ class ResourceUtil(Pipeline):
             SELECT resloc.resource_id, {loc_flds}
             FROM location
             INNER JOIN resource_location resloc
-            ON location.placeId = resloc.location_id
+            ON location.placeid = resloc.location_id
             {where_clause}
         """.format(loc_flds=location_fields, where_clause=where_clause)
 

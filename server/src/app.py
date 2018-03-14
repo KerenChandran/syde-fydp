@@ -82,8 +82,8 @@ def upload_resource():
 
     user_id = g.user['id']
 
-    # update data point with ownerId
-    data['ownerId'] = user_id
+    # update data point with ownerid
+    data['ownerid'] = user_id
 
     # create list of single dictionary
     data = [data]
@@ -139,14 +139,14 @@ def bulk_resource_upload():
 
         body.append(row_data)
 
-    # assumption: ownerId data point is present for each record
+    # assumption: ownerid data point is present for each record
 
     for idx, dp in enumerate(body):
         # add location data to each record
         body[idx]['location'] = location
         
         # add owner data to each record
-        body[idx]['ownerId'] = user_id
+        body[idx]['ownerid'] = user_id
 
     # run upload pipeline
     pipeline = UploadPipeline()
