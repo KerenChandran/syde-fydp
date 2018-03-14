@@ -4,14 +4,22 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 
 import { resourceActions, resourceSelectors } from '../modules/resources'; 
-import { userSelectors } from '../modules/users';
+import { userSelectors, userActions } from '../modules/users';
 
 import ResourceInfoView from '../views/ResourceInfo';
 import { scheduleActions } from '../modules/schedule';
 
 class ResourceInfo extends Component {
+  state = {
+    loading: true
+  }
+
   componentDidMount() {
-    this.props.fetchResource(this.props.match.params.id);
+    this.props.fetchResource(this.props.match.params.id).then(resource => {
+      this.props.fetchUser(resource.ownerid);
+    }).then(() => {
+      this.setState({ loading: false });
+    });
   }
 
   handleBackClick = () => (
@@ -19,36 +27,37 @@ class ResourceInfo extends Component {
   )
 
   handleEditClick = () => {
-    const { currentUser, history, resource: { resource_id, ownerId }} = this.props;
-    if (currentUser.id === ownerId) {
+    const { currentUser, history, resource: { resource_id, ownerid }} = this.props;
+    if (currentUser.id === ownerid) {
       history.push(`/resources/${resource_id}/edit`);
     }
   }
 
   handleDeleteClick = () => {
-    const { currentUser, deleteResource, resource: { resource_id, ownerId }} = this.props;
-    if (currentUser.id === ownerId) {
+    const { currentUser, deleteResource, resource: { resource_id, ownerid }} = this.props;
+    if (currentUser.id === ownerid) {
       deleteResource(resource_id);
       this.handleBackClick();
     }
   }
 
   handleRequestClick = () => {
-    const { history, resource: { resource_id }} = this.props;
-    history.push(`/resources/${resource_id}/schedule`)
+    const { resource, saveResource } = this.props;
+    saveResource(resource);
   }
 
   render() {
-    const { currentUser, resource } = this.props;
-    if (resource == null) {
+    const { currentUser, resource, owner } = this.props;
+    if (!resource || !owner || this.state.loading) {
       return null;
     }
 
     return (
       <ResourceInfoView
         currentUser={currentUser}
-        isMyResource={resource.ownerId === currentUser.id}
+        isMyResource={resource.ownerid === currentUser.id}
         resource={resource}
+        owner={owner}
         onBackClick={this.handleBackClick}
         onEditClick={this.handleEditClick}
         onDeleteClick={this.handleDeleteClick}
@@ -60,13 +69,16 @@ class ResourceInfo extends Component {
 
 const mapStateToProps = (state, props) => ({
   resource: resourceSelectors.getResource(state, props.match.params.id),
-  currentUser: userSelectors.currentUser(state)
+  currentUser: userSelectors.currentUser(state),
+  owner: userSelectors.getOwnerByResource(state, props.match.params.id)
 });
 
 const mapDispatchToProps = (dispatch) => ({
   deleteResource: bindActionCreators(resourceActions.deleteResource, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
-  clearAvailableEvents: bindActionCreators(scheduleActions.clearAvailableEvents, dispatch)
+  clearAvailableEvents: bindActionCreators(scheduleActions.clearAvailableEvents, dispatch),
+  saveResource: bindActionCreators(resourceActions.saveResource, dispatch),
+  fetchUser: bindActionCreators(userActions.fetchUser, dispatch)
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResourceInfo));

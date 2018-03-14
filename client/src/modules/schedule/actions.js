@@ -30,7 +30,7 @@ export const fetchResourceScheduleHelper = async (id, dispatch) => {
     body: JSON.stringify({ resource_list: [id] })
   });
   let data = await response.json();
-  return dispatch(fetchScheduleBlocksSuccess(data));
+  return dispatch(fetchScheduleBlocksSuccess(data.resource_data[id]));
 }
 
 export const submitScheduleBlock = (block) => async dispatch => {

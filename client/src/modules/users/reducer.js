@@ -4,7 +4,8 @@ const initialState = {
   currentUser: {
     user: {},
     accounts: []
-  }
+  },
+  users: []
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -37,6 +38,45 @@ export default (state = initialState, { type, payload }) => {
 
         return {
           ...state, currentUser
+        };
+      }
+
+      case UserConstants.FETCH_USERS: {
+        return {
+          ...state,
+          users: payload.all_users
+        };
+      }
+
+      case UserConstants.FETCH_USER: {
+        const { users } = state;
+        if (!users.length) {
+          return {
+            ...state,
+            users: [payload.user]
+          }
+        }
+  
+        let idx = -1;
+        const res = payload.user;
+  
+        users.find((user, index) => {
+          if (user.id === res.id) {
+            idx = index;
+            return true;
+          }
+          return false;
+        });
+  
+        const newUsers = [
+          ...users.slice(0, idx),
+          res,
+          ...users.slice(idx + 1)
+        ];
+  
+        return {
+          ...state,
+          users: newUsers
         };
       }
 

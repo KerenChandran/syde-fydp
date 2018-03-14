@@ -19,7 +19,7 @@ class ResourceInfoEditConfirm extends Component {
       incentive_type,
       fee_amount,
       fee_cadence,
-      ownerId
+      ownerid
     } = resource;
 
     const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';

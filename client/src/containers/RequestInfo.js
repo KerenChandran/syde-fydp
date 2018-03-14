@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { requestActions, requestSelectors } from '../modules/request';
 import { resourceSelectors, resourceActions } from '../modules/resources';
 import { scheduleSelectors, scheduleActions } from '../modules/schedule';
-import { userSelectors } from '../modules/users';
+import { userSelectors, userActions } from '../modules/users';
 
 import {
   ButtonToolbar,
@@ -26,8 +26,10 @@ class RequestInfo extends Component {
   }
 
   componentDidMount() {
-    const { fetchResource, match: { params }, clearSchedule } = this.props;
-    fetchResource(params.id);
+    const { fetchResource, fetchUser, match: { params }, clearSchedule } = this.props;
+    fetchResource(params.id).then(resource => (
+      fetchUser(resource.ownerid)
+    ));
     clearSchedule();
   }
 
@@ -108,7 +110,8 @@ const mapDispatchToProps = dispatch => ({
   clearIncentive: bindActionCreators(requestActions.clearIncentive, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
   submitRequest: bindActionCreators(requestActions.submitRequest, dispatch),
-  clearSchedule: bindActionCreators(scheduleActions.clearSchedule, dispatch)
+  clearSchedule: bindActionCreators(scheduleActions.clearSchedule, dispatch),
+  fetchUser: bindActionCreators(userActions.fetchUser, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RequestInfo)

@@ -77,7 +77,7 @@ class LocationMap extends Component {
               lng,
               name: locationName
             },
-            ownerId
+            ownerid
           } = resource;
 
           const fees = fine !== null ? `$${fine.toFixed(2)}` : fine;
@@ -92,7 +92,7 @@ class LocationMap extends Component {
                     { fees != null && <p>{`Fees: ${fees}`}</p>}
                     <p>{`Available: ${available}`}</p>
                     <div style={{ display: 'flex', justifyContent: 'flex-end'}}>
-                      { ownerId === currentUserId ? (
+                      { ownerid === currentUserId ? (
                         <div>
                           <IconButton aria-label="Edit" onClick={this.handleEdit(id)}>
                             <EditIcon />

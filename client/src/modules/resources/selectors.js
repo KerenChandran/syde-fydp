@@ -41,7 +41,7 @@ export const filteredResources = createSelector(resources, resourceSearch, (reso
 });
 
 export const userResources = (resources, userId) => (
-  resources.filter(resource => resource.ownerId === userId)
+  resources.filter(resource => resource.ownerid === userId)
 );
 export const currentUserResources = createSelector(filteredResources, currentUserId, userResources);
 
@@ -60,7 +60,7 @@ export const showDetailsResource = state => state.resources.showDetailsResource;
 export const resourceOwnedByCurrentUser = (state, id) => {
   const resource = getResource(state, id);
   if (resource) {
-    return resource.ownerId === currentUserId(state)
+    return resource.ownerid === currentUserId(state)
   }
 };
 

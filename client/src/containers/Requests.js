@@ -6,33 +6,22 @@ import { withRouter } from 'react-router';
 import { resourceActions, resourceSelectors } from '../modules/resources'; 
 import { requestActions } from '../modules/request';
 import { searchActions } from '../modules/search';
-import { userSelectors } from '../modules/users';
+import { userActions, userSelectors } from '../modules/users';
 
 import RequestsView from '../views/RequestsDataTable';
 import { requestSelectors } from '../modules/request';
 
-class MyResources extends Component {
+class Requests extends Component {
   state = {
-    loadingResources: true,
-    loadingRequests: true
+    loading: true
   }
 
   componentDidMount() {
-    const { currentUserId, fetchRequests, fetchResources } = this.props;
-    fetchResources(() => this.setState({
-      loadingResources: false
-    }));
-    fetchRequests(currentUserId, () => {
-      this.setState({
-        loadingRequests: false
-      })
-    });
+    const { currentUserId, fetchRequests, fetchResources, fetchUsers } = this.props;
+    console.log('currentUserId', currentUserId);
+    Promise.all([fetchResources(), fetchRequests(currentUserId), fetchUsers()]).then(() => this.setState({ loading: false }));
   }
 
-  // componentWillUnmount() {
-  //   this.props.clearResources();
-  //   this.props.clearRequests();
-  // }
 
   showRequestDetails = (id) => {
     this.props.history.push(`/requests/${id}`);
@@ -44,6 +33,11 @@ class MyResources extends Component {
       resources,
       requests
     } = this.props;
+
+    if (this.state.loading) {
+
+    }
+
     return (
       <div style={{ display: 'flex', width: '100%' }}>
         <RequestsView
@@ -65,8 +59,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   fetchResources: bindActionCreators(resourceActions.fetchResources, dispatch),
   fetchRequests: bindActionCreators(requestActions.fetchRequests, dispatch),
+  fetchUsers: bindActionCreators(userActions.fetchUsers, dispatch),
   clearResources: bindActionCreators(resourceActions.clearResources, dispatch),
   clearRequests: bindActionCreators(requestActions.clearRequests, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MyResources);
+export default connect(mapStateToProps, mapDispatchToProps)(Requests);
