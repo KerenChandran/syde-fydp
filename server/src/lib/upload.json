@@ -65,7 +65,7 @@
         }
     },
     "database_fields": {
-        "resource": ["category", "model", "company", "description", "mobile", "available", "rules_restrictions"],
+        "resource": ["category", "model", "company", "description", "mobile", "available", "rules_restrictions", "room_number"],
         "location": ["placeid", "name", "latitude", "longitude"],
         "incentive": ["incentive_type", "fee_amount", "fee_cadence"]
     }
