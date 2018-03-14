@@ -26,19 +26,20 @@ class RequestInfo extends Component {
   }
 
   componentDidMount() {
-    const { fetchResource, fetchUser, match: { params }, clearSchedule } = this.props;
+    const { fetchResource, fetchUser, match: { params } } = this.props;
     fetchResource(params.id).then(resource => (
       fetchUser(resource.ownerid)
     ));
-    clearSchedule();
   }
 
   componentWillUnmount() {
-    this.props.clearIncentive();
+    const { clearIncentive, clearSchedule } = this.props;
+    clearIncentive();
+    clearSchedule();
   }
 
   handleSubmit = () => {
-    const { currentUser, resource, incentive, requestedEvents, submitRequest } = this.props;
+    const { currentUser, resource, incentive, newRequestedEvents, submitRequest } = this.props;
     const { source_account, message } = this.state;
     
     const { new_incentive, ...others } = incentive;
@@ -47,7 +48,7 @@ class RequestInfo extends Component {
     submitRequest({
       resource_id: resource.resource_id,
       user_id: currentUser.id,
-      requested_blocks: requestedEvents,
+      requested_blocks: newRequestedEvents,
       incentive_data,
       source_account,
       message
@@ -101,7 +102,7 @@ class RequestInfo extends Component {
 const mapStateToProps = (state, props) => ({
   currentUser: userSelectors.currentUser(state),
   incentive: requestSelectors.getRequestIncentive(state),
-  requestedEvents: scheduleSelectors.getRequestedEvents(state),
+  newRequestedEvents: scheduleSelectors.getNewRequestedEvents(state),
   resource: resourceSelectors.getResource(state, props.match.params.id),
   accounts: userSelectors.currentUserAccounts(state)
 });
