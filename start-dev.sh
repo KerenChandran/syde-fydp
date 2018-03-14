@@ -57,6 +57,7 @@ bash exec.sh scripts/2018_01_24/release.sql
 bash exec.sh scripts/2018_01_28/release.sql
 bash exec.sh scripts/2018_03_04/release.sql
 bash exec.sh scripts/2018_03_11/release.sql
+bash exec.sh scripts/2018_03_14/release.sql
 
 echo "creating transaction database tables..."
 cd ../trxn_db
@@ -64,8 +65,9 @@ bash exec.sh scripts/2018_01_22/release.sql
 
 echo "starting app server..."
 
-# dynamically create static folder for file uploads
-docker exec -d server mkdir App/src/static
+# dynamically create static folders for image and file uploads
+docker exec -d server mkdir App/src/static_image
+docker exec -d server mkdir App/src/static_file
 
 # execute this command in terminal: docker exec -it server python App/src/app.py
 

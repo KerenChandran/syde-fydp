@@ -6,7 +6,7 @@ import io
 import csv
 import json
 
-from flask import Flask, jsonify, request, g
+from flask import Flask, jsonify, request, g, send_from_directory
 from flask_bcrypt import Bcrypt
 from flask_httpauth import HTTPTokenAuth
 from flask_login import LoginManager
@@ -19,6 +19,7 @@ from lib.schedule import SchedulePipeline, ScheduleFilter
 from lib.accounts import TransactionUtil
 from lib.resource import ResourceUtil
 from lib.request import RequestUtil
+from lib.file import FileUtil
 
 import pdb
 
@@ -32,11 +33,11 @@ auth = HTTPTokenAuth('Bearer')
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# define upload folders - photo and file
+# define upload folders - image and file
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-PHOTO_UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static_photo')
+IMAGE_UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static_image')
 FILE_UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static_file')
-app.config['PHOTO_UPLOAD_FOLDER'] = PHOTO_UPLOAD_FOLDER
+app.config['IMAGE_UPLOAD_FOLDER'] = IMAGE_UPLOAD_FOLDER
 app.config['FILE_UPLOAD_FOLDER'] = FILE_UPLOAD_FOLDER
 
 
@@ -212,13 +213,31 @@ def get_resource_schedules():
 
     return jsonify(ret_val)
 
+@app.route("/get_resource_files", methods=['POST'])
+def get_resource_files():
+    # retrieve resource_id
+    data = request.get_json()
+
+    resource_id = data['resource_id']
+
+    file_util = FileUtil(image_dir=app.config['IMAGE_UPLOAD_FOLDER'],
+                         file_dir=app.config['FILE_UPLOAD_FOLDER'])
+
+    fldata = file_util.get_uploaded_files(resource_id)
+
+    ret_val = {
+        'file_data': fldata
+    }
+
+    return jsonify(ret_val)
+
 
 """
-    FILE UPLOAD ENDPOINTS
+    FILE UPLOAD/DOWNLOAD ENDPOINTS
 """
-@app.route("/resource_photo_upload", methods=['POST'])
+@app.route("/resource_image_upload", methods=['POST'])
 @auth.login_required
-def resource_photo_upload():
+def resource_image_upload():
     # retrieve resource id
     data = json.loads(request.form)
 
@@ -228,6 +247,11 @@ def resource_photo_upload():
     image_file = request.files['image']
     
     image_type = data['image_type']
+
+    file_util = FileUtil(image_dir=app.config['IMAGE_UPLOAD_FOLDER'])
+
+    success, errors = \
+        file_util.upload_image(resource_id, image_file, image_type=image_type)
 
     ret_val = {
         'success': success,
@@ -249,7 +273,11 @@ def resource_file_upload():
     file = request.files['resource_file']
 
     # retrieve metadata
-    metadata = data['metadata']
+    file_type = data['file_type']
+
+    file_util = FileUtil(file_dir=app.config['FILE_UPLOAD_FOLDER'])
+
+    success, errors = file_util.upload_file(resource_id, file, file_type)
 
     ret_val = {
         'success': success,
@@ -259,25 +287,21 @@ def resource_file_upload():
     return jsonify(ret_val)
 
 
-@app.route("/upload_file", methods=['POST'])
-def upload_file():
-    try:
-        file = request.files['image']
-        f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    
-        # assume that uploaded file is safe
-        file.save(f)
+@app.route("/download_file", methods=['POST'])
+def download():
+    # get filename and file type (i.e. image, file)
+    data = request.get_json()
 
-        success = True
+    filename = data['filename']
 
-    except:
-        success = False
+    file_type = data['file_type']
 
-    ret_val = {
-        "success": success
+    ft_map = {
+        "image": app.config['IMAGE_UPLOAD_FOLDER'],
+        "file": app.config['FILE_UPLOAD_FOLDER']
     }
 
-    return jsonify(ret_val)
+    return send_from_directory(directory=ft_map[file_type], filename=filename)
 
 
 """
