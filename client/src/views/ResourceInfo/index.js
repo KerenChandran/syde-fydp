@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup } from 'react-bootstrap';
+import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup, ButtonToolbar } from 'react-bootstrap';
 
 class ResourceInfoView extends Component {
   render() {
@@ -27,12 +27,7 @@ class ResourceInfoView extends Component {
 
     return (
       <div className="container">
-        { currentUser != null && (
-          <Row>
-            {isMyResource && <Button bsClass={available ? "col-sm-6 btn" : "col-sm-6 col-sm-offset-6 btn"} onClick={onEditClick}>Edit Resource</Button>}
-            {available ? <Button bsClass={isMyResource ? "col-sm-6 btn" : "col-sm-6 col-sm-offset-6 btn"} bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Update Availability" : "Request Resource"}</Button> : null}
-          </Row>
-        )}
+        <h3>Resource Info</h3>
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
           <Col sm={10}><FormControl.Static>{category}</FormControl.Static></Col>
@@ -51,31 +46,6 @@ class ResourceInfoView extends Component {
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
           <Col sm={10}><FormControl.Static>{company}</FormControl.Static></Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} sm={2}>Owner Name</Col>
-          <Col sm={10}><FormControl.Static>{owner.first_name} {owner.last_name}</FormControl.Static></Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} sm={2}>Deparment</Col>
-          <Col sm={10}><FormControl.Static>{owner.department}</FormControl.Static></Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
-          <Col sm={10}><FormControl.Static>{owner.faculty}</FormControl.Static></Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} sm={2}>Phone</Col>
-          <Col sm={10}><FormControl.Static>{owner.phone}</FormControl.Static></Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} sm={2}>Email</Col>
-          <Col sm={10}><FormControl.Static>{owner.email}</FormControl.Static></Col>
         </Row>
 
         <Row>
@@ -126,6 +96,39 @@ class ResourceInfoView extends Component {
             </Row>
           </div>
         }
+
+        <h3>Owner Info</h3>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Owner Name</Col>
+          <Col sm={10}><FormControl.Static>{owner.first_name} {owner.last_name}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Deparment</Col>
+          <Col sm={10}><FormControl.Static>{owner.department}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
+          <Col sm={10}><FormControl.Static>{owner.faculty}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Phone</Col>
+          <Col sm={10}><FormControl.Static>{owner.phone}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Email</Col>
+          <Col sm={10}><FormControl.Static>{owner.email}</FormControl.Static></Col>
+        </Row>
+
+        { currentUser != null && (
+          <ButtonToolbar className="right-align">
+            {isMyResource && <Button onClick={onEditClick}>Edit Resource</Button>}
+            {available ? <Button bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Update Availability" : "Request Resource"}</Button> : null}
+          </ButtonToolbar>
+        )}
       </div>
     );
   }

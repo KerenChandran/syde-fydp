@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 import { resourceActions } from '../modules/resources';
 import { userActions, userSelectors } from '../modules/users';
@@ -16,7 +17,8 @@ import {
   ControlLabel,
   FormControl,
   Button,
-  Row
+  Row,
+  Table
 } from 'react-bootstrap';
 import { requestActions } from '../modules/request';
 
@@ -71,11 +73,24 @@ class RequestReview extends Component {
         <h5>{requester.department} - {requester.faculty}</h5>
         <Link to={`/resources/${request.resource_id}`}>{request.model}</Link>
         <h4>Requested Time</h4>
-        <div>
-          {request.block_list.map((event, index) => (
-            <p key={index}>{event.block_start} - {event.block_end}</p>
-          ))}
-        </div>
+        <Table>
+          <thead>
+            <tr>
+              <th>Start Date</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              request.block_list.map((event, index) => (
+                <tr>
+                  <td>{moment(event.block_start).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
+                  <td>{moment(event.block_end).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </Table>
         <h4>Choose account</h4>
         <ButtonToolbar vertical>
           <ToggleButtonGroup type="radio" name="options" value={target_account} onChange={this.handleRadioChange('target_account')}>

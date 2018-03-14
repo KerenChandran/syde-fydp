@@ -6,7 +6,8 @@ import {
   ControlLabel,
   Col,
   Button,
-  Row
+  Row,
+  ButtonToolbar
 } from 'react-bootstrap';
 
 import Select, { Creatable } from 'react-select';
@@ -73,7 +74,7 @@ class ResourceInfoEditView extends Component {
     } = this.state;
 
     return (
-      <div className="container form-horizontal">
+      <div className="form-horizontal container-center">
         <FormGroup controlId="formCategory">
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
           <Col sm={10}>
@@ -200,10 +201,10 @@ class ResourceInfoEditView extends Component {
           </div>
         }
 
-        <Row>
-          <Button bsClass="col-sm-6 btn" type="button" onClick={this.props.onBackClick}>Go Back</Button>
-          <Button bsClass="col-sm-6 btn" bsStyle="primary" type="submit" onClick={this.handleSubmit}>Continue</Button>
-        </Row>
+        <ButtonToolbar className="right-align">
+          <Button type="button" onClick={this.props.onBackClick}>Go Back</Button>
+          <Button bsStyle="primary" type="submit" onClick={this.handleSubmit}>Continue</Button>
+        </ButtonToolbar>
       </div>
     );
   }
