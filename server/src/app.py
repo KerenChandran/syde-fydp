@@ -32,10 +32,13 @@ auth = HTTPTokenAuth('Bearer')
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# define upload folder
+# define upload folders - photo and file
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static')
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+PHOTO_UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static_photo')
+FILE_UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static_file')
+app.config['PHOTO_UPLOAD_FOLDER'] = PHOTO_UPLOAD_FOLDER
+app.config['FILE_UPLOAD_FOLDER'] = FILE_UPLOAD_FOLDER
+
 
 # HELPER METHODS
 def shutdown_server():
@@ -213,6 +216,49 @@ def get_resource_schedules():
 """
     FILE UPLOAD ENDPOINTS
 """
+@app.route("/resource_photo_upload", methods=['POST'])
+@auth.login_required
+def resource_photo_upload():
+    # retrieve resource id
+    data = json.loads(request.form)
+
+    resource_id = data['resource_id']
+
+    # retrieve image to be uploaded - can be either for resource or accessory
+    image_file = request.files['image']
+    
+    image_type = data['image_type']
+
+    ret_val = {
+        'success': success,
+        'errors': errors
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/resource_file_upload", methods=['POST'])
+@auth.login_required
+def resource_file_upload():
+    # retrieve resource id
+    data = json.loads(request.form)
+
+    resource_id = data['resource_id']
+
+    # retrieve file to be uploaded
+    file = request.files['resource_file']
+
+    # retrieve metadata
+    metadata = data['metadata']
+
+    ret_val = {
+        'success': success,
+        'errors': errors
+    }
+
+    return jsonify(ret_val)
+
+
 @app.route("/upload_file", methods=['POST'])
 def upload_file():
     try:
@@ -584,6 +630,7 @@ def validate_request_block():
 
 
 @app.route("/submit_request", methods=['POST'])
+@auth.login_required
 def submit_request():
     data = request.get_json()
 
@@ -644,6 +691,7 @@ def submit_request():
 
 
 @app.route("/accept_request", methods=['POST'])
+@auth.login_required
 def accept_request():
     data = request.get_json()
 
@@ -672,6 +720,7 @@ def accept_request():
 
 
 @app.route("/reject_request", methods=['POST'])
+@auth.login_required
 def reject_request():
     data = request.get_json()
 
@@ -691,6 +740,30 @@ def reject_request():
     ret_val = {
         "success": success,
         "errors": errors
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/get_transfer_amount", methods=['POST'])
+@auth.login_required
+def get_transfer_amount():
+    data = request.get_json()
+
+    fee_amount = float(data['fee_amount'])
+
+    fee_cadence = str(data['fee_cadence'])
+
+    block_list = list(data['block_list'])
+
+    # use helper method in request utility class to compute total amount
+    request_util = RequestUtil()
+
+    transfer_amount = request_util.compute_transfer_amount(
+        fee_amount, fee_cadence, block_list)
+
+    ret_val = {
+        "transfer_amount": transfer_amount
     }
 
     return jsonify(ret_val)

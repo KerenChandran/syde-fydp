@@ -25,6 +25,7 @@ CREATE TABLE resource (
     mobile BOOLEAN,
     available BOOLEAN,
     description TEXT,
+    room_number TEXT,
     rules_restrictions TEXT
 );
 

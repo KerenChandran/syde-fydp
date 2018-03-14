@@ -2,7 +2,7 @@
     "mappings": {
     },
     "database_fields": {
-        "resource": ["category", "company", "model", "mobile", "available", "description", "rules_restrictions", "id"],
+        "resource": ["category", "company", "model", "mobile", "available", "description", "room_number", "rules_restrictions", "id"],
         "location": ["placeid", "name", "latitude", "longitude"],
         "resource_schedule_blocks": ["resource_id", "user_id", "block_start", "block_end"],
         "resource_availability_blocks": ["resource_id", "user_id", "block_start", "block_end"]

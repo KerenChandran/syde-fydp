@@ -193,11 +193,11 @@ class UnitFour:
                 amount of money to be transferred from source to target account
         """
         if not self.valid_account(source) or not self.valid_account(target):
-            return False, "invalid account information"
+            return False, ["invalid account information"]
         elif not self.sufficient_funds(source, amount):
-            return False, "insufficient funds in %s" % source
+            return False, ["insufficient funds in %s" % source]
         elif self.get_type(target) == 'research':
-            return False, "funds cannot be transferred into a research account"
+            return False, ["funds cannot be transferred into a research account"]
 
         source_balance = self.get_balance(source) - amount
 
@@ -217,7 +217,7 @@ class UnitFour:
 
         self.crs.commit()
 
-        return True, ""
+        return True, []
 
 
 if __name__ == '__main__':

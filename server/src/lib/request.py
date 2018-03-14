@@ -19,6 +19,12 @@ class RequestUtil(Pipeline):
 
         self.trxn_util = TransactionUtil()
 
+        self.cadence_divisibility_map = {
+            'hourly': 60**2,
+            'daily': 60**2 * 24,
+            'weekly': 60**2 * 24 * 7
+        }
+
     def validate_request(self, request_id):
         """
             Helper method to check to see whether a passed request exists.
@@ -337,6 +343,46 @@ class RequestUtil(Pipeline):
 
         return
 
+    def compute_transfer_amount(self, amount, cadence, blocks):
+        """
+            Helper method to compute the total amount to be transferred
+            based on the amount, cadence, and specified duration blocks.
+
+            Parameters
+            ----------
+            amount : {float}
+                user fee amount being charged for usage of resource
+
+            cadence : {str}
+                fee cadence that corresponds to specified fee amount (i.e.
+                how often is that amount being charged)
+
+            blocks : {list}
+                list of blocks corresponding to times for which a resource will
+                be used
+        """
+        if not isinstance(amount, float) or not isinstance(cadence, str) or \
+            not isinstance(blocks, list):
+            self.error_logs.append("Incorrect parameter type specified")
+            return None
+
+        elif len(blocks) == 0:
+            self.error_logs.append("Empty block list passed as param.")
+            return None
+
+        total_duration = 0
+
+        for block in blocks:
+            total_duration += \
+                (block['block_end'] - block['block_start']).total_seconds()
+
+        total_duration = \
+            total_duration / self.cadence_divisibility_map[fee_cadence]
+
+        transfer_amount = total_duration * fee_amount
+
+        return transfer_amount
+
     def transfer_funds(self, request_id):
         """
             Underlying method which encapsulates all of the logic associated
@@ -361,6 +407,24 @@ class RequestUtil(Pipeline):
 
         target_account = result['target_account']
 
+        # retrieve fee amount and cadence
+        cadence_retrieval_query = \
+        """
+            SELECT uf.fee_amount, uf.cadence
+            FROM request_incentive ri
+            INNER JOIN incentive
+                ON ri.incentive_id = incentive.id
+                AND ri.request_id = {rid}
+            INNER JOIN user_fee uf
+                ON incentive.fee_id = uf.id
+        """.format(rid=request_id)
+
+        result = self.crs.fetch_dict(cadence_retrieval_query)[0]
+
+        fee_amount = float(result['fee_amount'])
+
+        fee_cadence = str(result['cadence'])
+
         # retrieve all blocks associated with said request
         block_retrieval_query = \
         """
@@ -381,38 +445,11 @@ class RequestUtil(Pipeline):
         # 3) use the 'seconds' representation of the timedelta and
         #    divisibility factors based on the cadence.
 
-        cadence_divisibility_map = {
-            'hourly': 60**2,
-            'daily': 60**2 * 24,
-            'weekly': 60**2 * 24 * 7
-        }
+        transfer_amount = \
+            self.compute_transfer_amount(fee_amount, fee_cadence, blocks)
 
-        total_duration = 0
-
-        for block in blocks:
-            total_duration += \
-                (block['block_end'] - block['block_start']).total_seconds()
-
-        cadence_retrieval_query = \
-        """
-            SELECT uf.fee_amount, uf.cadence
-            FROM request_incentive ri
-            INNER JOIN incentive
-                ON ri.incentive_id = incentive.id
-                AND ri.request_id = {rid}
-            INNER JOIN user_fee uf
-                ON incentive.fee_id = uf.id
-        """.format(rid=request_id)
-
-        result = self.crs.fetch_dict(cadence_retrieval_query)[0]
-
-        fee_amount = float(result['fee_amount'])
-
-        fee_cadence = str(result['cadence'])
-
-        total_duration = total_duration / cadence_divisibility_map[fee_cadence]
-
-        transfer_amount = total_duration * fee_amount
+        if not transfer_amount:
+            return False
 
         # transfer funds from source account to target
         success, errors = self.trxn_util.transfer_funds(
@@ -514,6 +551,9 @@ class RequestUtil(Pipeline):
                 if fld == 'block_start' or fld == 'block_end':
                     # convert datetime object to string
                     block[fld] = val.strftime(expected_dt_format)
+
+            # add block recurring field before running through pipeline
+            block['block_recurring'] = {}
 
         # use scheduling pipeline to upload blocks
         schedpipe = SchedulePipeline(user_id=self.get_requester_id(request_id))

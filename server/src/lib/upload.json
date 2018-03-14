@@ -45,6 +45,9 @@
         "mobile": {
             "data_type": "boolean"
         },
+        "room_number": {
+            "data_type": "text"
+        },
         "application": {
             "data_type": "text"
         },
