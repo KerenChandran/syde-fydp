@@ -4,7 +4,7 @@
     top:0px;
     width:100%;
     height:100%;
-    background-color: lightblue;
+    background-color: #DDE4F1;
 }
 
 .editProfileBox {
@@ -13,6 +13,9 @@
     padding-bottom:20px;
     width: 700px;
     margin: 20px auto;
+    -webkit-box-shadow: 0 2px 3px rgba(0,0,0,.55);
+    -moz-box-shadow: 0 2px 3px rgba(0,0,0,.55);
+    box-shadow: 0 2px 3px rgba(0,0,0,.55);
 }
 
 .profileFormContent .row {
