@@ -9,6 +9,7 @@ import { searchActions } from '../modules/search';
 import { scheduleActions } from '../modules/schedule';
 
 import ResourcesView from '../views/ResourcesDataTable';
+import ResourceDataHeader from '../components/ResourceDataHeader';
 import LocationMap from '../components/LocationMap';
 import Sidebar from '../components/ResourceSidebar';
 import ScheduleFilters from './ScheduleFilters';
@@ -47,35 +48,29 @@ class AllResources extends Component {
     const { view } = this.state;
 
     return (
-      <div style={{ display: 'flex', flexGrow: 1 }}>
+      <div style={{ display: 'flex', flexGrow: 1, overflowY: 'hidden' }}>
         <Sidebar />
         <div style={{ flexDirection: 'column', flexGrow: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <ScheduleFilters />
-            <Button bsStyle={view === LIST ? 'primary' : 'default'} onClick={this.handleViewToggle(LIST)}>
-              <Glyphicon glyph="list" />
-            </Button>
-            <Button bsStyle={view === MAP ? 'primary' : 'default'} onClick={this.handleViewToggle(MAP)}>
-              <Glyphicon glyph="map-marker" />
-            </Button>
+          <ResourceDataHeader view={view} handleViewToggle={this.handleViewToggle} />
+          <div style={{ overflowY: 'auto', overflowX: 'hidden', height: '100%' }}>
+            {
+              view === LIST ? (
+                <ResourcesView
+                  resources={resources}
+                  showDetailsForm={this.detailResource}
+                  currentUserId={currentUserId}
+                />
+              ) : (
+                <LocationMap
+                  resources={resources}
+                  deleteResource={deleteResource}
+                  showEditForm={this.editResource}
+                  showDetailsForm={this.detailResource}
+                  currentUserId={currentUserId}
+                />
+              )
+            }
           </div>
-          {
-            view === LIST ? (
-              <ResourcesView
-                resources={resources}
-                showDetailsForm={this.detailResource}
-                currentUserId={currentUserId}
-              />
-            ) : (
-              <LocationMap
-                resources={resources}
-                deleteResource={deleteResource}
-                showEditForm={this.editResource}
-                showDetailsForm={this.detailResource}
-                currentUserId={currentUserId}
-              />
-            )
-          }
         </div>
       </div>
     );

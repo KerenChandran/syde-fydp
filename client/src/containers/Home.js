@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
 
-import { Button } from 'react-bootstrap';
+import HomeView from '../views/Home';
 
 class Home extends Component {
   signUp = () => (
@@ -14,13 +13,9 @@ class Home extends Component {
   
   render() {
     return (
-      <div>
-        <h1>Share-It</h1>
-        <Button onClick={this.signUp}>Sign Up</Button>
-        <Button onClick={this.login}>Login</Button>
-      </div>
+      <HomeView signUp={this.signUp} login={this.login} />
     );
   }
 }
 
-export default withRouter(Home);
+export default Home;

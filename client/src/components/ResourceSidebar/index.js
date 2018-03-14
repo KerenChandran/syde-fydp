@@ -54,25 +54,22 @@ class Sidebar extends Component {
           <MenuItem eventKey="1" onSelect={this.handleDataImport}>Individual Resource</MenuItem>
           <MenuItem eventKey="2" onSelect={this.handleBulkImport}>Bulk Resources</MenuItem>
         </DropdownButton>
-        <Drawer
-          type="permanent"
-          classes={{ paper: classes.drawerPaper }}
-        > 
-        <ListGroup>
-          <NavLink to="/resources" exact className="resource-link" activeClassName="active-link">
-            <ListGroupItem>All Resources</ListGroupItem>
-          </NavLink>
-          <NavLink to="/resources/myresources" exact className="resource-link" activeClassName="active-link">
-            <ListGroupItem>My Resources</ListGroupItem>
-          </NavLink>
+        <div className="resources-sidebar-container">
+          <ListGroup>
+            <NavLink to="/resources" exact className="resource-link" activeClassName="active-link">
+              <ListGroupItem>All Resources</ListGroupItem>
+            </NavLink>
+            <NavLink to="/resources/myresources" exact className="resource-link" activeClassName="active-link">
+              <ListGroupItem>My Resources</ListGroupItem>
+            </NavLink>
           </ListGroup>
 
           <BulkDataImport
             open={isBulkImportOpen}
             closeForm={showBulkImport}
             submitForm={submitBulkImport}
-          />
-        </Drawer>
+          />  
+        </div>
       </div>
     );
   }

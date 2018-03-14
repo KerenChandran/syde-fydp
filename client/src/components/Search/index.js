@@ -7,7 +7,8 @@ import {
   MenuItem,
   Glyphicon,
   Button,
-  Panel
+  Panel,
+  ButtonToolbar
 } from 'react-bootstrap';
 
 import './index.css';
@@ -23,6 +24,14 @@ class Search extends Component {
     };
   }
 
+  componentWillMount() {
+    document.addEventListener('mousedown', this.handleClick, false)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClick, false)
+  }
+
   toggleFilters = () => {
     this.setState({ open: !this.state.open });
   }
@@ -30,6 +39,10 @@ class Search extends Component {
   handleChange = name => event => (
     this.setState({ [name]: event.target.value })
   )
+
+  handleSelectChange = name => value => {
+    this.setState({ [name]: value })
+  }
   
   handleSubmit = () => {
     const { open, ...search } = this.state;
@@ -44,11 +57,17 @@ class Search extends Component {
     this.setState(newState);
   }
 
+  handleClick = e => {
+    if (!this.node.contains(e.target)) {
+      this.setState({ open: false });
+    }
+  }
+
   render() {
     const { open, ...filters } = this.state;
 
     return (
-      <div className="search-root">
+      <div className="search-root" ref={node => this.node = node}>
         <div className="search-container">
           <Button bsStyle="link" className="search-btn" onClick={this.handleSubmit}>
             <Glyphicon glyph="search"/>
@@ -58,7 +77,7 @@ class Search extends Component {
               <InputGroup>
                 <FormControl type="text" value={filters.searchText} onChange={this.handleChange('searchText')} onKeyPress={this.handleKeyPress}/>
                 <InputGroup.Button>
-                  <Button onClick={this.toggleFilters}>
+                  <Button bsStyle="link" className="search-filter-controls" onClick={this.toggleFilters}>
                     <Glyphicon glyph="triangle-bottom"/>
                   </Button>
                 </InputGroup.Button>
@@ -67,22 +86,23 @@ class Search extends Component {
             </FormGroup>
           </div>
         </div>
-        <Panel id="search-filter-panel" expanded={open}>
+        <Panel id="search-filter-panel" expanded={open} className="search-filter-panel">
           <Panel.Collapse>
             <Panel.Body>
               <div className="search-filter-close">
-                <Button bsStyle='default' onClick={this.toggleFilters}>X</Button>
+                <Button bsStyle='link' className="search-filter-controls" onClick={this.toggleFilters}>X</Button>
               </div>
               { 
                 React.cloneElement(this.props.children, {
                   handleChange: this.handleChange,
+                  handleSelectChange: this.handleSelectChange,
                   filters: filters
                 })
               }
-              <div className="search-filter-close">
+              <ButtonToolbar className="search-filter-btn-toolbar">
                 <Button bsStyle='default' onClick={this.handleReset}>Reset</Button>
                 <Button bsStyle='primary' onClick={this.handleSubmit}>Submit</Button>
-              </div>
+              </ButtonToolbar>
             </Panel.Body>
           </Panel.Collapse>
         </Panel>
