@@ -19,7 +19,8 @@ class ResourceInfoEditConfirm extends Component {
       incentive_type,
       fee_amount,
       fee_cadence,
-      ownerid
+      ownerid,
+      room_number
     } = resource;
 
     const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';
@@ -54,6 +55,11 @@ class ResourceInfoEditConfirm extends Component {
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Location</Col>
           <Col sm={10}><FormControl.Static>{location.name}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Room Number</Col>
+          <Col sm={10}><FormControl.Static>{room_number}</FormControl.Static></Col>
         </Row>
 
         <Row>
