@@ -12,6 +12,7 @@ import {
 } from 'react-bootstrap';
 
 import './index.css';
+import { withRouter } from 'react-router-dom';
 
 class Search extends Component {
   constructor(props) {
@@ -63,6 +64,14 @@ class Search extends Component {
     }
   }
 
+  searchLocation = () => {
+    const { location: { pathname } } = this.props;
+    if (pathname === '/resources/myresources') {
+      return 'My Resources';
+    }
+    return 'All Resources';
+  }
+
   render() {
     const { open, ...filters } = this.state;
 
@@ -81,7 +90,7 @@ class Search extends Component {
                     <Glyphicon glyph="triangle-bottom"/>
                   </Button>
                 </InputGroup.Button>
-                <InputGroup.Addon>All Resources</InputGroup.Addon>
+                <InputGroup.Addon>{this.searchLocation()}</InputGroup.Addon>
               </InputGroup>
             </FormGroup>
           </div>
@@ -111,4 +120,4 @@ class Search extends Component {
   }
 }
 
-export default Search;
+export default withRouter(Search);
