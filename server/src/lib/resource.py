@@ -134,7 +134,7 @@ class ResourceUtil(Pipeline):
         for dct in result:
             placeholder_data[dct['resource_id']] = \
                 {fld:val for fld, val in dct.iteritems() if 
-                 fld != ['resource_id']}
+                 fld != 'resource_id'}
 
         for rid, dct in self.resource_data.iteritems():
             dct.update({'location': placeholder_data[rid]})
