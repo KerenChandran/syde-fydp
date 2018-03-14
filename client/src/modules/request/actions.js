@@ -8,7 +8,7 @@ export const clearIncentive = createAction(RequestConstants.CLEAR_INCENTIVE);
 export const clearRequests = createAction(RequestConstants.CLEAR_REQUESTS);
 export const fetchRequestsSuccess = createAction(RequestConstants.FETCH_REQUESTS, request => request);
 
-export const fetchRequests = (owner_id, callback) => async dispatch => {
+export const fetchRequests = owner_id => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/get_requests', {
       method: 'post',
@@ -17,9 +17,7 @@ export const fetchRequests = (owner_id, callback) => async dispatch => {
     });
     let data = await response.json();
     dispatch(fetchRequestsSuccess(data));
-    if (callback) {
-      callback();
-    }
+    return data;
   } catch (error) {
     throw new Error(error);
   }

@@ -42,8 +42,8 @@ class ResourceInfoEditConfirm extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  existingEvents: scheduleSelectors.getEvents(state),
-  newEvents: scheduleSelectors.getAvailableEvents(state),
+  existingEvents: scheduleSelectors.getAvailableEvents(state),
+  newEvents: scheduleSelectors.getNewAvailableEvents(state),
   resource: resourceSelectors.getNewResource(state)
 });
 

@@ -58,7 +58,8 @@ class RequestResource extends Component {
   }
 
   checkNoOverlap = (event) => {
-    return this.checkNoOverlapHelper(event, this.props.events); // && this.checkNoOverlapHelper(event, this.props.events);
+    const { availableEvents, newAvailableEvents, requestedEvents, newRequestedEvents } = this.props;
+    return this.checkNoOverlapHelper(event, requestedEvents) && this.checkNoOverlapHelper(event, newRequestedEvents) && this.checkNoOverlapHelper(event, availableEvents) && this.checkNoOverlapHelper(event, newAvailableEvents);
   }
 
   checkNoOverlapHelper = (event, eventList) => {
@@ -93,20 +94,23 @@ class RequestResource extends Component {
   }
 
   handleSelectEvent = (event) => {
-    const { events, availableEvents, requestedEvents, currentUser } = this.props;
+    const { availableEvents, requestedEvents, newAvailableEvents, newRequestedEvents, currentUser } = this.props;
     if (event.user_id !== currentUser.id) {
       return false;
     }
     let requestedEvent = false;
     let availableEvent = false;
 
-    let selectedEventIdx = events.indexOf(event);
+    let selectedEventIdx = availableEvents.indexOf(event);
     if (selectedEventIdx < 0) {
       selectedEventIdx = requestedEvents.indexOf(event);
+    }
+    if (selectedEventIdx < 0) {
+      selectedEventIdx = newRequestedEvents.indexOf(event);
       requestedEvent = selectedEventIdx >= 0;
     }
     if (selectedEventIdx < 0) {
-      selectedEventIdx = availableEvents.indexOf(event);
+      selectedEventIdx = newAvailableEvents.indexOf(event);
       availableEvent = selectedEventIdx >= 0;;
     }
 
@@ -115,9 +119,8 @@ class RequestResource extends Component {
       requestedEvent,
       selectedEventIdx,
       selectedEvent: {
-        ...events[selectedEventIdx],
-        block_start: new Date(event.block_start + "-0500"),
-        block_end: new Date(event.block_end + "-0500"),
+        block_start: new Date(event.block_start),
+        block_end: new Date(event.block_end),
         allDay: this.allDayCheck(event),
         repeat: !isEmpty(event.block_recurring)
       },
@@ -250,7 +253,7 @@ class RequestResource extends Component {
 
   titleAccessor = event => {
     const { currentUser, match: { params }, resource } = this.props;
-    if (params.id == null || event.user_id === resource.ownerId) {
+    if (params.id == null || event.user_id === resource.ownerid) {
       return 'Available';
     }
     return `${currentUser.first_name} ${currentUser.last_name}`
@@ -258,7 +261,7 @@ class RequestResource extends Component {
 
   render() {
     const { showEventDetails, selectedEvent, requestedEvent, availableEvent } = this.state;
-    const { events, availableEvents, currentUser, isMyResource, requestedEvents, resource, match: { params } } = this.props;
+    const { newAvailableEvents, newRequestedEvents, availableEvents, currentUser, isMyResource, requestedEvents, resource, match: { params } } = this.props;
 
     if (params.id == null && !resource) {
       return null;
@@ -270,13 +273,13 @@ class RequestResource extends Component {
           {
             (isMyResource || params.id == null) ?
             <Button bsStyle="primary" onClick={this.handleFinish}>Continue</Button> :
-            requestedEvents.length ? 
+            newRequestedEvents.length ? 
             <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Continue</Button> :
             null
           }
         </div>
         <Calendar
-          events={[...events, ...availableEvents, ...requestedEvents]}
+          events={[...availableEvents, ...newAvailableEvents, ...requestedEvents, ...newRequestedEvents]}
           onEventResize={this.handleEventResize}
           onSelectEvent={this.handleSelectEvent}
           onSelectSlot={this.handleSelectSlot}
@@ -390,10 +393,11 @@ class RequestResource extends Component {
 
 const mapStateToProps = (state, props) => ({
   isMyResource: resourceSelectors.resourceOwnedByCurrentUser(state, props.match.params.id),
-  events: scheduleSelectors.getEvents(state),
   requestedEvents: scheduleSelectors.getRequestedEvents(state),
   currentUser: userSelectors.currentUser(state),
   availableEvents: scheduleSelectors.getAvailableEvents(state),
+  newAvailableEvents: scheduleSelectors.getNewAvailableEvents(state),
+  newRequestedEvents: scheduleSelectors.getNewRequestedEvents(state),
   resource: resourceSelectors.getResource(state, props.match.params.id)
 });
 

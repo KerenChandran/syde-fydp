@@ -5,7 +5,7 @@ import json
 
 from flask import Flask, jsonify, request
 
-import trxn
+from trxn import UnitFour
 
 
 # global application instance
@@ -33,8 +33,10 @@ def create_basic_profile():
     user_id = data['user_id']
 
     # create research and operational accounts
-    research_acct = trxn.create_account(user_id, 'research')
-    op_acct = trxn.create_account(user_id, 'operational')
+    unit4 = UnitFour()
+
+    research_acct = unit4.create_account(user_id, 'research')
+    op_acct = unit4.create_account(user_id, 'operational')
 
     success = research_acct and op_acct
 
@@ -50,7 +52,9 @@ def get_accounts():
     data = request.get_json()
     user_id = data['user_id']
 
-    accounts = trxn.retrieve_accounts(user_id)
+    unit4 = UnitFour()
+
+    accounts = unit4.retrieve_accounts(user_id)
 
     ret_val = {
         'accounts': accounts
@@ -65,8 +69,10 @@ def transfer_funds():
     target_acct = int(data['target_account'])
     fund_amount = float(data['fund_amount'])
 
+    unit4 = UnitFour()
+
     success, errors = \
-        trxn.transfer_funds(source_acct, target_acct, fund_amount)
+        unit4.transfer_funds(source_acct, target_acct, fund_amount)
 
     ret_val = {
         'success': success,

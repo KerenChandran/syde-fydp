@@ -17,7 +17,7 @@ class LocationSearch extends Component {
       .then(results => getLatLng(results[0]))
       .then(({ lat, lng }) => {
         this.props.onChange({
-          placeId,
+          placeid: placeId,
           latitude: lat,
           longitude: lng,
           name: address

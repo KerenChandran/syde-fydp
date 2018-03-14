@@ -29,7 +29,7 @@ CREATE TABLE resource (
 );
 
 CREATE TABLE location (
-    placeId TEXT PRIMARY KEY,
+    placeid TEXT PRIMARY KEY,
     name TEXT,
     latitude NUMERIC,
     longitude NUMERIC
@@ -73,7 +73,7 @@ CREATE TABLE user_password (
 
 CREATE TABLE resource_location (
     resource_id SERIAL REFERENCES resource (id),
-    location_id TEXT REFERENCES location (placeId)
+    location_id TEXT REFERENCES location (placeid)
 );
 
 CREATE TABLE resource_incentive (

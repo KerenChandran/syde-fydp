@@ -72,13 +72,13 @@ class UploadPipeline(Pipeline):
         # check if location is already present in the database
         check_query = \
         """
-            SELECT placeId
+            SELECT placeid
             FROM location
-            WHERE placeId = '{id}'
-        """.format(id=record['location_placeId'])
+            WHERE placeid = '{id}'
+        """.format(id=record['location_placeid'])
 
         if self.crs.check_record_present(check_query):
-            return record['location_placeId']
+            return record['location_placeid']
 
         flds, location_data = self.crs.sanitize(record)
 
@@ -89,7 +89,7 @@ class UploadPipeline(Pipeline):
         """
             INSERT INTO location ({cols})
             VALUES ({insert_data})
-            RETURNING placeId;
+            RETURNING placeid;
         """.format(cols=",".join(compatible_flds), 
                    insert_data=",".join(location_data))
 
@@ -250,13 +250,13 @@ class UploadPipeline(Pipeline):
         # boolean slicing of dataframe to obtain all users to add to database
         user_check_series = self.df_transform.apply(
             lambda x: not self.crs.check_record_present(
-                user_check_query.format(id=x['ownerId'])),
+                user_check_query.format(id=x['ownerid'])),
             axis=1)
 
         df_users = self.df_transform[user_check_series]
 
         # add single occurrence of unique owner
-        df_users.drop_duplicates(subset=['ownerId'], inplace=True)
+        df_users.drop_duplicates(subset=['ownerid'], inplace=True)
 
         add_user_query = \
         """
@@ -265,7 +265,7 @@ class UploadPipeline(Pipeline):
         """
 
         df_users.apply(
-            lambda x: self.crs.execute(add_user_query.format(id=x['ownerId'])),
+            lambda x: self.crs.execute(add_user_query.format(id=x['ownerid'])),
             axis=1)
 
         # add user and resource records to join table
@@ -278,7 +278,7 @@ class UploadPipeline(Pipeline):
 
         self.df_transform.apply(
             lambda x: self.crs.execute(
-                upload_query.format(rid=x['resource_id'], uid=x['ownerId'])),
+                upload_query.format(rid=x['resource_id'], uid=x['ownerid'])),
             axis=1)
 
         self.crs.commit()

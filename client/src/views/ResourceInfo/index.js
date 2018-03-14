@@ -4,7 +4,7 @@ import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup } from 'react-
 
 class ResourceInfoView extends Component {
   render() {
-    const { currentUser, isMyResource, resource, onDeleteClick, onEditClick, onRequestClick } = this.props;
+    const { currentUser, isMyResource, resource, owner, onDeleteClick, onEditClick, onRequestClick } = this.props;
     const {
       category,
       company,
@@ -19,7 +19,7 @@ class ResourceInfoView extends Component {
       incentive_type,
       fee_amount,
       fee_cadence,
-      ownerId
+      ownerid
     } = resource;
 
     const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';
@@ -28,8 +28,8 @@ class ResourceInfoView extends Component {
       <div className="container">
         { currentUser != null && (
           <Row>
-            {isMyResource && <Button bsClass="col-sm-6 btn" onClick={onEditClick}>Edit Resource</Button>}
-            <Button bsClass={isMyResource ? "col-sm-6 btn" : "col-sm-6 col-sm-offset-6 btn"} bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Update Availability" : "Request Resource"}</Button>
+            {isMyResource && <Button bsClass={available ? "col-sm-6 btn" : "col-sm-6 col-sm-offset-6 btn"} onClick={onEditClick}>Edit Resource</Button>}
+            {available ? <Button bsClass={isMyResource ? "col-sm-6 btn" : "col-sm-6 col-sm-offset-6 btn"} bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Update Availability" : "Request Resource"}</Button> : null}
           </Row>
         )}
         <Row>
@@ -50,6 +50,31 @@ class ResourceInfoView extends Component {
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
           <Col sm={10}><FormControl.Static>{company}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Owner Name</Col>
+          <Col sm={10}><FormControl.Static>{owner.first_name} {owner.last_name}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Deparment</Col>
+          <Col sm={10}><FormControl.Static>{owner.department}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
+          <Col sm={10}><FormControl.Static>{owner.faculty}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Phone</Col>
+          <Col sm={10}><FormControl.Static>{owner.phone}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Email</Col>
+          <Col sm={10}><FormControl.Static>{owner.email}</FormControl.Static></Col>
         </Row>
 
         <Row>

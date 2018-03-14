@@ -31,7 +31,7 @@ def main():
 
     data_point['location'] = {
         'name': 'test',
-        'placeId': 'test',
+        'placeid': 'test',
         'latitude': 10,
         'longitude': 10
     }

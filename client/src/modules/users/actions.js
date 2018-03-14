@@ -7,6 +7,8 @@ import ApiHeaders from '../api/headers';
 export const addLoginSuccess = createAction(UserConstants.LOGIN_USER, user => ({ user }));
 export const editProfileSuccess = createAction(UserConstants.EDIT_PROFILE, profile => ({ profile }));
 export const fetchAccountsSuccess = createAction(UserConstants.FETCH_ACCOUNTS, accounts => accounts);
+export const fetchUsersSuccess = createAction(UserConstants.FETCH_USERS, users => users)
+export const fetchUserSuccess = createAction(UserConstants.FETCH_USER, user => user);
 
 export const signUp = (user, history) => async dispatch => {
   try {
@@ -86,3 +88,38 @@ export const logout = () => async dispatch => {
   localStorage.removeItem('id_token');
   dispatch(push('/'));
 };
+
+export const fetchUser = user_id => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/fetch_user_by_id', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ user_id })
+    });
+    let data = await response.json();
+    dispatch(fetchUserSuccess(data));
+    return data.user;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+export const fetchUsers = () => async dispatch => {
+  try {
+    let response = await fetch(`http://localhost:3000/api/fetch_all_users`, {
+      method: 'get',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    });
+    let data = await response.json();
+    dispatch(fetchUsersSuccess(data));
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+}

@@ -13,7 +13,7 @@
             "data_type": "dictionary",
             "flatten": true,
             "dictionary_fields": {
-                "placeId": {
+                "placeid": {
                     "data_type": "text"
                 },
                 "name": {
@@ -54,7 +54,7 @@
         "fee_cadence": {
             "data_type": "text"
         },
-        "ownerId": {
+        "ownerid": {
             "data_type": "integer"
         },
         "resource_id": {
@@ -63,7 +63,7 @@
     },
     "database_fields": {
         "resource": ["category", "model", "company", "description", "mobile", "available", "rules_restrictions"],
-        "location": ["placeId", "name", "latitude", "longitude"],
+        "location": ["placeid", "name", "latitude", "longitude"],
         "incentive": ["incentive_type", "fee_amount", "fee_cadence"]
     }
 }

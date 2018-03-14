@@ -6,225 +6,219 @@ from decimal import Decimal
 
 from utils.db import Cursor
 
-# global database connection object
-crs = Cursor()
+class UnitFour:
+    def __init__(self):
+        self.crs = Cursor()
 
-def valid_user(user_id):
-    """
-        Helper function which validates passed user id (i.e. does user exist
-        on trxn platform).
+    def valid_user(self, user_id):
+        """
+            Helper function which validates passed user id (i.e. does user exist
+            on trxn platform).
 
-        Parameters
-        ----------
-        user_id : {str}
-            unique user identifier
-    """
-    user_check_query = """
-        SELECT id
-        FROM trxn_user
-        WHERE id = '{uid}'
-    """.format(uid=user_id)
+            Parameters
+            ----------
+            user_id : {str}
+                unique user identifier
+        """
+        user_check_query = """
+            SELECT id
+            FROM trxn_user
+            WHERE id = '{uid}'
+        """.format(uid=user_id)
 
-    return crs.check_record_present(user_check_query)
+        return self.crs.check_record_present(user_check_query)
 
+    def valid_account(self, account_id):
+        """
+            Helper function which validates passed account id (i.e. does account
+            exist on trxn platform).
 
-def valid_account(account_id):
-    """
-        Helper function which validates passed account id (i.e. does account
-        exist on trxn platform).
+            Parameters
+            ----------
+            account_id : {str}
+                unique account identifier
+        """
+        acct_check_query = """
+            SELECT id
+            FROM account
+            WHERE id = {acct_id}
+        """.format(acct_id=account_id)
 
-        Parameters
-        ----------
-        account_id : {str}
-            unique account identifier
-    """
-    acct_check_query = """
-        SELECT id
-        FROM account
-        WHERE id = {acct_id}
-    """.format(acct_id=account_id)
+        return self.crs.check_record_present(acct_check_query)
 
-    return crs.check_record_present(acct_check_query)
+    def get_balance(self, account_id):
+        """
+            Helper function which retrieves the balance of a specified account.
 
+            Parameters
+            ----------
+            account_id : {str}
+                unique account identifier
+        """
+        retrieve_balance_query = """
+            SELECT balance
+            FROM account
+            WHERE id = {acc_id}
+        """.format(acc_id=account_id)
 
-def get_balance(account_id):
-    """
-        Helper function which retrieves the balance of a specified account.
+        return float(self.crs.fetch_first(retrieve_balance_query))
 
-        Parameters
-        ----------
-        account_id : {str}
-            unique account identifier
-    """
-    retrieve_balance_query = """
-        SELECT balance
-        FROM account
-        WHERE id = {acc_id}
-    """.format(acc_id=account_id)
+    def get_type(self, account_id):
+        """
+            Helper function which retrieves the type of a specified account.
 
-    return float(crs.fetch_first(retrieve_balance_query))
+            Parameters
+            ----------
+            account_id : {str}
+                unique account identifier
+        """
+        retrieve_type_query = """
+            SELECT type
+            FROM account
+            WHERE id = {acc_id}
+        """.format(acc_id=account_id)
 
+        return str(self.crs.fetch_first(retrieve_type_query))
 
-def get_type(account_id):
-    """
-        Helper function which retrieves the type of a specified account.
+    def sufficient_funds(self, account_id, fund_amount):
+        """
+            Helper function which checks whether the specified account has a
+            balance gte the passed fund amount.
 
-        Parameters
-        ----------
-        account_id : {str}
-            unique account identifier
-    """
-    retrieve_type_query = """
-        SELECT type
-        FROM account
-        WHERE id = {acc_id}
-    """.format(acc_id=account_id)
+            Parameters
+            ----------
+            account_id : {str}
+                unique account identifier
 
-    return str(crs.fetch_first(retrieve_type_query))
+            fund_amount : {float}
+                amount to compare account balance against
+        """
+        return self.get_balance(account_id) >= fund_amount
 
+    def create_account(self, user_id, account_type):
+        """
+            Main method to create an account for a particular user.
 
-def sufficient_funds(account_id, fund_amount):
-    """
-        Helper function which checks whether the specified account has a
-        balance gte the passed fund amount.
+            Parameters
+            ----------
+            user_id : {str}
+                identifier of user for which account is being created
 
-        Parameters
-        ----------
-        account_id : {str}
-            unique account identifier
+            account_type : {str}
+                corresponds to either 'research' or 'operational'
+        """
 
-        fund_amount : {float}
-            amount to compare account balance against
-    """
-    return get_balance(account_id) >= fund_amount
+        # check to see that user exists
+        if not self.valid_user(user_id):
+            # create user record in user table
+            self.crs.execute("""
+                INSERT INTO trxn_user (id)
+                VALUES ('{uid}')
+            """.format(uid=user_id))
 
+        # generate random initial amount for account
+        init_amt = random.randint(10000, 20000)
 
-def create_account(user_id, account_type):
-    """
-        Main method to create an account for a particular user.
+        # create account
+        create_account_query = """
+            INSERT INTO account (type, balance)
+            VALUES ('{acc_type}', {balance})
+            RETURNING id
+        """.format(acc_type=account_type, balance=init_amt)
 
-        Parameters
-        ----------
-        user_id : {str}
-            identifier of user for which account is being created
+        acct_id = self.crs.fetch_first(create_account_query)
 
-        account_type : {str}
-            corresponds to either 'research' or 'operational'
-    """
+        # map user to account
+        user_account_query = """
+            INSERT INTO user_account (user_id, account_id)
+            VALUES ('{uid}', {acc_id})
+        """.format(uid=user_id, acc_id=acct_id)
 
-    # check to see that user exists
-    if not valid_user(user_id):
-        # create user record in user table
-        crs.execute("""
-            INSERT INTO trxn_user (id)
-            VALUES ('{uid}')
-        """.format(uid=user_id))
+        self.crs.execute(user_account_query)
 
-    # generate random initial amount for account
-    init_amt = random.randint(10000, 20000)
+        self.crs.commit()
 
-    # create account
-    create_account_query = """
-        INSERT INTO account (type, balance)
-        VALUES ('{acc_type}', {balance})
-        RETURNING id
-    """.format(acc_type=account_type, balance=init_amt)
+        return True
 
-    acct_id = crs.fetch_first(create_account_query)
+    def retrieve_accounts(self, user_id):
+        """
+            Main method to retrieve accounts for a particular user.
 
-    # map user to account
-    user_account_query = """
-        INSERT INTO user_account (user_id, account_id)
-        VALUES ('{uid}', {acc_id})
-    """.format(uid=user_id, acc_id=acct_id)
+            Parameters
+            ----------
+            user_id : {str}
+                identifier of user for which accounts are being retrieved
+        """
+        if not self.valid_user(user_id):
+            return []
 
-    crs.execute(user_account_query)
+        retrieve_acct_query = """
+            SELECT account.id, account.type, account.balance
+            FROM user_account
+            INNER JOIN account
+                ON user_account.account_id = account.id
+                AND user_account.user_id = '{uid}'
+        """
+        acct_info = self.crs.fetch_dict(retrieve_acct_query.format(uid=user_id))
 
-    crs.commit()
+        # make account information JSON compatible before sending
+        data = []
 
-    return True
+        for acct in acct_info:
+            placeholder = {}
 
+            for key, val in acct.iteritems():
+                if isinstance(val, Decimal):
+                    val = float(val)
 
-def retrieve_accounts(user_id):
-    """
-        Main method to retrieve accounts for a particular user.
+                placeholder[key] = val
 
-        Parameters
-        ----------
-        user_id : {str}
-            identifier of user for which accounts are being retrieved
-    """
-    if not valid_user(user_id):
-        return []
+            data.append(placeholder)
 
-    retrieve_acct_query = """
-        SELECT account.id, account.type, account.balance
-        FROM user_account
-        INNER JOIN account
-            ON user_account.account_id = account.id
-            AND user_account.user_id = '{uid}'
-    """
-    acct_info = crs.fetch_dict(retrieve_acct_query.format(uid=user_id))
+        return data
 
-    # make account information JSON compatible before sending
-    data = []
+    def transfer_funds(self, source, target, amount):
+        """
+            Main method to transfer funds from source to target account.
 
-    for acct in acct_info:
-        placeholder = {}
+            Parameters
+            ----------
+            source : {int}
+                identifier of source account
 
-        for key, val in acct.iteritems():
-            if isinstance(val, Decimal):
-                val = float(val)
+            target : {int}
+                identifier of target account
 
-            placeholder[key] = val
+            amount : {float}
+                amount of money to be transferred from source to target account
+        """
+        if not self.valid_account(source) or not self.valid_account(target):
+            return False, "invalid account information"
+        elif not self.sufficient_funds(source, amount):
+            return False, "insufficient funds in %s" % source
+        elif self.get_type(target) == 'research':
+            return False, "funds cannot be transferred into a research account"
 
-        data.append(placeholder)
+        source_balance = self.get_balance(source) - amount
 
-    return data
+        target_balance = self.get_balance(target) + amount
 
+        update_query = """
+            UPDATE account
+            SET balance={balance}
+            WHERE id = {acct}
+        """
 
-def transfer_funds(source, target, amount):
-    """
-        Main method to transfer funds from source to target account.
+        # update source balance
+        self.crs.execute(update_query.format(balance=source_balance, acct=source))
 
-        Parameters
-        ----------
-        source : {int}
-            identifier of source account
+        # update target balance
+        self.crs.execute(update_query.format(balance=target_balance, acct=target))
 
-        target : {int}
-            identifier of target account
+        self.crs.commit()
 
-        amount : {float}
-            amount of money to be transferred from source to target account
-    """
-    if not valid_account(source) or not valid_account(target):
-        return False, "invalid account information"
-    elif not sufficient_funds(source, amount):
-        return False, "insufficient funds in %s" % source
-    elif get_type(target) == 'research':
-        return False, "funds cannot be transferred into a research account"
-
-    source_balance = get_balance(source) - amount
-
-    target_balance = get_balance(target) + amount
-
-    update_query = """
-        UPDATE account
-        SET balance={balance}
-        WHERE id = {acct}
-    """
-
-    # update source balance
-    crs.execute(update_query.format(balance=source_balance, acct=source))
-
-    # update target balance
-    crs.execute(update_query.format(balance=target_balance, acct=target))
-
-    crs.commit()
-
-    return True, ""
+        return True, ""
 
 
 if __name__ == '__main__':
-    print "Use as module."
+    unit4 = UnitFour()

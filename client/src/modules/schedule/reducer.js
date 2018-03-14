@@ -2,41 +2,40 @@ import * as ScheduleConstants from './constants';
 import moment from 'moment';
 
 const initialState = {
-  events: [],
   requestedEvents: [],
+  newRequestedEvents: [],
   availableEvents: [],
   errors: [],
-  availability_start: null,
-  availability_end: null
+  newAvailableEvents: []
 };
 
 export default (state = initialState, { type, payload }) => {
   switch(type) {
     case ScheduleConstants.FETCH_SCHEDULE: {
-      const { block_list } = payload.schedule.resource_data[0];
+      const { availability_blocks, usage_blocks } = payload.schedule;
       return {
         ...state,
-        events: block_list || []
+        requestedEvents: usage_blocks || [],
+        availableEvents: availability_blocks || []
       };
     }
 
     case ScheduleConstants.VALIDATE_BLOCKS: {
-      const { requestedEvents, ...others } = state;
-      const newRequestedEvents = [
-        ...requestedEvents,
-        ...payload.schedule.final_blocks
-      ];
+      const { newRequestedEvents, ...others } = state;
       return {
         ...others,
-        requestedEvents: newRequestedEvents,
+        newRequestedEvents: [
+          ...newRequestedEvents,
+          ...payload.schedule.final_blocks
+        ],
         errors: payload.schedule.errors        
       };
     }
 
     case ScheduleConstants.DELETE_EVENT: {
-      const { requestedEvents, ...others } = state;
+      const { newRequestedEvents, ...others } = state;
       return {
-        requestedEvents: requestedEvents.filter((event, idx) => idx != payload.idx),
+        newRequestedEvents: newRequestedEvents.filter((event, idx) => idx != payload.idx),
         ...others
       };
     }
@@ -48,17 +47,17 @@ export default (state = initialState, { type, payload }) => {
     case ScheduleConstants.SAVE_AVAILABLE_EVENT: {
       return {
         ...state,
-        availableEvents: [
-          ...state.availableEvents,
+        newAvailableEvents: [
+          ...state.newAvailableEvents,
           payload.event
         ]
       };
     }
 
     case ScheduleConstants.DELETE_AVAILABLE_EVENT: {
-      const { availableEvents, ...others } = state;
+      const { newAvailableEvents, ...others } = state;
       return {
-        availableEvents: availableEvents.filter((event, idx) => idx != payload.idx),
+        newAvailableEvents: newAvailableEvents.filter((event, idx) => idx != payload.idx),
         ...others
       };
     }
@@ -66,6 +65,7 @@ export default (state = initialState, { type, payload }) => {
     case ScheduleConstants.CLEAR_AVAILABLE_EVENTS: {
       return {
         ...state,
+        newAvailableEvents: [],
         availableEvents: []
       };
     }
@@ -73,7 +73,10 @@ export default (state = initialState, { type, payload }) => {
     case ScheduleConstants.CLEAR_EVENTS: {
       return {
         ...state,
-        events: []
+        requestedEvents: [],
+        newRequestedEvents: [],
+        availableEvents: [],
+        newAvailableEvents: [],
       }
     }
 
