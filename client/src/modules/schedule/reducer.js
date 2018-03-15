@@ -49,7 +49,7 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         newAvailableEvents: [
           ...state.newAvailableEvents,
-          payload.event
+          ...payload.events
         ]
       };
     }

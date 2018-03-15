@@ -128,8 +128,8 @@ class RequestResource extends Component {
     });
   }
 
-  handleSelectSlot = ({ start, end }) => {
-    const { availableEvents, newAvailableEvents, isMyResource, match: { params }, currentUser, saveAvailableEvent, validateRequestBlocks } = this.props;
+  handleSelectSlot = async ({ start, end }) => {
+    const { availableEvents, newAvailableEvents, newRequestedEvents, isMyResource, match: { params }, currentUser, saveAvailableEvent, validateRequestBlocks } = this.props;
     const { selectedEvent } = this.state;
     const momentEnd = moment(end);
 
@@ -154,7 +154,42 @@ class RequestResource extends Component {
       event.block_recurring = {};
     }
 
-    isMyResource || params.id == null ? saveAvailableEvent([...availableEvents, ...newAvailableEvents], event) : validateRequestBlocks(event);
+    if (isMyResource || params.id == null) {
+      await saveAvailableEvent([...availableEvents, ...newAvailableEvents], event, currentUser.id)
+      this.setState({
+        availableEvent: true,
+        requestedEvent: false,
+        selectedEventIdx: newAvailableEvents.length,
+        selectedEvent: {
+          block_start: start,
+          block_end: realEnd,
+          allDay: this.allDayCheck({
+            block_start: start,
+            block_end: realEnd
+          }),
+          user_id: currentUser.id,
+          repeat: false
+        },
+        showEventDetails: true
+      });
+    } else { 
+      this.setState({
+        availableEvent: false,
+        requestedEvent: true,
+        selectedEventIdx: newRequestedEvents.length,
+        selectedEvent: {
+          block_start: start,
+          block_end: realEnd,
+          allDay: this.allDayCheck({
+            block_start: start,
+            block_end: realEnd
+          }),
+          user_id: currentUser.id,
+          repeat: false
+        },
+        showEventDetails: true
+      });
+    }
   }
 
   handleEventDetailClose = () => {
@@ -165,7 +200,7 @@ class RequestResource extends Component {
   }
 
   handleSaveEvent = () => {
-    const { availableEvents, newAvailableEvents, isMyResource, match: { params }, saveAvailableEvent, validateRequestBlocks } = this.props;
+    const { availableEvents, newAvailableEvents, currentUser, isMyResource, match: { params }, saveAvailableEvent, validateRequestBlocks } = this.props;
     const { selectedEvent } = this.state;
 
     const event = {
@@ -183,11 +218,9 @@ class RequestResource extends Component {
       event.block_recurring = {};
     }
 
-    (isMyResource || params.id == null) ? saveAvailableEvent([...availableEvents, ...newAvailableEvents], event) : validateRequestBlocks(event);
+    (isMyResource || params.id == null) ? saveAvailableEvent([...availableEvents, ...newAvailableEvents], event, currentUser.id) : validateRequestBlocks(event);
 
-    this.setState({
-      showEventDetails: false
-    });
+    this.handleEventDetailClose();
   }
 
   handleDeleteEvent = () => {
