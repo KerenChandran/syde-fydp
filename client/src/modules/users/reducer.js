@@ -5,7 +5,16 @@ const initialState = {
     user: {},
     accounts: []
   },
-  users: []
+  users: [{
+    department: 'Systems Design Engineering',
+    email: 'sid@unnithan.com',
+    faculty: 'Engineering',
+    first_name: 'Sid',
+    id: 1,
+    last_name: 'Unnithan',
+    phone: '123',
+    role: 'Operator'
+  }]
 };
 
 export default (state = initialState, { type, payload }) => {

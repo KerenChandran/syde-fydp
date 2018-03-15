@@ -26,7 +26,7 @@ class ResourceInfoView extends Component {
     const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';
 
     return (
-      <div className="container">
+      <div className="container form-horizontal">
         <h3>Resource Info</h3>
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
@@ -99,7 +99,7 @@ class ResourceInfoView extends Component {
 
         <h3>Owner Info</h3>
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Owner Name</Col>
+          <Col componentClass={ControlLabel} sm={2}>Name</Col>
           <Col sm={10}><FormControl.Static>{owner.first_name} {owner.last_name}</FormControl.Static></Col>
         </Row>
 
@@ -111,6 +111,11 @@ class ResourceInfoView extends Component {
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
           <Col sm={10}><FormControl.Static>{owner.faculty}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Role</Col>
+          <Col sm={10}><FormControl.Static>{owner.role}</FormControl.Static></Col>
         </Row>
 
         <Row>

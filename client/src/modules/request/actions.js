@@ -8,6 +8,9 @@ export const clearIncentive = createAction(RequestConstants.CLEAR_INCENTIVE);
 export const clearRequests = createAction(RequestConstants.CLEAR_REQUESTS);
 export const fetchRequestsSuccess = createAction(RequestConstants.FETCH_REQUESTS, request => request);
 
+export const fetchRequestTotalSuccess = createAction(RequestConstants.FETCH_REQUEST_TOTAL, total => total);
+export const clearRequestTotal = createAction(RequestConstants.CLEAR_REQUEST_TOTAL);
+
 export const fetchRequests = owner_id => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/get_requests', {
@@ -61,6 +64,25 @@ export const rejectRequest = request => async dispatch => {
     });
     let data = await response.json();
     data.success ? dispatch(push('/requests')) : null;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+export const fetchRequestTotal = (fee_amount, fee_cadence, block_list) => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/get_transfer_amount', {
+      method: 'post',
+      headers: ApiHeaders(),
+      body: JSON.stringify({
+        fee_cadence,
+        fee_amount,
+        block_list
+      })
+    });
+    let data = await response.json();
+    dispatch(fetchRequestTotalSuccess(data))
+    return data;
   } catch (error) {
     throw new Error(error);
   }

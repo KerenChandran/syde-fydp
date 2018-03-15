@@ -20,7 +20,7 @@ class ResourcesDataTable extends Component {
   }
 
   renderShowsTotal = (start, to, total) => (
-    <p style={{ marginRight: 20 }}>{start} - {to} of {total} resources</p>
+    <span style={{ marginRight: 20 }}>{start} - {to} of {total} resources</span>
   )
 
   availableFormatter = (cell) => (

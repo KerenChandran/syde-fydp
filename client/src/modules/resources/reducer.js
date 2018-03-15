@@ -1,7 +1,8 @@
 import * as ResourceConstants from './constants';
+import data from './data_modified.json';
 
 const initialState = {
-  resources: [],
+  resources: data.resources,
   showBulkImport: false,
   newResource: {}
 };
@@ -77,7 +78,10 @@ export default (state = initialState, { type, payload }) => {
     case ResourceConstants.FETCH_RESOURCES: {
       return {
         ...state,
-        resources: payload.resources.resource_data
+        resources: [
+          ...data.resources,
+          ...payload.resources.resource_data
+        ]
       };
     }
     
@@ -86,7 +90,10 @@ export default (state = initialState, { type, payload }) => {
       if (!resources.length) {
         return {
           ...state,
-          resources: payload.resource.resource_data
+          resources: [
+            ...data.resources,
+            ...payload.resource.resource_data,
+          ]
         }
       }
 
@@ -116,7 +123,7 @@ export default (state = initialState, { type, payload }) => {
     case ResourceConstants.CLEAR_RESOURCES: {
       return {
         ...state,
-        resources: []
+        resources: data.resources
       }
     }
 

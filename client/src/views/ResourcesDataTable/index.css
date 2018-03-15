@@ -1,3 +1,7 @@
 .resource-table-row {
   cursor: pointer;
 }
+
+.react-bs-table-sizePerPage-dropdown, .react-bs-table-sizePerPage-dropdown .show {
+  display: inline !important;
+}

@@ -27,7 +27,7 @@ class ResourceInfoEditConfirm extends Component {
     const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';
 
     return (
-      <div className="container">
+      <div className="container-center">
         <h3>Resource Info</h3>
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
@@ -148,7 +148,7 @@ class ResourceInfoEditConfirm extends Component {
           </div> : null
         }
 
-        <ButtonToolbar className="center">
+        <ButtonToolbar className="center top-spacing">
           <Button onClick={onCancel}>Cancel</Button>
           <Button bsStyle="primary" onClick={onConfirm}>Confirm</Button>
         </ButtonToolbar>

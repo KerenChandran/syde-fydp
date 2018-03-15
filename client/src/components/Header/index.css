@@ -7,11 +7,17 @@
   display: flex;
   justify-content: space-between;
   background-color: white;
-  height: 80px;
+  height: 35px;
   padding: 20px;
   margin-bottom: 20px;
   color: #222;
-  border-bottom: 1px solid #e4e4e4
+  border-bottom: 1px solid #e4e4e4;
+  box-sizing: content-box;
+}
+
+.large-header {
+  height: 80px;
+  box-sizing: content-box;
 }
 
 .app-logo {

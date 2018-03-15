@@ -1,0 +1,17 @@
+.account-box {
+  background: white;
+  border: 1px solid black;
+  width: 200px;
+  margin-left: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.account-box:hover {
+  background: aliceblue;
+}
+
+.account-box.active {
+  background: lightblue;
+}

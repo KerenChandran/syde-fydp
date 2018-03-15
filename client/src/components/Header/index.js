@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import Search from '../../containers/Search';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import classnames from 'classnames';
 
+import { userActions } from '../../modules/users';
+
+import Search from '../../containers/Search';
 import { Button } from 'react-bootstrap';
 
 import './index.css';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { userActions } from '../../modules/users';
-
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
-import { faBell } from '@fortawesome/fontawesome-free-solid';
 
 class Header extends Component {
   logout = () => {
@@ -18,8 +17,9 @@ class Header extends Component {
   }
 
   render() {
+    const { pathname } = this.props.location;
     return (
-      <header className="app-header">
+      <header className={classnames('app-header', { 'large-header': pathname === '/resources'})}>
         <Link to="/resources">
           <span className="app-logo">ShareIt</span>
         </Link>

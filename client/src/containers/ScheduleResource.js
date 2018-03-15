@@ -129,7 +129,7 @@ class RequestResource extends Component {
   }
 
   handleSelectSlot = ({ start, end }) => {
-    const { isMyResource, match: { params }, currentUser, saveAvailableEvent, validateRequestBlocks } = this.props;
+    const { availableEvents, newAvailableEvents, isMyResource, match: { params }, currentUser, saveAvailableEvent, validateRequestBlocks } = this.props;
     const { selectedEvent } = this.state;
     const momentEnd = moment(end);
 
@@ -154,10 +154,7 @@ class RequestResource extends Component {
       event.block_recurring = {};
     }
 
-    isMyResource || params.id == null ? saveAvailableEvent({
-      ...event,
-      user_id: currentUser.id
-    }) : validateRequestBlocks(event);
+    isMyResource || params.id == null ? saveAvailableEvent([...availableEvents, ...newAvailableEvents], event) : validateRequestBlocks(event);
   }
 
   handleEventDetailClose = () => {
@@ -168,7 +165,7 @@ class RequestResource extends Component {
   }
 
   handleSaveEvent = () => {
-    const { isMyResource, match: { params }, saveAvailableEvent, validateRequestBlocks } = this.props;
+    const { availableEvents, newAvailableEvents, isMyResource, match: { params }, saveAvailableEvent, validateRequestBlocks } = this.props;
     const { selectedEvent } = this.state;
 
     const event = {
@@ -186,7 +183,7 @@ class RequestResource extends Component {
       event.block_recurring = {};
     }
 
-    (isMyResource || params.id == null) ? saveAvailableEvent(event) : validateRequestBlocks(event);
+    (isMyResource || params.id == null) ? saveAvailableEvent([...availableEvents, ...newAvailableEvents], event) : validateRequestBlocks(event);
 
     this.setState({
       showEventDetails: false
