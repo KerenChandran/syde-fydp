@@ -20,3 +20,5 @@ export const getRequest = (state, id) => {
     ...request
   };
 }
+
+export const getRequestTotal = state => state.request.fee_total;

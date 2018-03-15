@@ -7,7 +7,8 @@ const initialState = {
     incentive_type: null,
     new_incentive: false,
   },
-  requests: []
+  requests: [],
+  fee_total: 0
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -17,6 +18,13 @@ export default (state = initialState, { type, payload }) => {
         ...state,
         requests: payload.request_data
       } 
+    }
+
+    case RequestConstants.FETCH_REQUEST_TOTAL: {
+      return {
+        ...state,
+        fee_total: parseFloat(payload.transfer_amount)
+      }
     }
 
     case RequestConstants.SAVE_INCENTIVE: {
@@ -30,6 +38,13 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         incentive: initialState.incentive
+      }
+    }
+
+    case RequestConstants.CLEAR_REQUEST_TOTAL: {
+      return {
+        ...state,
+        fee_total: 0
       }
     }
 

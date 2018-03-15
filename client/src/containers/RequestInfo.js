@@ -32,16 +32,17 @@ class RequestInfo extends Component {
   }
 
   componentDidMount() {
-    const { fetchResource, fetchUser, match: { params } } = this.props;
+    const { fetchResource, fetchRequestTotal, fetchUser, match: { params }, newRequestedEvents } = this.props;
     fetchResource(params.id).then(resource => (
-      fetchUser(resource.ownerid)
+      Promise.all([fetchUser(resource.ownerid), fetchRequestTotal(resource.fee_amount, resource.fee_cadence, newRequestedEvents)])
     )).then(() => this.setState({ loading: false }));
   }
 
   componentWillUnmount() {
-    const { clearIncentive, clearSchedule } = this.props;
+    const { clearIncentive, clearSchedule, clearRequestTotal } = this.props;
     clearIncentive();
     clearSchedule();
+    clearRequestTotal();
   }
 
   handleSubmit = () => {
@@ -74,7 +75,7 @@ class RequestInfo extends Component {
   );
 
   render() {
-    const { accounts, resource, match: { params }, newRequestedEvents, owner } = this.props;
+    const { accounts, resource, match: { params }, newRequestedEvents, owner, fee_total } = this.props;
     const { message, source_account } = this.state;
 
     if (!resource || !owner || this.state.loading) {
@@ -172,7 +173,7 @@ class RequestInfo extends Component {
 
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Total</Col>
-          <Col sm={10}><FormControl.Static>$123</FormControl.Static></Col>
+          <Col sm={10}><FormControl.Static>${fee_total}</FormControl.Static></Col>
         </Row>
 
         <h3>Choose account</h3>
@@ -211,7 +212,8 @@ const mapStateToProps = (state, props) => ({
   newRequestedEvents: scheduleSelectors.getNewRequestedEvents(state),
   resource: resourceSelectors.getResource(state, props.match.params.id),
   owner: userSelectors.getOwnerByResource(state, props.match.params.id),
-  accounts: userSelectors.currentUserAccounts(state)
+  accounts: userSelectors.currentUserAccounts(state),
+  fee_total: requestSelectors.getRequestTotal(state)
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -219,7 +221,9 @@ const mapDispatchToProps = dispatch => ({
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
   submitRequest: bindActionCreators(requestActions.submitRequest, dispatch),
   clearSchedule: bindActionCreators(scheduleActions.clearSchedule, dispatch),
-  fetchUser: bindActionCreators(userActions.fetchUser, dispatch)
+  fetchUser: bindActionCreators(userActions.fetchUser, dispatch),
+  fetchRequestTotal: bindActionCreators(requestActions.fetchRequestTotal, dispatch),
+  clearRequestTotal: bindActionCreators(requestActions.clearRequestTotal, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RequestInfo)

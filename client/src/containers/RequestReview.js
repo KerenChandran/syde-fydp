@@ -37,17 +37,22 @@ class RequestReview extends Component {
   }
   
   componentDidMount() {
-    const { fetchResource, fetchUser, request } = this.props;
+    const { fetchResource, fetchRequestTotal, fetchUser, request } = this.props;
     
     if (request != null) {
-      fetchResource(request.resource_id).then(resource => 
-        fetchUser(request.requester_id)
-      ).then(
-        fetchUser(request.ownerid)
-      ).then(() => 
+      Promise.all([
+        fetchResource(request.resource_id),
+        fetchUser(request.requester_id),
+        fetchUser(request.ownerid),
+        fetchRequestTotal(request.fee_amount, request.fee_cadence, request.block_list)
+      ]).then(() => 
         this.setState({ loading: false })
       );
     }
+  }
+
+  componentWillUnmount() {
+    this.props.clearRequestTotal();
   }
 
   handleChange = (name) => (event) => (
@@ -72,7 +77,7 @@ class RequestReview extends Component {
 
   render() {
     const { message, target_account } = this.state;
-    const { accounts, request, requester } = this.props;
+    const { accounts, request, requester, fee_total } = this.props;
     return (
       <div className="container form-horizontal">
         <h3>Requester Info</h3>
@@ -108,7 +113,7 @@ class RequestReview extends Component {
           </Link>
         </p>
 
-        <h3>Requested Time</h3>
+        <h3>Fee Breakdown</h3>
         <Table>
           <thead>
             <tr>
@@ -127,6 +132,16 @@ class RequestReview extends Component {
             }
           </tbody>
         </Table>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Fee</Col>
+          <Col sm={10}><FormControl.Static>${request.fee_amount} / {request.fee_cadence}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Total</Col>
+          <Col sm={10}><FormControl.Static>${fee_total}</FormControl.Static></Col>
+        </Row>
 
         <h3>Choose account</h3>
         <div style={{ display: 'flex' }}>
@@ -165,14 +180,17 @@ class RequestReview extends Component {
 const mapStateToProps = (state, props) => ({
   accounts: userSelectors.currentUserTargetAccounts(state),
   request: requestSelectors.getRequest(state, props.match.params.id),
-  requester: userSelectors.getRequesterByRequest(state, props.match.params.id)
+  requester: userSelectors.getRequesterByRequest(state, props.match.params.id),
+  fee_total: requestSelectors.getRequestTotal(state)
 });
 
 const mapDispatchToProps = dispatch => ({
   acceptRequest: bindActionCreators(requestActions.acceptRequest, dispatch),
   rejectRequest: bindActionCreators(requestActions.rejectRequest, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
-  fetchUser: bindActionCreators(userActions.fetchUser, dispatch)
+  fetchRequestTotal: bindActionCreators(requestActions.fetchRequestTotal, dispatch),
+  fetchUser: bindActionCreators(userActions.fetchUser, dispatch),
+  clearRequestTotal: bindActionCreators(requestActions.clearRequestTotal, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(RequestReview);
