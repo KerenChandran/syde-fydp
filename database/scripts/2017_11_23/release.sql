@@ -54,12 +54,6 @@ CREATE TABLE application (
     label VARCHAR(50)
 );
 
-CREATE TABLE file (
-    id SERIAL PRIMARY KEY,
-    type VARCHAR(50),
-    filename TEXT
-);
-
 -- relationship tables
 
 CREATE TABLE resource_user (
@@ -86,11 +80,6 @@ CREATE TABLE resource_lab (
     resource_id SERIAL REFERENCES resource (id),
     lab_id SERIAL REFERENCES lab (id),
     application VARCHAR(50)
-);
-
-CREATE TABLE resource_file (
-    resource_id SERIAL REFERENCES resource (id),
-    file_id SERIAL REFERENCES file (id)
 );
 
 CREATE TABLE lab_user (

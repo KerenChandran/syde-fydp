@@ -1,11 +1,8 @@
 import React from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import {Form, FormGroup, FormControl, ControlLabel, Col, Button} from 'react-bootstrap'
-import Select, { Creatable } from 'react-select'
 import {userActions, userSelectors} from '../modules/users'
-import AccountInput from '../components/AccountInput'
-import './EditProfile.css'
+import EditProfileView from '../views/EditProfile'
 
 class EditProfile extends React.Component {
 
@@ -32,6 +29,7 @@ class EditProfile extends React.Component {
         role: role,
         department_options: []
         };
+
     this.faculties = [{"faculty": "Applied Health Sciences"}, {"faculty": "Arts"}, {"faculty": "Engineering"}, {"faculty": "Environment"}, {"faculty": "Mathematics"}, {"faculty": "Science"}];
     this.eng_departments = [{"department": "Chemical Engineering"}, {"department": "Civil & Environmental Engineering"}, {"department": "Electrical & Computer Engineering"}, {"department": "Management Sciences"}, {"department": "Mechanical & Mechatronics Engineering"}, {"department": "Systems Design Engineering"}, {"department": "School of Architecture"}, {"department": "Conrad Business, Entrepreneurship and Technology Centre"}];
     this.science_departments = [{"department": "Biology"}, {"department": "Chemistry"}, {"department": "Earth and Environmental Sciences"}, {"department": "Physics and Astronomy"}, {"department": "School of Optometry and Vision Sciences"}, {"department": "School of Pharmacy"}];
@@ -105,91 +103,24 @@ class EditProfile extends React.Component {
 
         console.log("render ", this.props);
         return (
-            <div id="editProfile">
-                <div class="editProfileBox">
-                    <form class="profileFormContent" onSubmit={this.handleSubmit}>
-                        <div class="row" controlId="formHorizontalFirstName">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
-                                First Name
-                            </label>
-                            <div class="col-sm-6">
-                                <FormControl type="firstName" placeholder="First Name" value={first_name} onChange={this.handleChange('first_name')} />
-                            </div>
-                        </div>
-
-                        <div class="row" controlId="formHorizontalLastName">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
-                                Last Name
-                            </label>
-                            <div class="col-sm-6">
-                                <FormControl type="lastName" placeholder="Last Name" value={last_name} onChange={this.handleChange('last_name')} />
-                            </div>
-                        </div>
-
-                        <div class="row" controlId="formHorizontalEmail">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
-                                Email
-                            </label>
-                            <div class="col-sm-6">
-                                <FormControl readOnly type="email" placeholder="Email" value={email} onChange={this.handleChange('email')} />
-                            </div>
-                        </div>
-
-                        <div class="row" controlId="formHorizontalPhoneNumber">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
-                                Phone Number
-                            </label>
-                            <div class="col-sm-6">
-                                <FormControl type="phone" placeholder="Phone Number" value={phone} onChange={this.handleChange('phone')} />
-                            </div>
-                        </div>
-
-
-                        <div class="row" controlId="formHorizontalFaculty">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
-                                Faculty
-                            </label>
-                            <div class="col-sm-6">
-                                <Select simpleValue value={faculty} onChange={this.handleFacultyChange} options={this.faculties} labelKey="faculty" valueKey="faculty" />
-
-                            </div>
-                        </div>
-
-                        <div class="row" controlId="formHorizontalDepartment">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
-                                Department
-                            </label>
-                            <div class="col-sm-6">
-                                <Select simpleValue value={department} onChange={this.handleSelectChange('department')} options={department_options} labelKey="department" valueKey="department" />
-                            </div>
-                        </div>
-
-                        <div class="row" controlId="formHorizontalRole">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
-                                Role
-                            </label>
-                            <div class="col-sm-6">
-                                <FormControl type="role" placeholder="Role" value={role} onChange={this.handleChange('role')} />
-                            </div>
-                        </div>
-
-
-                        {
-                            currentUserAccounts.map((account) => (
-                                <AccountInput key={account.id} {...account}/>
-                            ))
-                        }
-
-                        <div class="row">
-                            <div class="container" style={{textAlign: 'center', marginTop: 10+'px'}}>
-                                <button class="btn btn-primary" type="submit" onClick={this.handleSubmit}>Save</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <EditProfileView
+                first_name={first_name}
+                last_name={last_name}
+                email={email}
+                phone={phone}
+                department={department}
+                faculty={faculty}
+                role={role}
+                department_options={department_options}
+                faculties={this.faculties}
+                currentUserAccounts={currentUserAccounts}
+                handleChange={this.handleChange}
+                handleSelectChange={this.handleSelectChange}
+                handleFacultyChange={this.handleFacultyChange}
+                handleSubmit={this.handleSubmit}
+            />
         )
-    }S
+    }
 }
 
 const mapStateToProps = state => ({

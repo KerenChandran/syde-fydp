@@ -5,14 +5,14 @@ import {Grid, Form, FormGroup, FormControl, ControlLabel, Row, Col, Button} from
 import { bootstrapUtils } from 'react-bootstrap/lib/utils'
 import {userActions} from '../modules/users'
 import {Redirect} from 'react-router-dom'
-import './Login.css'
+import HomeView from '../views/Home';
 
 class SignUp extends React.Component {
 
     state = {
         email: "",
         password: "",
-        redirect: false
+        pageAction: "Sign Up"
     };
 
     handleChange = name => event => {
@@ -27,42 +27,23 @@ class SignUp extends React.Component {
     render() {
         const {
             email,
-            password
+            password,
+            pageAction
         } = this.state;
 
         return (
-            <div id="loginPage">
-                <div class="container">
-                    <div class="loginBox">
-                        <form class="loginContent" onSubmit={this.handleSubmit}>
-                            <div class="row" controlId="formHorizontalEmail">
-                                <label class="control-label">
-                                    Email
-                                </label>
-                            </div>
-
-                            <div class="row">
-                                    <FormControl type="email" placeholder="Email" value={email} onChange={this.handleChange('email')}/>
-                            </div>
-
-                            <div class="row" controlId="formHorizontalPassword">
-                                <label class="control-label">
-                                    Password
-                                </label>
-                            </div>
-
-                            <div class="row">
-                                    <FormControl type="password" placeholder="Password" value={password} onChange={this.handleChange('password')}/>
-                            </div>
-
-                            <div class="row" style={{textAlign: 'center', marginTop: 10+'px'}}>
-                                    <button type="submit" class="btn btn-primary">Sign up</button>
-                            </div>
-                        </form>
+            <HomeView
+                email={email}
+                password={password}
+                handleSubmit={this.handleSubmit}
+                handleChange={this.handleChange}
+                pageAction={pageAction}
+                footer={
+                    <div class="row" style={{textAlign: 'center'}}>
+                        Already have an account? <a href="/login">Log in here</a>.
                     </div>
-                </div>
-            </div>
-
+                }
+            />
         )
     }
 }

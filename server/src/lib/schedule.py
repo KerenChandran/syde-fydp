@@ -250,7 +250,7 @@ class SchedulePipeline(Pipeline):
 
         return True
 
-    def block_scheduling_load(self, record, availability=False):
+    def block_scheduling_load(self, record, target_table):
         """
             Main method to load block schedule for the passed resource.
 
@@ -259,18 +259,14 @@ class SchedulePipeline(Pipeline):
             record : {pandas.Series}
                 Data point for usage block to be uploaded.
 
-            availability : {bool}
-                flag denoting whether it is an availability load, as opposed
-                to schedule
+            target_table : {str}
+                target table to load block data into.
         """
         flds, record_data = self.crs.sanitize(record)
 
         # single user per pipeline run and bulk block upload
         flds.append("user_id")
         record_data.append(str(self.user_id))
-
-        target_table = "resource_availability_blocks" if availability else \
-            "resource_schedule_blocks"
 
         upload_query = \
         """
@@ -358,6 +354,9 @@ class SchedulePipeline(Pipeline):
                         x['resource_id'], x['block_start'], x['block_end']),
                     axis=1)]
 
+                # define target table for load step
+                target_table = "resource_schedule_blocks"
+
             elif block_availability:
                 # step to check whether availabilty loaded blocks overlap
                 # with existing availability blocks (sanity)
@@ -373,8 +372,7 @@ class SchedulePipeline(Pipeline):
                 # only add new cols to non-empty dataframes after overlap 
                 # check
                 block_sched_df['block_id'] = block_sched_df.apply(
-                    lambda x: self.block_scheduling_load(
-                        x, availability=block_availability), 
+                    lambda x: self.block_scheduling_load(x, target_table), 
                     axis=1)
 
         self.crs.commit()
@@ -428,6 +426,121 @@ class SchedulePipeline(Pipeline):
                       block_availability=block_availability)
 
         return (True, self.error_logs)
+
+    def intermediate_availability_load(self):
+        """
+            Main method in which underlying generation and load methods are 
+            applied to data set enabling the hypothetical loading of 
+            availability information in an intermediary table.
+        """
+        db_flds = self.database_fields['intermediate_availability_blocks']
+
+        db_flds.append('block_recurring')
+
+        avail_df = self.df_transform[db_flds]
+
+        # generate blocks based on passed data
+        avail_df.apply(
+            lambda x: self.generate_blocks(
+                x['resource_id'], x['block_start'], x['block_end'], 
+                block_recurring=x['block_recurring']),
+            axis=1)
+        
+        block_df = pd.DataFrame(self.generated_blocks)
+
+        # check whether generated blocks overlap with existing ones
+        target_table = "intermediate_availability_blocks"
+
+        block_df = block_df[block_df.apply(
+            lambda x: self.check_block_overlap(
+                x['resource_id'], x['block_start'], x['block_end'],
+                custom_target=target_table),
+            axis=1)]
+
+        block_df = block_df[['block_start', 'block_end']]
+
+        return block_df.to_dict('records')
+
+    def intermediate_availability_flush(self, resource_id):
+        """
+            Main method in which intermediate availability data is flushed out
+            of database tables for a particular resource.
+
+            Parameters
+            ----------
+            resource_id : {int}
+                unique identifier of resource for which data is being flushed
+                out
+        """
+        data_removal_query = \
+        """
+            DELETE FROM intermediate_availability_blocks
+            WHERE resource_id = {rid}
+        """.format(resource_id)
+
+        self.crs.execute(data_removal_query)
+
+        return True, self.error_logs
+
+    def intermediate_availability_run(self, existing_data, new_block):
+        """
+            Main method to run scheduling pipeline for intermediary availability
+            loads.
+
+            Parameters
+            ----------
+            existing_data : {list}
+                list of dictionarieis containing existing availability data.
+                Each data point mirrors block scheduling data points (i.e.
+                resource identifier, start, end, and recurring information).
+
+            new_block : {dict}
+                data point for the new block to be 'loaded'. should include
+                information about start, end, and recurring.
+        """
+        if not isinstance(data, list) or len(data) == 0:
+            self.error_logs.append("Invalid existing data store.")
+            return False, self.error_logs, None
+        elif not isinstance(new_block, dict) or len(new_block) == 0:
+            self.error_logs.append("Invalid new block specified.")
+            return False, self.error_logs, None
+
+        # run pipeline on existing data points with custom load step
+        self.data = data
+
+        self.transform()
+
+        # apply custom transformation to db_transform that adds new resource id
+        resource_insertion_query = \
+        """
+            INSERT INTO resource (description)
+            VALUES ('placeholder_resource')
+            RETURNING id;
+        """
+
+        resource_id = self.crs.fetch_first(resource_insertion_query)
+
+        self.df_transform['resource_id'] = resource_id
+
+        # insert existing blocks into intermediary table
+        target_table = "intermediate_availability_blocks"
+
+        self.df_transform.apply(
+            lambda x: self.block_scheduling_load(x, target_table), axis=1)
+
+        # run pipeline on new data point and return generated blocks
+        self.data = [new_block]
+
+        self.transform()
+
+        self.df_transform['resource_id'] = resource_id
+
+        result = self.intermediate_availability_load()
+
+        # remove all previously loaded data points
+        self.intermediate_availability_flush(resource_id)
+
+        return True, self.error_logs, result
 
 
 class ScheduleFilter(Pipeline):

@@ -13,8 +13,6 @@ DROP TABLE resource_incentive;
 
 DROP TABLE lab_application;
 
-DROP TABLE resource_file;
-
 DROP TABLE user_password;
 
 -- entity tables
@@ -31,5 +29,3 @@ DROP TABLE incentive;
 DROP TABLE user_fee;
 
 DROP TABLE application;
-
-DROP TABLE file;
