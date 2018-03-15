@@ -18,8 +18,10 @@ class Header extends Component {
   }
 
   render() {
+    const { pathname } = this.props.location;
+    const className = pathname === '/resources' || pathname === '/resources/myresources' ? 'app-header large-header' : 'app-header';
     return (
-      <header className="app-header">
+      <header className={className}>
         <Link to="/resources">
           <span className="app-logo">ShareIt</span>
         </Link>

@@ -3,6 +3,9 @@ import { getRequest } from '../request/selectors';
 export const currentUserId = state => state.users.currentUser.user.id;
 export const currentUser = state => state.users.currentUser.user;
 export const currentUserAccounts = state => state.users.currentUser.accounts;
+export const currentUserTargetAccounts = state => (
+  state.users.currentUser.accounts.filter(account => account.type === 'operational')
+);
 
 export const getAllUsers = state => state.users.users;
 export const getOwnerByResource = (state, resourceId) => {

@@ -52,7 +52,7 @@ class AllResources extends Component {
         <Sidebar />
         <div style={{ flexDirection: 'column', flexGrow: 1 }}>
           <ResourceDataHeader view={view} handleViewToggle={this.handleViewToggle} />
-          <div style={{ overflowY: 'auto', overflowX: 'hidden', height: '100%' }}>
+          <div style={{ overflowY: 'auto', overflowX: 'hidden', height: '100%', paddingBottom: 150 }}>
             {
               view === LIST ? (
                 <ResourcesView

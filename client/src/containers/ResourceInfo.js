@@ -15,11 +15,16 @@ class ResourceInfo extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchResource(this.props.match.params.id).then(resource => {
-      this.props.fetchUser(resource.ownerid);
-    }).then(() => {
-      this.setState({ loading: false });
-    });
+    const { fetchResource, fetchUser, match: { params } } = this.props;
+    if (params.id >= 1000) {
+      this.setState({ loading: false })
+    } else {
+      this.props.fetchResource(this.props.match.params.id).then(resource => {
+        this.props.fetchUser(resource.ownerid);
+      }).then(() => {
+        this.setState({ loading: false });
+      });
+    }
   }
 
   handleBackClick = () => (

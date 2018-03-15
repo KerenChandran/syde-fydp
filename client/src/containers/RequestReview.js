@@ -22,6 +22,8 @@ import {
 } from 'react-bootstrap';
 import { requestActions } from '../modules/request';
 
+import AccountPill from '../components/Account';
+
 class RequestReview extends Component {
   constructor(props) {
     super(props);
@@ -56,6 +58,10 @@ class RequestReview extends Component {
     this.setState({ [name]: event })
   )
 
+  handleAccountSelect = id => () => (
+    this.setState({ target_account: id })
+  )
+
   handleAccpet = () => {
     this.props.acceptRequest(this.state);
   }
@@ -69,10 +75,40 @@ class RequestReview extends Component {
     const { accounts, request, requester } = this.props;
     return (
       <div className="container form-horizontal">
-        <h4>{request.requester_name}</h4>
-        <h5>{requester.department} - {requester.faculty}</h5>
-        <Link to={`/resources/${request.resource_id}`}>{request.model}</Link>
-        <h4>Requested Time</h4>
+        <h3>Requester Info</h3>
+        <Row>
+          <Col componentClass={ControlLabel} xs={2}>Name</Col>
+          <Col xs={10}>{request.requester_name}</Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} xs={2}>Deparment</Col>
+          <Col xs={10}>{requester.department}</Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} xs={2}>Faculty</Col>
+          <Col xs={10}>{requester.faculty}</Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} xs={2}>Phone</Col>
+          <Col xs={10}><FormControl.Static>{requester.phone}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Email</Col>
+          <Col xs={10}><FormControl.Static>{requester.email}</FormControl.Static></Col>
+        </Row>
+
+        <h3>Resource Info</h3>
+        <p>
+          <Link to={`/resources/${request.resource_id}`}>
+            Click here to view more details on {request.model}
+          </Link>
+        </p>
+
+        <h3>Requested Time</h3>
         <Table>
           <thead>
             <tr>
@@ -91,17 +127,23 @@ class RequestReview extends Component {
             }
           </tbody>
         </Table>
-        <h4>Choose account</h4>
-        <ButtonToolbar vertical>
-          <ToggleButtonGroup type="radio" name="options" value={target_account} onChange={this.handleRadioChange('target_account')}>
-            { accounts.map(account => (
-              <ToggleButton key={account.id} value={account.id}>ID: {account.id} - {account.type}, ${account.balance}</ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-        </ButtonToolbar>
-        <FormGroup controlId="formMessage">
-          <Col componentClass={ControlLabel} sm={2}>Message</Col>
-          <Col sm={10}>
+
+        <h3>Choose account</h3>
+        <div style={{ display: 'flex' }}>
+          {
+            accounts.map(account => (
+              <AccountPill
+                {...account}
+                key={account.id}
+                onClick={this.handleAccountSelect}
+                active={target_account === account.id}
+              />
+            ))
+          }
+        </div>
+
+        <FormGroup controlId="formMessage" className="top-spacing">
+          <Col sm={12}>
             <FormControl
               componentClass="textarea"
               value={message}
@@ -110,17 +152,18 @@ class RequestReview extends Component {
             />
           </Col>
         </FormGroup>
-        <Row>
-          <Button bsClass="col-sm-6 btn" bsStyle="primary" onClick={this.handleAccpet}>Accept</Button>
-          <Button bsClass="col-sm-6 btn" onClick={this.handleReject}>Reject</Button>
-        </Row>
+
+        <ButtonToolbar className="pull-right">
+          <Button bsStyle="primary" onClick={this.handleAccpet}>Accept</Button>
+          <Button onClick={this.handleReject}>Reject</Button>
+        </ButtonToolbar>
       </div>
     );
   }
 }
 
 const mapStateToProps = (state, props) => ({
-  accounts: userSelectors.currentUserAccounts(state),
+  accounts: userSelectors.currentUserTargetAccounts(state),
   request: requestSelectors.getRequest(state, props.match.params.id),
   requester: userSelectors.getRequesterByRequest(state, props.match.params.id)
 });

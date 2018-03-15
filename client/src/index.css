@@ -43,3 +43,7 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
+
+.top-spacing {
+  margin-top: 30px;
+}

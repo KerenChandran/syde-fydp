@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 import { requestActions, requestSelectors } from '../modules/request';
 import { resourceSelectors, resourceActions } from '../modules/resources';
@@ -16,20 +18,24 @@ import {
   ControlLabel,
   FormControl,
   Button,
-  Row
+  Row,
+  Table
 } from 'react-bootstrap';
+
+import AccountPill from '../components/Account';
 
 class RequestInfo extends Component {
   state = {
     message: '',
-    source_account: null
+    source_account: null,
+    loading: true
   }
 
   componentDidMount() {
     const { fetchResource, fetchUser, match: { params } } = this.props;
     fetchResource(params.id).then(resource => (
       fetchUser(resource.ownerid)
-    ));
+    )).then(() => this.setState({ loading: false }));
   }
 
   componentWillUnmount() {
@@ -63,32 +69,132 @@ class RequestInfo extends Component {
     this.setState({ [name]: event })
   );
 
+  handleAccountSelect = id => () => (
+    this.setState({ source_account: id })
+  );
+
   render() {
-    const { accounts, resource } = this.props;
+    const { accounts, resource, match: { params }, newRequestedEvents, owner } = this.props;
     const { message, source_account } = this.state;
+
+    if (!resource || !owner || this.state.loading) {
+      return null;
+    }
 
     return (
       <div className="container form-horizontal">
-        <h2 style={{ textAlign: 'center' }}>Final Review</h2>
+        <h3>Resource Info</h3>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Category</Col>
+          <Col sm={10}><FormControl.Static>{resource.category}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Model</Col>
+          <Col sm={10}><FormControl.Static>{resource.model}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Description</Col>
+          <Col sm={10}><FormControl.Static>{resource.description}</FormControl.Static></Col>
+        </Row>
+    
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
+          <Col sm={10}><FormControl.Static>{resource.company}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
+          <Col sm={10}><FormControl.Static>{resource.mobile ? 'Yes' : 'No'}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Location</Col>
+          <Col sm={10}><FormControl.Static>{resource.location.name}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Room Number</Col>
+          <Col sm={10}><FormControl.Static>{resource.room_number}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Rules for Use</Col>
+          <Col sm={10}><FormControl.Static>{resource.rules_restrictions}</FormControl.Static></Col>
+        </Row>
+
+        <h3>Owner Info</h3>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Name</Col>
+          <Col sm={10}><FormControl.Static>{owner.first_name} {owner.last_name}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Deparment</Col>
+          <Col sm={10}><FormControl.Static>{owner.department}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
+          <Col sm={10}><FormControl.Static>{owner.faculty}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Role</Col>
+          <Col sm={10}><FormControl.Static>{owner.role}</FormControl.Static></Col>
+        </Row>
+
+        <h3>Fee Breakdown</h3>
+        <Table>
+          <thead>
+            <tr>
+              <th>Start Date</th>
+              <th>End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              newRequestedEvents.map((event, index) => (
+                <tr>
+                  <td>{moment(event.block_start).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
+                  <td>{moment(event.block_end).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </Table>
+
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Fee</Col>
-          <Col sm={10}>${resource.fee_amount} / {resource.fee_cadence} </Col>
+          <Col sm={10}><FormControl.Static>${resource.fee_amount} / {resource.fee_cadence}</FormControl.Static></Col>
         </Row>
-        <h4>Choose account</h4>
-        <ButtonToolbar vertical>
-          <ToggleButtonGroup type="radio" name="options" onChange={this.handleRadioChange('source_account')} value={source_account}>
-            { accounts.map(account => (
-              <ToggleButton key={account.id} value={account.id}>ID: {account.id} - {account.type}, ${account.balance}</ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-        </ButtonToolbar>
-        <FormGroup controlId="formMessage">
-          <Col componentClass={ControlLabel} sm={2}>Message</Col>
-          <Col sm={10}>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Total</Col>
+          <Col sm={10}><FormControl.Static>$123</FormControl.Static></Col>
+        </Row>
+
+        <h3>Choose account</h3>
+        <div style={{ display: 'flex' }}>
+          {
+            accounts.map(account => (
+              <AccountPill
+                {...account}
+                key={account.id}
+                onClick={this.handleAccountSelect}
+                active={source_account === account.id}
+              />
+            ))
+          }
+        </div>
+
+        <FormGroup controlId="formMessage" className="top-spacing">
+          <Col sm={12}>
             <FormControl
               componentClass="textarea"
               value={message}
-              placeholder="Message"
+              placeholder="Message to owner"
               onChange={this.handleChange('message')}
             />
           </Col>
@@ -104,6 +210,7 @@ const mapStateToProps = (state, props) => ({
   incentive: requestSelectors.getRequestIncentive(state),
   newRequestedEvents: scheduleSelectors.getNewRequestedEvents(state),
   resource: resourceSelectors.getResource(state, props.match.params.id),
+  owner: userSelectors.getOwnerByResource(state, props.match.params.id),
   accounts: userSelectors.currentUserAccounts(state)
 });
 
