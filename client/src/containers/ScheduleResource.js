@@ -209,7 +209,7 @@ class RequestResource extends Component {
     const { availableEvents, newAvailableEvents, currentUser, isMyResource, match: { params }, saveAvailableEvent, validateRequestBlocks } = this.props;
     const { selectedEvent } = this.state;
 
-    if (selectedEvent.block_start == null || selectedEvent.block_end == null || selectedEvent.recurring_start == null || selectedEvent.recurring_end == null) {
+    if (selectedEvent.block_start == null || selectedEvent.block_end == null || (selectedEvent.repeat && (selectedEvent.recurring_start == null || selectedEvent.recurring_end == null))) {
       return false;
     }
 
