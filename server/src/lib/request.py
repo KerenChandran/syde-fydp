@@ -150,7 +150,7 @@ class RequestUtil(Pipeline):
 
         # apply transformation to blocks if necessary and compute total duration
         for block in blocks:
-            if isisntance(block['block_start'], unicode) or \
+            if isinstance(block['block_start'], unicode) or \
                 isinstance(block['block_start'], str):
                 block['block_start'] = dt.datetime.strptime(
                     block['block_start'], self.expected_dt_format)
