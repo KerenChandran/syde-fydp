@@ -9,7 +9,7 @@ CREATE TABLE image (
 );
 
 -- file table
-CREATE TABLE file (
+CREATE TABLE misc_file (
     id SERIAL PRIMARY KEY,
     file_type TEXT,
     generated_filename TEXT,
@@ -22,9 +22,14 @@ CREATE TABLE resource_image (
     image_id SERIAL REFERENCES image (id)
 );
 
-CREATE TABLE resource_file (
+CREATE TABLE resource_misc_file (
     resource_id SERIAL REFERENCES resource (id),
-    file_id SERIAL REFERENCES file (id)
+    file_id SERIAL REFERENCES misc_file (id)
+);
+
+CREATE TABLE user_image (
+    user_id SERIAL references platform_user (id),
+    image_id SERIAL REFERENCES image (id)
 );
 
 -- intermediate availability tables

@@ -1,10 +1,10 @@
 -- drop mapping tables
-DROP TABLE resource_file;
+DROP TABLE resource_misc_file;
 
 DROP TABLE resource_image;
 
 -- drop original tables
-DROP TABLE file;
+DROP TABLE misc_file;
 
 DROP TABLE image;
 
