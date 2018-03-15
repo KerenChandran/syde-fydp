@@ -498,35 +498,36 @@ class SchedulePipeline(Pipeline):
                 data point for the new block to be 'loaded'. should include
                 information about start, end, and recurring.
         """
-        if not isinstance(existing_data, list) or len(existing_data) == 0:
+        if not isinstance(existing_data, list):
             self.error_logs.append("Invalid existing data store.")
             return False, self.error_logs, None
         elif not isinstance(new_block, dict) or len(new_block) == 0:
             self.error_logs.append("Invalid new block specified.")
             return False, self.error_logs, None
 
-        # run pipeline on existing data points with custom load step
-        self.data = existing_data
+        if len(existing_data) > 0:
+            # run pipeline on existing data points with custom load step
+            self.data = existing_data
 
-        self.transform()
+            self.transform()
 
-        # apply custom transformation to db_transform that adds new resource id
-        resource_insertion_query = \
-        """
-            INSERT INTO resource (description)
-            VALUES ('placeholder_resource')
-            RETURNING id;
-        """
+            # apply custom transformation to add new resource id
+            resource_insertion_query = \
+            """
+                INSERT INTO resource (description)
+                VALUES ('placeholder_resource')
+                RETURNING id;
+            """
 
-        resource_id = self.crs.fetch_first(resource_insertion_query)
+            resource_id = self.crs.fetch_first(resource_insertion_query)
 
-        self.df_transform['resource_id'] = resource_id
+            self.df_transform['resource_id'] = resource_id
 
-        # insert existing blocks into intermediary table
-        target_table = "intermediate_availability_blocks"
+            # insert existing blocks into intermediary table
+            target_table = "intermediate_availability_blocks"
 
-        self.df_transform.apply(
-            lambda x: self.block_scheduling_load(x, target_table), axis=1)
+            self.df_transform.apply(
+                lambda x: self.block_scheduling_load(x, target_table), axis=1)
 
         # run pipeline on new data point and return generated blocks
         self.data = [new_block]
