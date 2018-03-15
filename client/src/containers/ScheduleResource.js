@@ -20,7 +20,8 @@ import {
   Form,
   FormControl,
   FormGroup,
-  Modal
+  Modal,
+  Row
 } from 'react-bootstrap';
 
 
@@ -32,7 +33,7 @@ const EMPTY_EVENT = {
   block_end: null,
   allDay: false,
   repeat: false,
-  cadence: null,
+  cadence: 'daily',
   start: null,
   end: null
 };
@@ -146,7 +147,7 @@ class RequestResource extends Component {
       block_recurring: {
         cadence: selectedEvent.cadence,
         start: selectedEvent.recurring_start,
-        end: selectedEvent.recurring_end
+        end: selectedEvent.recurring_end,
       }
     };
 
@@ -168,7 +169,9 @@ class RequestResource extends Component {
             block_end: realEnd
           }),
           user_id: currentUser.id,
-          repeat: false
+          repeat: false,
+          recurring_start: start,
+          cadence: 'daily'
         },
         showEventDetails: true
       });
@@ -185,7 +188,9 @@ class RequestResource extends Component {
             block_end: realEnd
           }),
           user_id: currentUser.id,
-          repeat: false
+          repeat: false,
+          recurring_start: start,
+          cadence: 'daily'
         },
         showEventDetails: true
       });
@@ -199,9 +204,14 @@ class RequestResource extends Component {
     })
   }
 
-  handleSaveEvent = () => {
+  handleSaveEvent = e => {
+    e.preventDefault();
     const { availableEvents, newAvailableEvents, currentUser, isMyResource, match: { params }, saveAvailableEvent, validateRequestBlocks } = this.props;
     const { selectedEvent } = this.state;
+
+    if (selectedEvent.block_start == null || selectedEvent.block_end == null || selectedEvent.recurring_start == null || selectedEvent.recurring_end == null) {
+      return false;
+    }
 
     const event = {
       resource_id: params.id,
@@ -289,6 +299,20 @@ class RequestResource extends Component {
     return `${currentUser.first_name} ${currentUser.last_name}`
   } 
 
+  validateField = name => {
+    if (this.state.selectedEvent[name] == null) {
+      return 'error';
+    }
+    return 'success';
+  }
+
+  validateRecurringField = name => {
+    if (this.state.repeat) {
+      return this.validateField(name);
+    }
+    return null;
+  }
+
   render() {
     const { showEventDetails, selectedEvent, requestedEvent, availableEvent } = this.state;
     const { newAvailableEvents, newRequestedEvents, availableEvents, currentUser, isMyResource, requestedEvents, resource, match: { params } } = this.props;
@@ -323,10 +347,9 @@ class RequestResource extends Component {
           <Modal.Header closeButton>
             <Modal.Title>{selectedEvent.title}</Modal.Title>
           </Modal.Header>
-          
-          <Modal.Body>
-            <Form horizontal onSubmit={this.handleSaveEvent}>
-              <FormGroup controlId="formStart">
+          <Form horizontal onSubmit={this.handleSaveEvent}>
+            <Modal.Body>
+              <FormGroup controlId="formStart" validationState={this.validateField('block_start')}>
                 <Col componentClass={ControlLabel} sm={2}>Start</Col>
                 <Col sm={10}>
                   <DateTimePicker
@@ -338,7 +361,7 @@ class RequestResource extends Component {
                 </Col>
               </FormGroup>
 
-              <FormGroup controlId="formEnd">
+              <FormGroup controlId="formEnd" validationState={this.validateField('block_end')}>
                 <Col componentClass={ControlLabel} sm={2}>End</Col>
                 <Col sm={10}>
                   <DateTimePicker
@@ -355,66 +378,68 @@ class RequestResource extends Component {
               <FormGroup>
                 <Col smOffset={2} sm={10}>
                   <Checkbox
+                    inline
                     checked={selectedEvent.allDay}
                     onChange={this.handleUpdateCheckedEvent('allDay')}
                   >All Day</Checkbox>
-                </Col>
-              </FormGroup>
-
-              <FormGroup>
-                <Col smOffset={2} sm={2}>
                   <Checkbox
+                    inline
                     checked={selectedEvent.repeat}
                     onChange={this.handleUpdateCheckedEvent('repeat')}
                   >Repeat</Checkbox>
                 </Col>
-                {
-                  selectedEvent.repeat &&
-                  <Col sm={4}>
+              </FormGroup>
+              {
+                selectedEvent.repeat &&
+                <FormGroup controlId="formCadence">
+                  <Col componentClass={ControlLabel} sm={2}>Cadence</Col>
+                  <Col sm={10}>
                     <FormControl componentClass="select" placeholder="Cadence" onChange={this.handleChange('cadence')} value={selectedEvent.cadence}>
-                      <option value="">N/A</option>
                       <option value="daily">Daily</option>
                       <option value="weekly">Weekly</option>
                       <option value="biweekly">Biweekly</option>
                       <option value="monthly">Monthly</option>
                     </FormControl>
                   </Col>
-                }
-              </FormGroup>
-
-              {
-                selectedEvent.repeat &&
-                <FormGroup>
-                  <Col componentClass={ControlLabel} sm={2}>Start</Col>
-                  <Col sm={4}>
-                    <DateTimePicker
-                      min={new Date()}
-                      format='MMMM DD, YYYY'
-                      time={false}
-                      onChange={this.handleUpdateDateEvent('recurring_start')}
-                      value={selectedEvent.recurring_start}
-                    />
-                  </Col>
-                  <Col componentClass={ControlLabel} sm={2}>End</Col>
-                  <Col sm={4}>
-                    <DateTimePicker
-                      min={new Date()}
-                      format='MMMM DD, YYYY'
-                      time={false}
-                      onChange={this.handleUpdateDateEvent('recurring_end')}
-                      value={selectedEvent.recurring_end}
-                    />
-                  </Col>
                 </FormGroup>
               }
 
-            </Form>
-          </Modal.Body>
+              {
+                selectedEvent.repeat &&
+                <div>
+                  <FormGroup controlId="formRecurringStart" validationState={this.validateField('recurring_start')}>
+                    <Col componentClass={ControlLabel} sm={2}>Start</Col>
+                    <Col sm={10}>
+                      <DateTimePicker
+                        min={new Date()}
+                        format='MMMM DD, YYYY'
+                        time={false}
+                        onChange={this.handleUpdateDateEvent('recurring_start')}
+                        value={selectedEvent.recurring_start}
+                      />
+                    </Col>
+                  </FormGroup>
+                  <FormGroup controlId="formRecurringEnd" validationState={this.validateField('recurring_end')}>
+                    <Col componentClass={ControlLabel} sm={2}>End</Col>
+                    <Col sm={10}>
+                      <DateTimePicker
+                        min={new Date()}
+                        format='MMMM DD, YYYY'
+                        time={false}
+                        onChange={this.handleUpdateDateEvent('recurring_end')}
+                        value={selectedEvent.recurring_end}
+                      />
+                    </Col>
+                  </FormGroup>
+                </div>
+              }
+            </Modal.Body>
 
-          <Modal.Footer>
-            { requestedEvent || availableEvent ? <Button bsStyle="danger" onClick={this.handleDeleteEvent}>Delete Event</Button> : null }
-            <Button bsStyle="primary" onClick={this.handleSaveEvent}>Save Changes</Button>
-          </Modal.Footer>
+            <Modal.Footer>
+              { requestedEvent || availableEvent ? <Button bsStyle="danger" onClick={this.handleDeleteEvent}>Delete Event</Button> : null }
+              <Button bsStyle="primary" type="submit">Save Changes</Button>
+            </Modal.Footer>
+          </Form>
         </Modal>
       </div>
     )

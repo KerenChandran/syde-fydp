@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 
 import {
+  Form,
   FormGroup,
   FormControl,
   ControlLabel,
   Col,
   Button,
   Row,
-  ButtonToolbar
+  ButtonToolbar,
+  HelpBlock
 } from 'react-bootstrap';
 
 import Select, { Creatable } from 'react-select';
@@ -23,8 +25,11 @@ class ResourceInfoEditView extends Component {
       mobile: true,
       available: true,
       incentive_type: 'user_fee',
+      fee_amount: 0,
       fee_cadence: 'hourly',
       room_number: '',
+      description: '',
+      rules_restrictions: '',
       ...this.props.resource
     };
     this.categories = [{"category":"Aircrafts"},{"category":"Arduino Shields Etc."},{"category":"Arduinos"},{"category":"Audio Accessories"},{"category":"Batteries"},{"category":"Battery Chargers"},{"category":"Bio Medical Equipment"},{"category":"Brakes"},{"category":"Breadboards"},{"category":"Cables"},{"category":"Cameras"},{"category":"Clamps"},{"category":"Clutches (Electric)"},{"category":"Computer Accessories"},{"category":"Counters"},{"category":"Couplings"},{"category":"Data Acquisition"},{"category":"Drills"},{"category":"FPGAs"},{"category":"Fans"},{"category":"Gearboxes"},{"category":"Heat Guns"},{"category":"Heat Sinks"},{"category":"Instrumentation (Force)"},{"category":"Instrumentation (Light)"},{"category":"Instrumentation (Sound)"},{"category":"Instrumentation (Torque)"},{"category":"Leads"},{"category":"Lights"},{"category":"Linear Actuators (Electric)"},{"category":"Measuring Devices"},{"category":"Microcontrollers & DSPs"},{"category":"Mobile Platforms/Chassis"},{"category":"Motor Controllers"},{"category":"Motors (AC)"},{"category":"Motors (DC)"},{"category":"Motors (Servo)"},{"category":"Motors (Stepper)"},{"category":"Multimeters"},{"category":"Oscilloscopes"},{"category":"Pliers"},{"category":"Power Supplies"},{"category":"Relays"},{"category":"Robotic Arms/Manipulators"},{"category":"Safety Glasses"},{"category":"Scanners"},{"category":"Sensors (BioMed)"},{"category":"Sensors (Color)"},{"category":"Sensors (Flex)"},{"category":"Sensors (Force)"},{"category":"Sensors (Gas)"},{"category":"Sensors (Infrared)"},{"category":"Sensors (Laser)"},{"category":"Sensors (Light)"},{"category":"Sensors (Liquid)"},{"category":"Sensors (Magnetic)"},{"category":"Sensors (Motion, Orientation)"},{"category":"Sensors (Pressure)"},{"category":"Sensors (Proximity)"},{"category":"Sensors (RF)"},{"category":"Sensors (Sound)"},{"category":"Sensors (Temperature)"},{"category":"Sensors (Touch)"},{"category":"Sensors (Ultrasonic)"},{"category":"Signal Generators"},{"category":"Socket Sets"},{"category":"Solder Suckers"},{"category":"Soldering Stations"},{"category":"Solenoid Actuators (Electric)"},{"category":"Speakers"},{"category":"Tachometers"},{"category":"Transformers/Inverters"},{"category":"Tweezers"},{"category":"Vises"},{"category":"Wall Adapters"},{"category":"Wheels"},{"category":"Wire Cutters"}];
@@ -51,15 +56,43 @@ class ResourceInfoEditView extends Component {
     this.setState({ [name]: value })
   }
   
-  handleSubmit = () => {
+  handleSubmit = e => {
+    e.preventDefault();
+
+    const { category, model, company, location } = this.state;
+
+    if (!category.length || !model.length ||
+      !company.length || location.placeid == null
+    ) {
+      return false;
+    }
     this.props.onSubmitClick(this.state);
+  }
+
+  validateField = name => {
+    if (this.state[name] == null) {
+      return null;
+    }
+    if (this.state[name].length == 0) {
+      return 'error';
+    }
+    return 'success';
+  }
+
+  validateLocation = () => {
+    if (this.state.location == null) {
+      return null;
+    }
+    if (this.state.location.placeid == null) {
+      return 'error';
+    }
+    return 'success';
   }
 
   render() {
     const {
       category,
       company,
-      faculty,
       location,
       model,
       mobile,
@@ -74,23 +107,25 @@ class ResourceInfoEditView extends Component {
     } = this.state;
 
     return (
-      <div className="form-horizontal container-center">
-        <FormGroup controlId="formCategory">
+      <Form horizontal className="container-center" onSubmit={this.handleSubmit}>
+        <FormGroup controlId="formCategory" validationState={this.validateField('category')}>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
           <Col sm={10}>
             <Select simpleValue required value={category} onChange={this.handleSelectChange('category')} options={this.categories} labelKey="category" valueKey="category" />
           </Col>
         </FormGroup>
 
-        <FormGroup controlId="formModel">
+        <FormGroup controlId="formModel" validationState={this.validateField('model')}>
           <Col componentClass={ControlLabel} sm={2}>Model</Col>
           <Col sm={10}>
             <FormControl
+              required
               type="text"
               value={model}
               placeholder="Model"
               onChange={this.handleChange('model')}
             />
+            <FormControl.Feedback />
           </Col>
         </FormGroup>
 
@@ -107,15 +142,17 @@ class ResourceInfoEditView extends Component {
         </FormGroup>
 
 
-        <FormGroup controlId="formManufacturer">
+        <FormGroup controlId="formManufacturer" validationState={this.validateField('company')}>
           <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
           <Col sm={10}>
             <FormControl
+              required
               type="text"
               value={company}
               placeholder="Manufacturer"
               onChange={this.handleChange('company')}
             />
+            <FormControl.Feedback />
           </Col>
         </FormGroup>
 
@@ -126,13 +163,15 @@ class ResourceInfoEditView extends Component {
           </Col>
         </FormGroup>
 
-        <FormGroup controlId="formLocation">
+        <FormGroup controlId="formLocation" validationState={this.validateLocation()}>
           <Col componentClass={ControlLabel} sm={2}>Location</Col>
           <Col sm={10}>
             <LocationSearch
               onChange={this.handleLocationChange}
               location={location}
             />
+            <FormControl.Feedback />
+            <HelpBlock>Choose a location from the dropdown.</HelpBlock>
           </Col>            
         </FormGroup>
 
@@ -203,9 +242,9 @@ class ResourceInfoEditView extends Component {
 
         <ButtonToolbar className="right-align">
           <Button type="button" onClick={this.props.onBackClick}>Go Back</Button>
-          <Button bsStyle="primary" type="submit" onClick={this.handleSubmit}>Continue</Button>
+          <Button bsStyle="primary" type="submit">Continue</Button>
         </ButtonToolbar>
-      </div>
+      </Form>
     );
   }
 }

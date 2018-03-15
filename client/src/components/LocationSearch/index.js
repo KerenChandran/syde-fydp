@@ -30,7 +30,8 @@ class LocationSearch extends Component {
     const { location } = this.props;
     const inputProps = {
       value: location ? location.name : '',
-      onChange: this.handleChange
+      onChange: this.handleChange,
+      required: true
     };
     
     const classes = {
