@@ -498,7 +498,7 @@ class SchedulePipeline(Pipeline):
                 data point for the new block to be 'loaded'. should include
                 information about start, end, and recurring.
         """
-        if not isinstance(data, list) or len(data) == 0:
+        if not isinstance(existing_data, list) or len(existing_data) == 0:
             self.error_logs.append("Invalid existing data store.")
             return False, self.error_logs, None
         elif not isinstance(new_block, dict) or len(new_block) == 0:
@@ -506,7 +506,7 @@ class SchedulePipeline(Pipeline):
             return False, self.error_logs, None
 
         # run pipeline on existing data points with custom load step
-        self.data = data
+        self.data = existing_data
 
         self.transform()
 
