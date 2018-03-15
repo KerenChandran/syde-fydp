@@ -10,7 +10,7 @@ export const fetchAccountsSuccess = createAction(UserConstants.FETCH_ACCOUNTS, a
 export const fetchUsersSuccess = createAction(UserConstants.FETCH_USERS, users => users)
 export const fetchUserSuccess = createAction(UserConstants.FETCH_USER, user => user);
 
-export const signUp = (user, history) => async dispatch => {
+export const signUp = user => async dispatch => {
   try {
     let response = await fetch('http://localhost:3000/api/new_user', {
       method: 'post',
