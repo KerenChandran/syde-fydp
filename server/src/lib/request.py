@@ -855,7 +855,7 @@ class RequestUtil(Pipeline):
                     ELSE 'pending_status'
                 END AS request_status,
                 rn.message as submitted_message
-            FROM requests req
+            FROM request req
             INNER JOIN resource_user rus
                 ON req.resource_id = rus.resource_id
             INNER JOIN platform_user pu
