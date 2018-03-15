@@ -29,12 +29,13 @@ import { userActions } from './modules/users';
 
 class ApplicationRouter extends Component {
   state = {
-    loading: localStorage.getItem('id_token') != null
+    loading: true
   }
-  componentDidMount() {
+  async componentDidMount() {
     if (localStorage.getItem('id_token')) {
-      this.props.authUser(this.setState({ loading: false}));
+      await this.props.authUser();
     }
+    this.setState({ loading: false });
   }
 
   componentWillUnmount() {
