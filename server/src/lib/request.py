@@ -25,6 +25,8 @@ class RequestUtil(Pipeline):
             'weekly': 60**2 * 24 * 7
         }
 
+        self.expected_dt_format = '%Y-%m-%d %H:%M'
+
     def validate_request(self, request_id):
         """
             Helper method to check to see whether a passed request exists.
@@ -84,8 +86,6 @@ class RequestUtil(Pipeline):
             self.error_logs.append("Empty block list passed.")
             return []
 
-        expected_dt_format = '%Y-%m-%d %H:%M'
-
         block_store = []
 
         for elem in block_list:
@@ -97,8 +97,8 @@ class RequestUtil(Pipeline):
             # convert and re-convert start block
             try:
                 block_start = \
-                    dt.datetime.strptime(block_start, expected_dt_format)
-                block_start = block_start.strftime(expected_dt_format)
+                    dt.datetime.strptime(block_start, self.expected_dt_format)
+                block_start = block_start.strftime(self.expected_dt_format)
 
                 block_obj['block_start'] = block_start
             except:
@@ -107,8 +107,8 @@ class RequestUtil(Pipeline):
             # convert and re-convert end block
             try:
                 block_end = \
-                    dt.datetime.strptime(block_end, expected_dt_format)
-                block_end = block_end.strftime(expected_dt_format)
+                    dt.datetime.strptime(block_end, self.expected_dt_format)
+                block_end = block_end.strftime(self.expected_dt_format)
 
                 block_obj['block_end'] = block_end
             except:
@@ -148,7 +148,18 @@ class RequestUtil(Pipeline):
 
         total_duration = 0
 
+        # apply transformation to blocks if necessary and compute total duration
         for block in blocks:
+            if isisntance(block['block_start'], unicode) or \
+                isinstance(block['block_start'], str):
+                block['block_start'] = dt.datetime.strptime(
+                    block['block_start'], self.expected_dt_format)
+
+            if isinstance(block['block_end'], unicode) or \
+                isinstance(block['block_end'], str):
+                block['block_end'] = dt.datetime.strptime(
+                    block['block_end'], self.expected_dt_format)
+
             total_duration += \
                 (block['block_end'] - block['block_start']).total_seconds()
 
@@ -609,13 +620,11 @@ class RequestUtil(Pipeline):
         retrieved_blocks = self.crs.fetch_dict(block_retrieval_query)
 
         # transform retrieved blocks
-        expected_dt_format = '%Y-%m-%d %H:%M'
-
         for block in retrieved_blocks:
             for fld, val in block.iteritems():
                 if fld == 'block_start' or fld == 'block_end':
                     # convert datetime object to string
-                    block[fld] = val.strftime(expected_dt_format)
+                    block[fld] = val.strftime(self.expected_dt_format)
 
             # add block recurring field before running through pipeline
             block['block_recurring'] = {}
@@ -830,7 +839,7 @@ class RequestUtil(Pipeline):
         block_data = self.crs.fetch_dict(block_retrieval_query)
 
         owned_request_data = \
-            self.transform_merge_block_list(block_list, owned_request_data)
+            self.transform_merge_block_list(block_data, owned_request_data)
 
         # retrieve basic and incentive-based attributes across submitted request
         submitted_request_retrieval_query = \
