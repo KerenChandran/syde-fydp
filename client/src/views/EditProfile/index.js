@@ -6,7 +6,14 @@ import AccountInput from '../../components/AccountInput'
 import './index.css';
 
 class EditProfileView extends Component {
+
+    showAccount = e => {
+        e.preventDefault();
+        document.getElementById("accountsDiv").style.display="";
+    };
+
     render() {
+
         const {
             first_name,
             last_name,
@@ -93,17 +100,20 @@ class EditProfileView extends Component {
                             </div>
                         </div>
 
+                        <div class="row" style={{textAlign: 'center', marginTop:10+'px', marginBottom:10+'px'}}>
+                            <button class="btn btn-primary" onClick={this.showAccount}>Connect to Unit4 Account</button>
+                        </div>
 
+                        <div class="row" id="accountsDiv" style={{display:"none"}}>
                         {
                             currentUserAccounts.map((account) => (
                                 <AccountInput key={account.id} {...account}/>
                             ))
                         }
+                        </div>
 
-                        <div class="row">
-                            <div class="container" style={{textAlign: 'center', marginTop: 10+'px'}}>
+                        <div class="row" style={{textAlign:'center', marginTop:10+'px'}}>
                                 <button class="btn btn-primary" type="submit">Save</button>
-                            </div>
                         </div>
                     </form>
                 </div>
