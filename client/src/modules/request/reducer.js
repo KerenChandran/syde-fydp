@@ -8,6 +8,7 @@ const initialState = {
     new_incentive: false,
   },
   requests: [],
+  submitted_requests: [],
   fee_total: 0
 };
 
@@ -16,7 +17,8 @@ export default (state = initialState, { type, payload }) => {
     case RequestConstants.FETCH_REQUESTS: {
       return {
         ...state,
-        requests: payload.request_data
+        requests: payload.owned_requests,
+        submitted_requests: payload.submitted_requests
       } 
     }
 
@@ -51,7 +53,8 @@ export default (state = initialState, { type, payload }) => {
     case RequestConstants.CLEAR_REQUESTS: {
       return {
         ...state,
-        requests: []
+        requests: [],
+        submitted_requests: []
       }
     }
 

@@ -8,17 +8,16 @@ import { requestActions, requestSelectors } from '../modules/request';
 import { searchActions } from '../modules/search';
 import { userActions, userSelectors } from '../modules/users';
 
-import RequestsView from '../views/RequestsDataTable';
+import RequestsView from '../views/MyRequestsDataTable';
 import Sidebar from '../components/RequestSidebar';
 
-class Requests extends Component {
+class MyRequests extends Component {
   state = {
     loading: true
   }
 
   componentDidMount() {
     const { currentUserId, fetchRequests, fetchResources, fetchUsers } = this.props;
-    console.log('currentUserId', currentUserId);
     Promise.all([fetchResources(), fetchRequests(currentUserId), fetchUsers()]).then(() => this.setState({ loading: false }));
   }
 
@@ -37,6 +36,8 @@ class Requests extends Component {
       return null;
     }
 
+    console.log('requests', requests);
+
     return (
       <div style={{ display: 'flex' }}>
         <Sidebar />
@@ -52,7 +53,7 @@ class Requests extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  requests: requestSelectors.getResourceRequests(state),
+  requests: requestSelectors.getSubmittedRequest(state),
   currentUserId: userSelectors.currentUserId(state)
 });
 
@@ -64,4 +65,4 @@ const mapDispatchToProps = (dispatch) => ({
   clearRequests: bindActionCreators(requestActions.clearRequests, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Requests);
+export default connect(mapStateToProps, mapDispatchToProps)(MyRequests);

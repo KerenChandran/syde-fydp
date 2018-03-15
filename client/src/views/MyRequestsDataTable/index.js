@@ -79,7 +79,7 @@ class RequestsDataTable extends Component {
         trClassName="request-table-row"
       >
         <TableHeaderColumn dataField='id' isKey hidden>ID</TableHeaderColumn>
-        <TableHeaderColumn dataSort dataField='requester_name'>Borrower</TableHeaderColumn>
+        <TableHeaderColumn dataSort dataField='owner_name'>Owner Name</TableHeaderColumn>
         <TableHeaderColumn dataSort dataField='model'>Model</TableHeaderColumn>
         <TableHeaderColumn dataSort dataField='request_status'>Status</TableHeaderColumn>
       </BootstrapTable>

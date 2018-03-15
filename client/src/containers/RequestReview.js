@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 
-import { resourceActions } from '../modules/resources';
-import { userActions, userSelectors } from '../modules/users';
-import { requestSelectors } from '../modules/request';
+import { requestActions, requestSelectors } from '../modules/request';
+import { resourceSelectors, resourceActions } from '../modules/resources';
+import { scheduleSelectors, scheduleActions } from '../modules/schedule';
+import { userSelectors, userActions } from '../modules/users';
 
 import {
   ButtonToolbar,
@@ -20,98 +21,130 @@ import {
   Row,
   Table
 } from 'react-bootstrap';
-import { requestActions } from '../modules/request';
 
 import AccountPill from '../components/Account';
 
-class RequestReview extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      message: '',
-      target_account: null,
-      request_id: props.match.params.id,
-      loading: true
-    };
+class RequestInfo extends Component {
+  state = {
+    message: '',
+    source_account: null,
+    loading: true
   }
-  
+
   componentDidMount() {
-    const { fetchResource, fetchRequestTotal, fetchUser, request } = this.props;
-    
-    if (request != null) {
-      Promise.all([
-        fetchResource(request.resource_id),
-        fetchUser(request.requester_id),
-        fetchUser(request.ownerid),
-        fetchRequestTotal(request.fee_amount, request.fee_cadence, request.block_list)
-      ]).then(() => 
-        this.setState({ loading: false })
-      );
-    }
+    const { fetchResource, fetchRequestTotal, fetchUser, match: { params }, newRequestedEvents } = this.props;
+    fetchResource(params.id).then(resource => (
+      Promise.all([fetchUser(resource.ownerid), fetchRequestTotal(resource.fee_amount, resource.fee_cadence, newRequestedEvents)])
+    )).then(() => this.setState({ loading: false }));
   }
 
   componentWillUnmount() {
-    this.props.clearRequestTotal();
+    const { clearIncentive, clearSchedule, clearRequestTotal } = this.props;
+    clearIncentive();
+    clearSchedule();
+    clearRequestTotal();
   }
 
-  handleChange = (name) => (event) => (
-    this.setState({ [name]: event.target.value })
-  )
+  handleSubmit = () => {
+    const { currentUser, resource, incentive, newRequestedEvents, submitRequest } = this.props;
+    const { source_account, message } = this.state;
+    
+    const { new_incentive, ...others } = incentive;
+    const incentive_data = new_incentive ? { new_incentive, ...others } : { new_incentive, incentive_id: resource.incentive_id };
+
+    submitRequest({
+      resource_id: resource.resource_id,
+      user_id: currentUser.id,
+      requested_blocks: newRequestedEvents,
+      incentive_data,
+      source_account,
+      message
+    });
+  }
+
+  handleChange = name => event => (
+    this.setState({ [name]: event.target.value})
+  );
 
   handleRadioChange = name => event => (
     this.setState({ [name]: event })
-  )
+  );
 
   handleAccountSelect = id => () => (
-    this.setState({ target_account: id })
-  )
-
-  handleAccpet = () => {
-    this.props.acceptRequest(this.state);
-  }
-
-  handleReject = () => {
-    this.props.rejectRequest(this.state);
-  }
+    this.setState({ source_account: id })
+  );
 
   render() {
-    const { message, target_account } = this.state;
-    const { accounts, request, requester, fee_total } = this.props;
+    const { accounts, resource, match: { params }, newRequestedEvents, owner, fee_total } = this.props;
+    const { message, source_account } = this.state;
+
+    if (!resource || !owner || this.state.loading) {
+      return null;
+    }
+
     return (
       <div className="container form-horizontal">
-        <h3>Requester Info</h3>
-        <Row>
-          <Col componentClass={ControlLabel} xs={2}>Name</Col>
-          <Col xs={10}>{request.requester_name}</Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} xs={2}>Deparment</Col>
-          <Col xs={10}>{requester.department}</Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} xs={2}>Faculty</Col>
-          <Col xs={10}>{requester.faculty}</Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} xs={2}>Phone</Col>
-          <Col xs={10}><FormControl.Static>{requester.phone}</FormControl.Static></Col>
-        </Row>
-
-        <Row>
-          <Col componentClass={ControlLabel} sm={2}>Email</Col>
-          <Col xs={10}><FormControl.Static>{requester.email}</FormControl.Static></Col>
-        </Row>
-
         <h3>Resource Info</h3>
-        <p>
-          <Link to={`/resources/${request.resource_id}`}>
-            Click here to view more details on {request.model}
-          </Link>
-        </p>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Category</Col>
+          <Col sm={10}><FormControl.Static>{resource.category}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Model</Col>
+          <Col sm={10}><FormControl.Static>{resource.model}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Description</Col>
+          <Col sm={10}><FormControl.Static>{resource.description}</FormControl.Static></Col>
+        </Row>
+    
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
+          <Col sm={10}><FormControl.Static>{resource.company}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
+          <Col sm={10}><FormControl.Static>{resource.mobile ? 'Yes' : 'No'}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Location</Col>
+          <Col sm={10}><FormControl.Static>{resource.location.name}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Room Number</Col>
+          <Col sm={10}><FormControl.Static>{resource.room_number}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Rules for Use</Col>
+          <Col sm={10}><FormControl.Static>{resource.rules_restrictions}</FormControl.Static></Col>
+        </Row>
+
+        <h3>Owner Info</h3>
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Name</Col>
+          <Col sm={10}><FormControl.Static>{owner.first_name} {owner.last_name}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Deparment</Col>
+          <Col sm={10}><FormControl.Static>{owner.department}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
+          <Col sm={10}><FormControl.Static>{owner.faculty}</FormControl.Static></Col>
+        </Row>
+
+        <Row>
+          <Col componentClass={ControlLabel} sm={2}>Role</Col>
+          <Col sm={10}><FormControl.Static>{owner.role}</FormControl.Static></Col>
+        </Row>
 
         <h3>Fee Breakdown</h3>
         <Table>
@@ -123,7 +156,7 @@ class RequestReview extends Component {
           </thead>
           <tbody>
             {
-              request.block_list.map((event, index) => (
+              newRequestedEvents.map((event, index) => (
                 <tr>
                   <td>{moment(event.block_start).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
                   <td>{moment(event.block_end).format('dddd, MMMM Do YYYY, h:mm:ss a')}</td>
@@ -135,7 +168,7 @@ class RequestReview extends Component {
 
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Fee</Col>
-          <Col sm={10}><FormControl.Static>${request.fee_amount} / {request.fee_cadence}</FormControl.Static></Col>
+          <Col sm={10}><FormControl.Static>${resource.fee_amount} / {resource.fee_cadence}</FormControl.Static></Col>
         </Row>
 
         <Row>
@@ -151,7 +184,7 @@ class RequestReview extends Component {
                 {...account}
                 key={account.id}
                 onClick={this.handleAccountSelect}
-                active={target_account === account.id}
+                active={source_account === account.id}
               />
             ))
           }
@@ -162,35 +195,35 @@ class RequestReview extends Component {
             <FormControl
               componentClass="textarea"
               value={message}
-              placeholder="Message"
+              placeholder="Message to owner"
               onChange={this.handleChange('message')}
             />
           </Col>
         </FormGroup>
-
-        <ButtonToolbar className="pull-right">
-          <Button bsStyle="primary" onClick={this.handleAccpet}>Accept</Button>
-          <Button onClick={this.handleReject}>Reject</Button>
-        </ButtonToolbar>
+        <Button bsClass="col-sm-12 btn" bsStyle="primary" disabled={source_account == null} onClick={this.handleSubmit}>Submit</Button>
       </div>
     );
   }
 }
 
 const mapStateToProps = (state, props) => ({
-  accounts: userSelectors.currentUserTargetAccounts(state),
-  request: requestSelectors.getRequest(state, props.match.params.id),
-  requester: userSelectors.getRequesterByRequest(state, props.match.params.id),
+  currentUser: userSelectors.currentUser(state),
+  incentive: requestSelectors.getRequestIncentive(state),
+  newRequestedEvents: scheduleSelectors.getNewRequestedEvents(state),
+  resource: resourceSelectors.getResource(state, props.match.params.id),
+  owner: userSelectors.getOwnerByResource(state, props.match.params.id),
+  accounts: userSelectors.currentUserAccounts(state),
   fee_total: requestSelectors.getRequestTotal(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-  acceptRequest: bindActionCreators(requestActions.acceptRequest, dispatch),
-  rejectRequest: bindActionCreators(requestActions.rejectRequest, dispatch),
+  clearIncentive: bindActionCreators(requestActions.clearIncentive, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
-  fetchRequestTotal: bindActionCreators(requestActions.fetchRequestTotal, dispatch),
+  submitRequest: bindActionCreators(requestActions.submitRequest, dispatch),
+  clearSchedule: bindActionCreators(scheduleActions.clearSchedule, dispatch),
   fetchUser: bindActionCreators(userActions.fetchUser, dispatch),
+  fetchRequestTotal: bindActionCreators(requestActions.fetchRequestTotal, dispatch),
   clearRequestTotal: bindActionCreators(requestActions.clearRequestTotal, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(RequestReview);
+export default connect(mapStateToProps, mapDispatchToProps)(RequestInfo)

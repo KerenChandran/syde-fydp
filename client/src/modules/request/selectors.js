@@ -12,7 +12,10 @@ export const getResourceRequests = state => {
   });
 }
 export const getRequest = (state, id) => {
-  const request = state.request.requests.find(request => request.id == id);
+  let request = state.request.requests.find(request => request.id == id);
+  if (request == null) {
+    request = state.request.submitted_requests.find(request => request.id == id);
+  }
   const resource = state.resources.resources.find(resource => resource.resource_id == request.resource_id);
 
   return {
@@ -22,3 +25,13 @@ export const getRequest = (state, id) => {
 }
 
 export const getRequestTotal = state => state.request.fee_total;
+
+export const getSubmittedRequest = state => {
+  return state.request.submitted_requests.map(request => {
+    const resource = state.resources.resources.find(resource => resource.resource_id == request.resource_id);
+    return {
+      ...resource,
+      ...request
+    };
+  })
+}
