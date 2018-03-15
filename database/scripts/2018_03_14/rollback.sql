@@ -7,3 +7,6 @@ DROP TABLE resource_image;
 DROP TABLE file;
 
 DROP TABLE image;
+
+-- drop block table
+DROP TABLE intermediate_availability_blocks;

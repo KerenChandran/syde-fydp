@@ -486,6 +486,42 @@ def submit_availability_blocks():
     return jsonify(ret_val)
 
 
+@app.route("/submit_intermediate_availability_blocks", methods=['POST'])
+@auth.login_required
+def submit_intermediate_availability_blocks():
+    # list of block data points
+    data = request.get_json()
+
+    existing_blocks = data['existing_blocks']
+
+    new_block_start = data['new_block_start']
+
+    new_block_end = data['new_block_end']
+
+    new_block_recurring = data['new_block_recurring']
+
+    new_block_payload = {
+        'block_start': new_block_start,
+        'block_end': new_block_end,
+        'block_recurring': new_block_recurring
+    }
+
+    user_id = g.user['id']
+
+    pipeline = SchedulePipeline(user_id=user_id)
+
+    success, errors, new_blocks = pipeline.intermediate_availability_run(
+        existing_blocks, new_block_payload)
+
+    ret_val = {
+        'success': success,
+        'errors': errors,
+        'new_blocks': new_blocks
+    }
+
+    return jsonify(ret_val)
+
+
 @app.route("/submit_schedule_filter", methods=['POST'])
 def submit_schedule_filter():
     data = request.get_json()

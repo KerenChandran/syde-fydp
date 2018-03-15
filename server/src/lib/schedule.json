@@ -30,6 +30,7 @@
     },
     "database_fields": {
         "resource_availability": ["resource_id", "availability_start", "availability_end"],
-        "resource_schedule_blocks": ["resource_id", "block_start", "block_end"]
+        "resource_schedule_blocks": ["resource_id", "block_start", "block_end"],
+        "intermediate_availability_blocks": ["resource_id", "block_start", "block_end"]
     }
 }

@@ -26,3 +26,12 @@ CREATE TABLE resource_file (
     resource_id SERIAL REFERENCES resource (id),
     file_id SERIAL REFERENCES file (id)
 );
+
+-- intermediate availability tables
+CREATE TABLE intermediate_availability_blocks (
+    block_id SERIAL PRIMARY KEY,
+    resource_id SERIAL REFERENCES resource(id),
+    user_id SERIAL REFERENCES platform_user (id),
+    block_start timestamp,
+    block_end timestamp
+);
