@@ -17,6 +17,7 @@ import RequestInfo from './containers/RequestInfo';
 import ScheduleResource from './containers/ScheduleResource';
 import ResourceAvailability from './containers/ResourceAvailability';
 import Requests from './containers/Requests';
+import MyRequests from './containers/MyRequests';
 import RequestReview from './containers/RequestReview';
 
 import EditProfile from './containers/EditProfile';
@@ -28,12 +29,13 @@ import { userActions } from './modules/users';
 
 class ApplicationRouter extends Component {
   state = {
-    loading: localStorage.getItem('id_token') != null
+    loading: true
   }
-  componentDidMount() {
+  async componentDidMount() {
     if (localStorage.getItem('id_token')) {
-      this.props.authUser(this.setState({ loading: false}));
+      await this.props.authUser();
     }
+    this.setState({ loading: false });
   }
 
   componentWillUnmount() {
@@ -71,9 +73,12 @@ class ApplicationRouter extends Component {
                 <Route exact path="/resources/:id/schedule" component={ScheduleResource} />
               </Switch>
               <Route exact path="/resources/:id/incentive" component={RequestResource} />
-              <Route exact path="/resources/:id/request" component={RequestInfo} />
+              <Route exact path="/resources/:id/request" component={RequestReview} />
               <Route exact path="/requests" component={Requests}/>
-              <Route exact path="/requests/:id" component={RequestReview}/>
+              <Switch>
+                <Route exact path="/requests/myrequests" component={MyRequests} />
+                <Route exact path="/requests/:id" component={RequestInfo}/>
+              </Switch>
             </div>
           </div>
         </Switch>

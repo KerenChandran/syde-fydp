@@ -2,6 +2,7 @@ import { createAction } from "redux-actions";
 import * as RequestConstants from './constants';
 import ApiHeaders from '../api/headers';
 import { push } from 'react-router-redux';
+import moment from 'moment';
 
 export const saveIncentive = createAction(RequestConstants.SAVE_INCENTIVE, incentive => ({ incentive }));
 export const clearIncentive = createAction(RequestConstants.CLEAR_INCENTIVE);
@@ -77,7 +78,10 @@ export const fetchRequestTotal = (fee_amount, fee_cadence, block_list) => async 
       body: JSON.stringify({
         fee_cadence,
         fee_amount,
-        block_list
+        block_list: block_list.map(event => ({
+          block_start: moment(event.block_start).format('YYYY-MM-DD HH:mm'),
+          block_end: moment(event.block_end).format('YYYY-MM-DD HH:mm')
+        }))
       })
     });
     let data = await response.json();

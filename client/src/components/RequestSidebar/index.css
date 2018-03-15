@@ -1,0 +1,32 @@
+.requests-sidebar-root {
+  z-index: 999;
+}
+
+.active-link .list-group-item {
+  text-decoration: none;
+  background-color: beige;
+  font-weight: bold;
+}
+
+.requests-link:hover {
+  text-decoration: none;
+}
+
+.requests-link .list-group-item {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.requests-link .list-group-item:hover {
+  cursor: pointer;
+  background-color: blanchedalmond;
+}
+
+
+.requests-sidebar-container {
+  min-width: 225px;
+  max-width: 400px;
+  height: 100%;
+  overflow-y: hidden;
+  border-right: 1px solid rgba(34, 34, 34, 0.3);
+}

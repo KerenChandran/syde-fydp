@@ -77,7 +77,7 @@ export const authUser = () => async dispatch => {
       headers: ApiHeaders()
     });
     let data = await response.json();
-    dispatch(editProfileSuccess(data));
+    return dispatch(editProfileSuccess(data));
   } catch (error) {
     localStorage.removeItem('id_token');
     throw new Error(error);
