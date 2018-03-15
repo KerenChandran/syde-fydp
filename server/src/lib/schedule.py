@@ -476,7 +476,7 @@ class SchedulePipeline(Pipeline):
         """
             DELETE FROM intermediate_availability_blocks
             WHERE resource_id = {rid}
-        """.format(resource_id)
+        """.format(rid=resource_id)
 
         self.crs.execute(data_removal_query)
 
