@@ -504,22 +504,22 @@ class SchedulePipeline(Pipeline):
         elif not isinstance(new_block, dict) or len(new_block) == 0:
             self.error_logs.append("Invalid new block specified.")
             return False, self.error_logs, None
+        
+        # create resource record
+        resource_insertion_query = \
+        """
+            INSERT INTO resource (description)
+            VALUES ('placeholder_resource')
+            RETURNING id;
+        """
+
+        resource_id = self.crs.fetch_first(resource_insertion_query)
 
         if len(existing_data) > 0:
             # run pipeline on existing data points with custom load step
             self.data = existing_data
 
             self.transform()
-
-            # apply custom transformation to add new resource id
-            resource_insertion_query = \
-            """
-                INSERT INTO resource (description)
-                VALUES ('placeholder_resource')
-                RETURNING id;
-            """
-
-            resource_id = self.crs.fetch_first(resource_insertion_query)
 
             self.df_transform['resource_id'] = resource_id
 
