@@ -213,6 +213,7 @@ def get_resource_schedules():
 
     return jsonify(ret_val)
 
+
 @app.route("/get_resource_files", methods=['POST'])
 def get_resource_files():
     # retrieve resource_id
@@ -223,7 +224,25 @@ def get_resource_files():
     file_util = FileUtil(image_dir=app.config['IMAGE_UPLOAD_FOLDER'],
                          file_dir=app.config['FILE_UPLOAD_FOLDER'])
 
-    fldata = file_util.get_uploaded_files(resource_id)
+    fldata = file_util.get_uploaded_files(resource_id, 'resource')
+
+    ret_val = {
+        'file_data': fldata
+    }
+
+    return jsonify(ret_val)
+
+@app.route("/get_resource_images", methods=['POST'])
+def get_user_images():
+    # retrieve user_id
+    data = request.get_json()
+
+    user_id = data['user_id']
+
+    file_util = FileUtil(image_dir=app.config['IMAGE_UPLOAD_FOLDER'],
+                         file_dir=app.config['FILE_UPLOAD_FOLDER'])
+
+    fldata = file_util.get_uploaded_files(user_id, 'user')
 
     ret_val = {
         'file_data': fldata
@@ -251,7 +270,8 @@ def resource_image_upload():
     file_util = FileUtil(image_dir=app.config['IMAGE_UPLOAD_FOLDER'])
 
     success, errors = \
-        file_util.upload_image(resource_id, image_file, image_type=image_type)
+        file_util.upload_file('resource', image_file, resource_id=resource_id,
+                              file_type='image_file', image_type=image_type)
 
     ret_val = {
         'success': success,
@@ -277,7 +297,32 @@ def resource_file_upload():
 
     file_util = FileUtil(file_dir=app.config['FILE_UPLOAD_FOLDER'])
 
-    success, errors = file_util.upload_file(resource_id, file, file_type)
+    success, errors = \
+        file_util.upload_file('resource', file, resource_id=resource_id,
+                              file_type='misc_file', misc_type=file_type)
+
+    ret_val = {
+        'success': success,
+        'errors': errors
+    }
+
+    return jsonify(ret_val)
+
+
+@app.route("/user_image_upload", methods=['POST'])
+@auth.login_required
+def user_image_upload():
+    # retrieve user id
+    data = json.loads(request.form)
+
+    user_id = data['user_id']
+
+    # retrieve image to be uploaded
+    image_file = request.files['image']
+
+    file_util = FileUtil(image_dir=app.config['IMAGE_UPLOAD_FOLDER'])
+
+    success, errors = file_util.upload_file('user', image_file, user_id=user_id)
 
     ret_val = {
         'success': success,

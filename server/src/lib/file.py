@@ -26,6 +26,8 @@ class FileUtil:
 
         self.error_logs = []
 
+        self.valid_entities = ['resource', 'user']
+
     def valid_resource(self, resource_id):
         """
             Helper method which checks to see whether a resource is valid.
@@ -44,14 +46,32 @@ class FileUtil:
 
         return self.crs.check_record_present(resource_check_query)
 
-    def generate_name(self, resource_id, filename, filetype):
+    def valid_user(self, user_id):
+        """
+            Helper method which checks to see whether a passed user is valid.
+
+            Parameters
+            ----------
+            user_id : {int}
+                unique identifier of user being validated
+        """
+        user_check_query = \
+        """
+            SELECT id
+            FROM platform_user
+            WHERE id = {uid}
+        """.format(uid=user_id)
+
+        return self.crs.check_record_present(user_check_query)
+
+    def generate_name(self, entity_id, filename, filetype):
         """
             Helper method to generate a new filename.
 
             Parameters
             ----------
-            resource_id : {int}
-                unique identifier of resource
+            entity_id : {int}
+                unique identifier of entity
 
             filename : {str}
                 original name of file.
@@ -69,157 +89,260 @@ class FileUtil:
 
         return filename, new_flnm
 
-
-    def upload_image(self, resource_id, image, image_type="resource"):
+    def _resource_file_upload(self, resource_id, file, file_type, image_type=None, misc_type=None):
         """
-            Main method to upload an image for a particular resource.
+            Underlying method which helps in uploading a file for a resource.
 
             Parameters
             ----------
-            resource_id : {int}
-                unique identifier of resource for which image is being uploaded.
-
-            image : {file}
-                file object corresponding to image being uploaded.
-
-            image_type : {str}
-                type of image being uploaded. defaults to resource.
-                available options: resource, accessory
+            These parameters are the same as the keyword-arguments in
+            upload_file(), under a 'resource' entity_type, with the addition
+            of a file object.
         """
         if not self.valid_resource(resource_id):
-            self.error_logs.append("Invalid resource passed for image upload.")
-            return False, self.error_logs
-        elif image is None:
-            self.error_logs.append("Empty image passed to upload utility.")
-            return False, self.error_logs
+            self.error_logs.append("Invalid resource specified via id.")
+            return False
 
-        # generate unique name for image
-        orig_flnm, new_flnm = \
-            self.generate_name(resource_id, image.filename, image_type)
+        type_mappings = {
+            "image_file": {
+                "target_table": "image",
+                "mapping_table": "resource_image",
+                "type_field": "image_type",
+                "mapping_id_field": "image_id",
+                "type": image_type,
+                "target_directory": self.image_dir 
+            },
+            "misc_file": {
+                "target_table": "misc_file",
+                "mapping_table": "resource_misc_file",
+                "type_field": "file_type",
+                "mapping_id_field": "file_id",
+                "type": misc_type,
+                "target_directory": self.file_dir
+            }
+        }
 
-        # save image
+        # generate unique name for file
+        orig_flnm, new_flnm = self.generate_name(
+            resource_id, file.filename, type_mappings[file_type]["type"])
+
+        # save file
         try:
-            flpath = os.path.join(self.image_dir, new_flnm)
+            flpath = os.path.join(
+                type_mappings[file_type]['target_directory'], new_flnm)
 
-            image.save(flpath)
-
-            save_success = True
+            file.save(flpath)
 
         except:
-            self.error_logs.append("Image upload failed.")
-            return False, self.error_logs
+            self.error_logs.append("Unable to upload file.")
+            return False
 
-        # add file record to database
-        image_addition_query = \
+        # add record to database
+        file_addition_query = \
         """
-            INSERT INTO image (image_type, generated_filename, original_filename)
-            VALUES ('{type}', '{flnm}', '{orig}')
+            INSERT INTO {target_tbl} ({type_fld}, generated_filename, original_filename)
+            VALUES ('{fl_type}', '{flnm}', '{orig}')
             RETURNING id;
-        """.format(type=image_type, flnm=new_flnm, orig=flnm)
+        """.format(target_tbl=type_mappings[file_type]['target_table'], 
+                   type_fld=type_mappings[file_type]['type_field'],
+                   fl_type=type_mappings[file_type]['type'],
+                   flnm=new_flnm, orig=orig_flnm)
+        
+        file_id = self.crs.fetch_first(file_addition_query)
 
-        image_id = self.crs.fetch_first(image_addition_query)
-
-        # add resource image mapping
-        resource_image_map_query = \
+        # add resource file mapping
+        resource_file_map_query = \
         """
-            INSERT INTO resource_image (resource_id, image_id)
-            VALUES ({rid}, {iid})
-        """.format(rid=resource_id, iid=image_id)
+            INSERT INTO {mapping_tbl} (resource_id, {map_id_fld})
+            VALUES ({rid}, {fid})
+        """.format(mapping_tbl=type_mappings[file_type]['mapping_table'],
+                   map_id_fld=type_mappings[file_type]['mapping_id_field'],
+                   rid=resource_id, fid=file_id)
 
-        return True, self.error_logs
+        return True
 
-    def upload_file(self, resource_id, file, file_type):
+    def _user_file_upload(self, user_id, file):
         """
-            Main method to upload a file for a particular resource.
-            Support for futher file metadata will be added in the future.
+            Underlying method which helps in uploading a file for a resource.
+            The current supported file type for users is 'image_file'
 
             Parameters
             ----------
-            resource_id : {rid}
-                unique identifier of resource for which file is being uploaded.
+            These parameters are the same as the keyword-arguments in
+            upload_file(), under a 'user' entity_type, with the addition of a
+            file object.
+        """
+        if not self.valid_user(user_id):
+            self.error_logs.append("Invalid user specified via id.")
+            return False
+
+        # generate unique name for file
+        orig_flnm, new_flnm = self.generate_name(
+            user_id, file.filename, "user")
+
+        try:
+            flpath = os.join(self.image_dir, new_flnm)
+
+            file.save(flpath)
+
+        except:
+            self.error_logs.append("Unable to upload user image.")
+            return False
+
+        # add record to database
+        file_addition_query = \
+        """
+            INSERT INTO image (image_type, generated_filename, original_filename)
+            VALUES ('user', '{flnm}', '{orig}')
+            RETURNING id;
+        """.format(flnm=new_flnm, orig=orig_flnm)
+
+        file_id = self.crs.fetch_first(file_addition_query)
+
+        # add user file mapping
+        user_file_map_query = \
+        """
+            INSERT INTO user_image (user_id, image_id)
+            VALUES ({uid}, {fid})
+        """.format(uid=user_id, fid=file_id)
+
+        return True
+
+    def upload_file(self, entity_type, file, **kwargs):
+        """
+            Main method to upload a file for a particular resource.
+
+            Parameters
+            ----------
+            entity_type : {str}
+                type of entity for which file is being uploaded. An entity
+                corresponds to one of 'resource' or 'user'.
 
             file : {file}
-                file object being uploaded.
+                file object corresponding to file being uploaded.
+
+            Keyword-Arguments
+            -----------------
+            Keyword Arguments vary based on the entity passed as param.
+
+            [entity_type == 'resource']
+            resource_id : {int}
+                unique identifier of resource for which file is being uploaded.
 
             file_type : {str}
-                type of file being uploaded. this is left arbitrary and is not
-                constrained to particular values.
+                type of file being uploaded. A file corresponds to one of
+                'image_file', 'misc_file'
+
+            image_type : {str} [conditional]
+                optional parameter based on whether the uploaded file is an
+                image. An image corresponds to one of 'resource' or 'accessory'
+
+            misc_type : {str} [conditional]
+                optional parameter based on whether the uploaded file is of
+                misc type. No constraints in terms of parameter values
+
+            [entity_type == 'user']
+            user_id : {int}
+                unique identifier of user for which image is being uploaded.
         """
-        if not self.valid_resource(resource_id):
-            self.error_logs.append("Invalid resource passed for file upload.")
+        if entity_type not in {'resource': None, 'user': None}:
+            self.error_logs.append("Invalid entity type submitted.")
             return False, self.error_logs
         elif file is None:
             self.error_logs.append("Empty file passed to upload utility.")
             return False, self.error_logs
 
-        # generate unique name for file
-        orig_flnm, new_flnm = \
-            self.generate_name(resource_id, file.filename, image_typez)
+        if entity_type == "resource":
+            resource_id = kwargs['resource_id']
 
-        # save file
-        try:
-            flpath = os.path.join(self.file_dir, new_flnm)
+            file_type = kwargs['file_type']
 
-            file.save(flpath)
+            if kwargs['image_type'] is None and kwargs['misc_type'] is None:
+                self.error_logs.append(
+                    "Type of resource file being uploaded was not specified.")
+                return False, self.error_logs
+            
+            elif file_type == 'image_file' and kwargs['image_type'] is None:
+                self.error_logs.append(
+                    "Specify image type for image file upload.")
+                return False, self.error_logs
 
-            save_success = True
+            elif file_type == 'misc_file' and kwargs['misc_type'] is None:
+                self.error_logs.append(
+                    "Specify misc type for misc file upload.")
+                return False, self.error_logs
 
-        except:
-            self.error_logs.append("File upload failed.")
-            return False, self.error_logs
+            image_type = \
+                kwargs['image_type'] if 'image_type' in kwargs else None
 
-        # add file record to database
-        file_addition_query = \
-        """
-            INSERT INTO file (file_type, generated_filename, original_filename)
-            VALUES ('{type}', '{flnm}', '{orig}')
-            RETURNING id;
-        """.format(type=file_type, flnm=new_flnm, orig=flnm)
+            misc_type = kwargs['misc_type'] if 'misc_type' in kwargs else None
 
-        file_id = self.crs.fetch_first(file_addition_query)
+            success = self._resource_file_upload(
+                resource_id, file, file_type, image_type=image_type, 
+                misc_type=misc_type)
 
-        # add resource file mapping
-        resource_image_map_query = \
-        """
-            INSERT INTO resource_file (resource_id, file_id)
-            VALUES ({rid}, {fid})
-        """.format(rid=resource_id, fid=file_id)
+        elif entity_type == "user":
+            user_id = kwargs['user_id']
 
-        return True, self.error_logs
+            success = self._user_file_upload(user_id, file)
 
-    def get_uploaded_files(self, resource_id):
+        return success, self.error_logs
+
+    def get_uploaded_files(self, entity_id, entity_type):
         """
             Main method to get a data package containing information about
-            image and file uploads for a particular resource.
+            image and file uploads for a particular entity.
 
             Parameters
             ----------
-            resource_id : {int}
-                unique identifier of resource for which information is to be
-                retrieved
+            entity_id : {int}
+                unique identifier of entity for which file information is to
+                be retrieved
+
+            entity_type : {str}
+                type of entity for which file information is being retrieved.
+                Valid types are 'user' and 'resource'.
         """
-        # assume valid resource id is passed
+        if entity_type == 'resource' and not self.valid_resource(entity_id):
+            self.error_logs.append("Invalid resource id specified.")
+            return False, self.error_logs, None
+        elif entity_type == 'user' and not self.valid_user(entity_id):
+            self.error_logs.append("Invalid user id specified.")
+            return False, self.error_logs, None
 
-        file_retrieval_query = \
-        """
-            SELECT 
-                img.image_type as type, img.generated_filename as filename,
-                img.original_filename
-            FROM image img
-            INNER JOIN resource_image ri
-                ON img.id = ri.image_id
-                AND ri.resource_id = {rid}
+        if entity_type == 'resource':
+            file_retrieval_query = \
+            """
+                SELECT 
+                    img.image_type as type, img.generated_filename as filename,
+                    img.original_filename
+                FROM image img
+                INNER JOIN resource_image ri
+                    ON img.id = ri.image_id
+                    AND ri.resource_id = {rid}
 
-            UNION
+                UNION
 
-            SELECT 
-                fl.file_type as type, fl.generated_filename as filename,
-                fl.original_filename
-            FROM file fl
-            INNER JOIN resource_image ri
-                ON fl.id = ri.file_id
-                AND ri.resource_id = {rid}
-        """.format(rid=resource_id)
+                SELECT 
+                    mf.file_type as type, mf.generated_filename as filename,
+                    mf.original_filename
+                FROM misc_file mf
+                INNER JOIN resource_misc_file rmf
+                    ON mf.id = rmf.file_id
+                    AND rmf.resource_id = {rid}
+            """.format(rid=entity_id)
+
+        elif entity_type == 'user':
+            file_retrieval_query = \
+            """
+                SELECT 
+                    img.image_type as type, img.generated_filename as filename,
+                    img.original_filename
+                FROM image img
+                INNER JOIN user_image ui
+                    ON img.id = ui.image_id
+                    AND ui.user_id = {uid}
+            """.format(uid=entity_id)
 
         result = self.crs.fetch_dict(file_retrieval_query)
 
