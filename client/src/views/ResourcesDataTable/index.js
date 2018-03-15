@@ -98,7 +98,7 @@ class ResourcesDataTable extends Component {
       >
         <TableHeaderColumn dataField='resource_id' isKey hidden>ID</TableHeaderColumn>
         <TableHeaderColumn dataField='category' dataSort caretRender={this.caretRender}>Category</TableHeaderColumn>
-        <TableHeaderColumn dataField='company' dataSort caretRender={this.caretRender}>Company</TableHeaderColumn>
+        <TableHeaderColumn dataField='company' dataSort caretRender={this.caretRender}>Manufacturer</TableHeaderColumn>
         <TableHeaderColumn dataField='model' dataSort caretRender={this.caretRender}>Model</TableHeaderColumn>
         <TableHeaderColumn dataField='location' dataFormat={this.locationFormatter} dataSort caretRender={this.caretRender}>Location</TableHeaderColumn>
         <TableHeaderColumn dataField='available' dataFormat={this.availableFormatter} dataSort caretRender={this.caretRender}>Available</TableHeaderColumn>
