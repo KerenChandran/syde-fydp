@@ -28,13 +28,22 @@ class EditProfileView extends Component {
             handleChange,
             handleSelectChange,
             handleFacultyChange,
-            handleSubmit
+            handleSubmit,
+            handleImageUpload
         } = this.props;
 
         return (
             <div id="editProfile">
                 <div class="editProfileBox">
                     <form class="profileFormContent" onSubmit={handleSubmit}>
+                        <div class="row" controlId="formHorizontalFirstName">
+                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                                Profile Image
+                            </label>
+                            <div class="col-sm-6">
+                                <input accept="*" id="file" type="file" onChange={handleImageUpload}/>
+                            </div>
+                        </div>
                         <div class="row" controlId="formHorizontalFirstName">
                             <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                                 First Name

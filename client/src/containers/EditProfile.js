@@ -48,6 +48,10 @@ class EditProfile extends React.Component {
         this.setState({ [name]: value });
     };
 
+    handleImageUpload = event => (
+        this.setState({ image: event.target.files[0] })
+    );
+
     handleFacultyChange = value => {
         let department_options = [];
 
@@ -82,42 +86,31 @@ class EditProfile extends React.Component {
         this.setState({faculty: value, department_options});
     };
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
-        this.props.editProfile(this.state, this.props.history);
+        const { image, ...profile } = this.state;
+        const { currentUser, editProfile, history, uploadUserImage } = this.props;
+        
+        await editProfile(profile);
+        await uploadUserImage(image, currentUser.id);
+        
+        history.push('/resources');
     };
 
     render() {
-        const {
-            first_name,
-            last_name,
-            email,
-            phone,
-            department,
-            faculty,
-            role,
-            department_options
-        } = this.state;
-
         const {currentUserAccounts} = this.props;
 
         console.log("render ", this.props);
         return (
             <EditProfileView
-                first_name={first_name}
-                last_name={last_name}
-                email={email}
-                phone={phone}
-                department={department}
-                faculty={faculty}
-                role={role}
-                department_options={department_options}
+                {...this.state}
                 faculties={this.faculties}
                 currentUserAccounts={currentUserAccounts}
                 handleChange={this.handleChange}
                 handleSelectChange={this.handleSelectChange}
                 handleFacultyChange={this.handleFacultyChange}
                 handleSubmit={this.handleSubmit}
+                handleImageUpload={this.handleImageUpload}
             />
         )
     }
@@ -129,7 +122,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    editProfile: bindActionCreators(userActions.editProfile, dispatch)
+    editProfile: bindActionCreators(userActions.editProfile, dispatch),
+    uploadUserImage: bindActionCreators(userActions.uploadUserImage, dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditProfile)

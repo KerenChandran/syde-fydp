@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 
-import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup, Table, ButtonToolbar } from 'react-bootstrap';
+import { Row, Form, FormGroup, FormControl, ControlLabel, Col, Button, ButtonGroup, Table, ButtonToolbar } from 'react-bootstrap';
 import moment from 'moment';
 
 class ResourceInfoEditConfirm extends Component {
   render() {
-    const { resource, newEvents, existingEvents, onConfirm, onCancel } = this.props;
+    const { resource, newEvents, existingEvents, onConfirm, onCancel, handleImageUpload } = this.props;
     const {
       category,
       company,
@@ -27,7 +27,7 @@ class ResourceInfoEditConfirm extends Component {
     const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';
 
     return (
-      <div className="container-center">
+      <Form className="container-center" onSubmit={onConfirm}>
         <h3>Resource Info</h3>
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
@@ -98,6 +98,14 @@ class ResourceInfoEditConfirm extends Component {
           </div>
         }
 
+        <h3>Resource File Upload</h3>
+        <FormGroup controlId="formFile">
+          <Col componentClass={ControlLabel} sm={2}>File</Col>
+          <Col sm={10}>
+            <input accept="*" id="file" type="file" onChange={handleImageUpload}/>
+          </Col>
+        </FormGroup>
+
         {
           available && existingEvents.length ?
           <div>
@@ -150,9 +158,9 @@ class ResourceInfoEditConfirm extends Component {
 
         <ButtonToolbar className="center top-spacing">
           <Button onClick={onCancel}>Cancel</Button>
-          <Button bsStyle="primary" onClick={onConfirm}>Confirm</Button>
+          <Button bsStyle="primary" type="submit">Confirm</Button>
         </ButtonToolbar>
-      </div>
+      </Form>
     );
   }
 }

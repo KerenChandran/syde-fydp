@@ -129,3 +129,24 @@ export const fetchScheduleFilterResources = (filters) => async dispatch => {
     throw new Error(error);
   }
 };
+
+export const uploadImage = (image, resource_id) => async dispatch => {
+  try {
+    let formData = new FormData();
+    formData.append('image', image);
+    formData.append('image_type', 'resource');
+    formData.append('resource_id', resource_id);
+
+    let response = await fetch('http://localhost:3000/api/resource_image_upload', {
+      method: 'post',
+      headers: ApiHeaders(),
+      body: formData
+    });
+    let data = await response.json();
+    console.log('data', data);
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+  
+}

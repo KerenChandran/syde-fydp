@@ -64,7 +64,9 @@ export const editProfile = (profile) => async dispatch => {
     });
     let data = await response.json();
     dispatch(editProfileSuccess(data));
-    dispatch(push('/resources'));
+
+    
+    return data;
   } catch (error) {
     throw new Error(error);
   }
@@ -118,6 +120,24 @@ export const fetchUsers = () => async dispatch => {
     });
     let data = await response.json();
     dispatch(fetchUsersSuccess(data));
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+export const uploadUserImage = (image, user_id) => async dispatch => {
+  try {
+    let formData = new FormData();
+    formData.append('image', image);
+    formData.append('user_id', user_id);
+
+    let response = await fetch(`http://localhost:3000/api/user_image_upload`, {
+      method: 'post',
+      headers: ApiHeaders(),
+      body: formData
+    });
+    let data = await response.json();
     return data;
   } catch (error) {
     throw new Error(error);
