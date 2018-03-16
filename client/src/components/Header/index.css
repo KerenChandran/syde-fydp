@@ -7,17 +7,10 @@
   display: flex;
   justify-content: space-between;
   background-color: white;
-  height: 35px;
   padding: 20px;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   color: #222;
   border-bottom: 1px solid #e4e4e4;
-  box-sizing: content-box;
-}
-
-.large-header {
-  height: 80px;
-  box-sizing: content-box;
 }
 
 .app-logo {
@@ -33,13 +26,14 @@
   justify-content: flex-start;
   flex: 1 0 auto;
   min-width: 500px;
+  width: 800px;
   z-index: 1000;
+  max-width: 900px;
 }
 
 .app-links {
   display: flex;
   justify-content: flex-end;
-  flex: 1 0 auto;
-  margin-right: 10;
+  margin-left: 20px;
 }
 

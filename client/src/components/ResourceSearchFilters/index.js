@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
+import moment from 'moment';
 
 import {
   Button,
@@ -12,6 +13,8 @@ import {
 
 import Select from 'react-select';
 
+import { DateTimePicker } from 'react-widgets';
+
 class ResourceSearchFilters extends Component {
   constructor(props) {
     super(props);
@@ -20,44 +23,87 @@ class ResourceSearchFilters extends Component {
 
   render() {
     const { handleChange, handleSelectChange, filters } = this.props;
-    const { category, company, mobile, model, searchText } = filters;
+    const { category, company, mobile, model, searchText, window_start, window_end, type, quantity } = filters;
     return (
       <Form horizontal>
         <FormGroup controlId="formKeyword">
-          <Col componentClass={ControlLabel} sm={2}>Keyword</Col>
+          <Col componentClass={ControlLabel} xs={2}>Keyword</Col>
           <Col xs={9}>
             <FormControl type="text" placeholder="Enter Key Word" value={searchText} onChange={handleChange('searchText')} />
           </Col>
         </FormGroup>
 
         <FormGroup controlId="formCategory">
-          <Col componentClass={ControlLabel} sm={2}>Category</Col>
+          <Col componentClass={ControlLabel} xs={2}>Category</Col>
           <Col xs={9}>
           <Select simpleValue required value={category} onChange={handleSelectChange('category')} options={this.categories} labelKey="category" valueKey="category" />
           </Col>
         </FormGroup>
 
         <FormGroup controlId="formModel">
-          <Col componentClass={ControlLabel} sm={2}>Model</Col>
+          <Col componentClass={ControlLabel} xs={2}>Model</Col>
           <Col xs={9}>
             <FormControl type="text" placeholder="Any" value={model} onChange={handleChange('model')} />
           </Col>
         </FormGroup>
 
         <FormGroup controlId="formManufacturer">
-          <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
+          <Col componentClass={ControlLabel} xs={2}>Manufacturer</Col>
           <Col xs={9}>
             <FormControl type="text" placeholder="Any" value={company} onChange={handleChange('company')}/>
           </Col>
         </FormGroup>
 
         <FormGroup controlId="formMobility">
-          <Col componentClass={ControlLabel} sm={2}>Mobility</Col>
+          <Col componentClass={ControlLabel} xs={2}>Mobility</Col>
           <Col xs={9}>
             <FormControl componentClass="select" value={mobile} onChange={handleChange('mobile')}>
               <option value={''}>Any</option>
               <option value={true}>True</option>
               <option value={false}>False</option>
+            </FormControl>
+          </Col>
+        </FormGroup>
+
+        <div className="divider" />
+        <h4>Availability</h4>
+
+        <FormGroup controlId="formAvailableStartDate">
+          <Col componentClass={ControlLabel} xs={2}>Range</Col>
+          <Col xs={4}>
+            <div style={{ display: 'table', width: '100%' }}>
+              <DateTimePicker
+                time={false}
+                min={new Date()}
+                format="YYYY-MM-DD"
+                onChange={handleSelectChange('window_start')}
+                value={window_start}
+              />
+            </div>
+          </Col>
+          <Col xsOffset={1} xs={4}>
+            <div style={{ display: 'table', width: '100%' }}>
+              <DateTimePicker
+                time={false}
+                min={window_start}
+                format="YYYY-MM-DD"
+                onChange={handleSelectChange('window_end')}
+                value={window_end}
+              />
+            </div>
+          </Col>
+        </FormGroup>
+
+        <FormGroup controlId="formAvailableDuration">
+          <Col componentClass={ControlLabel} xs={2}>Duration</Col>
+          <Col xs={4}>
+            <FormControl type="number" placeholder="Quantity" onChange={handleChange('quantity')} value={quantity} />
+          </Col>
+          <Col xsOffset={1} xs={4}>
+            <FormControl componentClass="select" value={type} onChange={handleChange('type')}>
+              <option value='hours'>Hours</option>
+              <option value='days'>Days</option>
+              <option value='weeks'>Weeks</option>
             </FormControl>
           </Col>
         </FormGroup>

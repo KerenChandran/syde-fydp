@@ -836,7 +836,7 @@ class ScheduleFilter(Pipeline):
             block_starts_before_window = block['block_start'] < self.start
 
             timedelta_check = block['block_end'] - self.start >= \
-                self.timedelta_check[self.dtype](self.dquantity)
+                self.timedelta_map[self.dtype](self.dquantity)
 
             if block_starts_before_window and timedelta_check:
                 # create a modified block to reflect overlap
@@ -852,7 +852,7 @@ class ScheduleFilter(Pipeline):
             block_ends_after_window = block['block_end'] > self.end
 
             timedelta_check = self.end - block['block_start'] >= \
-                self.timedelta_check[self.dtype](self.dquantity)
+                self.timedelta_map[self.dtype](self.dquantity)
 
             if block_ends_after_window and timedelta_check:
                 # create modified block to reflect overlap

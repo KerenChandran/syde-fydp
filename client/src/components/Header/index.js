@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import classnames from 'classnames';
 
 import { userActions } from '../../modules/users';
 
@@ -19,7 +18,7 @@ class Header extends Component {
   render() {
     const { pathname } = this.props.location;
     return (
-      <header className={classnames('app-header', { 'large-header': pathname === '/resources'})}>
+      <header className='app-header'>
         <Link to="/resources">
           <span className="app-logo">ShareIt</span>
         </Link>
@@ -27,9 +26,6 @@ class Header extends Component {
           <Search />
         </div>
         <div className="app-links">
-          <Link to="/resources">
-            <span className="app-logo">Resources</span>
-          </Link>
           <Link to="/requests">
             <span className="app-logo">Requests</span>
           </Link>
