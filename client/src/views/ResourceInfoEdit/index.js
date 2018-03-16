@@ -55,6 +55,10 @@ class ResourceInfoEditView extends Component {
   handleSelectChange = name => value => {
     this.setState({ [name]: value })
   }
+
+  handleImageUpload = e => {
+    this.setState({ image: e.target.files[0] })
+  }
   
   handleSubmit = e => {
     e.preventDefault();
@@ -66,6 +70,7 @@ class ResourceInfoEditView extends Component {
     ) {
       return false;
     }
+
     this.props.onSubmitClick(this.state);
   }
 
@@ -108,6 +113,13 @@ class ResourceInfoEditView extends Component {
 
     return (
       <Form horizontal className="container-center" onSubmit={this.handleSubmit}>
+        <FormGroup controlId="formImage">
+          <Col componentClass={ControlLabel} sm={2}>Image</Col>
+          <Col sm={10}>
+          <FormControl style={{ marginTop: 8 }} type="file" accept="*" onChange={this.handleImageUpload} />
+          </Col>
+        </FormGroup>
+
         <FormGroup controlId="formCategory" validationState={this.validateField('category')}>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
           <Col sm={10}>

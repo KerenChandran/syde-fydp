@@ -19,9 +19,18 @@ class ResourceInfoEdit extends Component {
     this.props.history.push('/resources')
   )
 
-  handleSubmit = (state) => {
+  handleSubmit = async data => {
     const { saveResource } = this.props;
-    saveResource(state);
+    const { image, ...resource } = data;
+    
+    if (image != null) {
+      const resource_id = await this.props.fetchSkeletonResource();
+      console.log('resource_id', resource_id);
+      resource.temp_resource_id = resource_id;
+      await this.props.uploadImage(image, resource_id);
+    }
+    
+    saveResource(resource);
   }
 
   render() {
@@ -51,7 +60,9 @@ const mapStateToProps = (state, props) => ({
 const mapDispatchToProps = (dispatch) => ({
   addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
   saveResource: bindActionCreators(resourceActions.saveResource, dispatch),
-  fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch)
+  fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
+  fetchSkeletonResource: bindActionCreators(resourceActions.fetchSkeletonResource, dispatch),
+  uploadImage: bindActionCreators(resourceActions.uploadImage, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ResourceInfoEdit);
