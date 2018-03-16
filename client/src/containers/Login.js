@@ -48,7 +48,7 @@ class Login extends React.Component {
                         Don't have an account? <a href="/signup">Sign up here.</a>
                     </div>
                 }
-                function={this.login}
+                signUpText={null}
             />
         )
     }

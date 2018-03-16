@@ -176,7 +176,7 @@ class RequestInfo extends Component {
           <Col sm={10}><FormControl.Static>${fee_total}</FormControl.Static></Col>
         </Row>
 
-        <h3>Choose account</h3>
+        <h3>Choose Payment Account</h3>
         <div style={{ display: 'flex' }}>
           {
             accounts.map(account => (
