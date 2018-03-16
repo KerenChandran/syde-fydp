@@ -437,7 +437,7 @@ class RequestResource extends Component {
 
             <Modal.Footer>
               { requestedEvent || availableEvent ? <Button bsStyle="danger" onClick={this.handleDeleteEvent}>Delete Event</Button> : null }
-              <Button bsStyle="primary" type="submit">Save Changes</Button>
+              <Button bsStyle="primary" type="submit">{(isMyResource || params.id == null) ? "Save" : "Request Dates"}</Button>
             </Modal.Footer>
           </Form>
         </Modal>

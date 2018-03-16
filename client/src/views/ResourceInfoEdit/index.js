@@ -109,14 +109,14 @@ class ResourceInfoEditView extends Component {
     return (
       <Form horizontal className="container-center" onSubmit={this.handleSubmit}>
         <FormGroup controlId="formCategory" validationState={this.validateField('category')}>
-          <Col componentClass={ControlLabel} sm={2}>Category</Col>
+          <Col componentClass={ControlLabel} sm={2} className="required">Category</Col>
           <Col sm={10}>
             <Select simpleValue required value={category} onChange={this.handleSelectChange('category')} options={this.categories} labelKey="category" valueKey="category" />
           </Col>
         </FormGroup>
 
         <FormGroup controlId="formModel" validationState={this.validateField('model')}>
-          <Col componentClass={ControlLabel} sm={2}>Model</Col>
+          <Col componentClass={ControlLabel} sm={2} className="required">Model</Col>
           <Col sm={10}>
             <FormControl
               required
@@ -143,7 +143,7 @@ class ResourceInfoEditView extends Component {
 
 
         <FormGroup controlId="formManufacturer" validationState={this.validateField('company')}>
-          <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
+          <Col componentClass={ControlLabel} sm={2} className="required">Manufacturer</Col>
           <Col sm={10}>
             <FormControl
               required
@@ -157,21 +157,20 @@ class ResourceInfoEditView extends Component {
         </FormGroup>
 
         <FormGroup controlId="formMobile">
-          <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
+          <Col componentClass={ControlLabel} sm={2}>Portable</Col>
           <Col sm={10}>
             <BootstrapSwitch offText="No" onText="Yes" onChange={this.handleSwitchChange('mobile')} value={mobile}/>
           </Col>
         </FormGroup>
 
         <FormGroup controlId="formLocation" validationState={this.validateLocation()}>
-          <Col componentClass={ControlLabel} sm={2}>Location</Col>
+          <Col componentClass={ControlLabel} sm={2} className="required">Location</Col>
           <Col sm={10}>
             <LocationSearch
               onChange={this.handleLocationChange}
               location={location}
             />
             <FormControl.Feedback />
-            <HelpBlock>Choose a location from the dropdown.</HelpBlock>
           </Col>            
         </FormGroup>
 
@@ -190,7 +189,7 @@ class ResourceInfoEditView extends Component {
         <FormGroup controlId="formRules">
           <Col componentClass={ControlLabel} sm={2}>Rules for Use</Col>
           <Col sm={10}>
-            <Creatable simpleValue multi options={this.rules} onChange={this.handleSelectChange('rules_restrictions')} value={rules_restrictions} labelKey="rule" valueKey="rule"/>
+            <Creatable simpleValue multi options={this.rules} onChange={this.handleSelectChange('rules_restrictions')} value={rules_restrictions} labelKey="rule" valueKey="rule" placeholder="Enter..."/>
           </Col>
         </FormGroup>
 
