@@ -177,9 +177,30 @@ class ResourceUtil(Pipeline):
 
         block_result = self.crs.fetch_dict(block_retrieval_query)
 
-        for dct in block_result:
-            # iterate through each block and add to list of dicts in main
-            # resource dictionary
+        # retrieve list of unique users across blocks
+        user_list = list(set([block['user_id'] for block in block_result]))
+
+        if len(user_list) > 0:
+            user_retrieval_query = \
+            """
+                SELECT id AS user_id, first_name || ' ' || last_name AS user_name
+                FROM platform_user
+                WHERE id IN ({user_list})
+            """.format(user_list=",".join([str(x) for x in user_list]))
+
+            user_result = self.crs.fetch_dict(user_retrieval_query)
+
+            # transform user result
+            placeholder = {}
+            
+            for user in user_result:
+                placeholder[user['user_id']] = user['user_name']
+
+            user_result = placeholder
+
+        # iterate through each block and add to list of dicts in main
+        # resource dictionary
+        for dct in block_result:    
             resid = dct['resource_id']
 
             # block-specific cleanup and transformations
@@ -193,6 +214,8 @@ class ResourceUtil(Pipeline):
                     continue
 
                 dp[key] = val
+
+            dp['user_name'] = user_result[dct['user_id']]
 
             if resid not in self.resource_data:
                 self.resource_data[resid] = []
