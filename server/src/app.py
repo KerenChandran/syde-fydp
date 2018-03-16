@@ -214,12 +214,9 @@ def get_resource_schedules():
     return jsonify(ret_val)
 
 
-@app.route("/get_resource_files", methods=['POST'])
-def get_resource_files():
+@app.route("/get_resource_files/<int:resource_id>")
+def get_resource_files(resource_id):
     # retrieve resource_id
-    data = request.get_json()
-
-    resource_id = data['resource_id']
 
     file_util = FileUtil(image_dir=app.config['IMAGE_UPLOAD_FOLDER'],
                          file_dir=app.config['FILE_UPLOAD_FOLDER'])
@@ -232,13 +229,9 @@ def get_resource_files():
 
     return jsonify(ret_val)
 
-@app.route("/get_user_images", methods=['POST'])
-def get_user_images():
+@app.route("/get_user_images/<int:user_id>")
+def get_user_images(user_id):
     # retrieve user_id
-    data = request.get_json()
-
-    user_id = data['user_id']
-
     file_util = FileUtil(image_dir=app.config['IMAGE_UPLOAD_FOLDER'],
                          file_dir=app.config['FILE_UPLOAD_FOLDER'])
 

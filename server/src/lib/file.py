@@ -159,6 +159,8 @@ class FileUtil:
                    map_id_fld=type_mappings[file_type]['mapping_id_field'],
                    rid=resource_id, fid=file_id)
 
+        self.crs.execute(resource_file_map_query)
+
         return True
 
     def _user_file_upload(self, user_id, file):
@@ -205,6 +207,8 @@ class FileUtil:
             INSERT INTO user_image (user_id, image_id)
             VALUES ({uid}, {fid})
         """.format(uid=user_id, fid=file_id)
+
+        self.crs.execute(user_file_map_query)
 
         return True
 
@@ -353,9 +357,9 @@ class FileUtil:
 
         for fl_info in result:
             if fl_info['type'] not in data_package:
-                data_package['type'] = []
+                data_package[fl_info['type']] = []
 
-            data_package['type'].append({
+            data_package[fl_info['type']].append({
                 'filename': fl_info['filename'],
                 'original_filename': fl_info['original_filename']
             })
