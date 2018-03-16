@@ -232,7 +232,7 @@ def get_resource_files():
 
     return jsonify(ret_val)
 
-@app.route("/get_resource_images", methods=['POST'])
+@app.route("/get_user_images", methods=['POST'])
 def get_user_images():
     # retrieve user_id
     data = request.get_json()
@@ -274,7 +274,7 @@ def create_skeleton_resource():
 @auth.login_required
 def resource_image_upload():
     # retrieve resource id
-    data = json.loads(request.form)
+    data = request.form
 
     resource_id = data['resource_id']
 
@@ -301,7 +301,7 @@ def resource_image_upload():
 @auth.login_required
 def resource_file_upload():
     # retrieve resource id
-    data = json.loads(request.form)
+    data = request.form
 
     resource_id = data['resource_id']
 
@@ -348,15 +348,8 @@ def user_image_upload():
     return jsonify(ret_val)
 
 
-@app.route("/download_file", methods=['POST'])
-def download():
-    # get filename and file type (i.e. image, file)
-    data = request.get_json()
-
-    filename = data['filename']
-
-    file_type = data['file_type']
-
+@app.route("/download_file/<file_type>/<filename>")
+def download(filename, file_type):
     ft_map = {
         "image": app.config['IMAGE_UPLOAD_FOLDER'],
         "file": app.config['FILE_UPLOAD_FOLDER']
