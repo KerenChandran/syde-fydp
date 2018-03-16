@@ -59,6 +59,30 @@ class ResourceUtil(Pipeline):
 
         self.resource_data = cleaned_store
 
+    def create_skeleton_resource(self):
+        """
+            Helper method to create skeleton resource object in the database.
+            Useful for when a resource_identifier is needed before the full
+            resource is created (e.g. file/image upload).
+        """
+        try:
+            resource_creation_query = \
+            """
+                INSERT INTO resource (description)
+                VALUES ('skeleton resource')
+                RETURNING id;
+            """
+
+            resource_id = self.crs.fetch_first(resource_creation_query)
+
+        except:
+            self.error_logs.append("Unable to create resource")
+            return False, self.error_logs, None
+
+        self.crs.commit()
+
+        return True, self.error_logs, resource_id
+
     def _get_resource_data(self):
         """
             Underlying method to retrieve attributes for specified resources.

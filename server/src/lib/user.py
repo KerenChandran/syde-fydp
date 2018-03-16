@@ -122,7 +122,6 @@ class User:
         """.format(email=email))
 
         result = self.crs.fetch_all()
-        print(result)
 
         # account already exists
         # update password

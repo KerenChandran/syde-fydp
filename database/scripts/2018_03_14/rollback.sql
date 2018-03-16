@@ -3,6 +3,8 @@ DROP TABLE resource_misc_file;
 
 DROP TABLE resource_image;
 
+DROP TABLE user_image;
+
 -- drop original tables
 DROP TABLE misc_file;
 

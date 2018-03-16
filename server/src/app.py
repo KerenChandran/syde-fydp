@@ -251,6 +251,22 @@ def get_user_images():
     return jsonify(ret_val)
 
 
+@app.route("/create_skeleton_resource", methods=['GET'])
+def create_skeleton_resource():
+    # create resource object and retrieve id
+    res_util = ResourceUtil()
+
+    success, errors, resource_id = res_util.create_skeleton_resource()
+
+    ret_val = {
+        'success': success,
+        'errors': errors,
+        'resource_id': resource_id
+    }
+
+    return jsonify(ret_val)
+
+
 """
     FILE UPLOAD/DOWNLOAD ENDPOINTS
 """
@@ -313,7 +329,7 @@ def resource_file_upload():
 @auth.login_required
 def user_image_upload():
     # retrieve user id
-    data = json.loads(request.form)
+    data = request.form
 
     user_id = data['user_id']
 
