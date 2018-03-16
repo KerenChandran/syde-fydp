@@ -139,7 +139,9 @@ export const uploadImage = (image, resource_id) => async dispatch => {
 
     let response = await fetch('http://localhost:3000/api/resource_image_upload', {
       method: 'post',
-      headers: ApiHeaders(),
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('id_token')
+      },
       body: formData
     });
     let data = await response.json();
