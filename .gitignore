@@ -27,4 +27,4 @@ yarn-error.log*
 .idea/*
 
 # ignore static directory on server
-server/src/static
+server/src/static*
