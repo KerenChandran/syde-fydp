@@ -98,14 +98,6 @@ class ResourceInfoEditConfirm extends Component {
           </div>
         }
 
-        <h3>Resource File Upload</h3>
-        <FormGroup controlId="formFile">
-          <Col componentClass={ControlLabel} sm={2}>File</Col>
-          <Col sm={10}>
-            <input accept="*" id="file" type="file" onChange={handleImageUpload}/>
-          </Col>
-        </FormGroup>
-
         {
           available && existingEvents.length ?
           <div>

@@ -62,10 +62,12 @@ export const updateResource = resource => async dispatch => {
 export const addDataImport = (resource) => async dispatch => {
   try {
     let updateFlag = true;
-    if (resource.resource_id === undefined) {
-      delete resource['resource_id'];
+    if (resource.temp_resource_id != null) {
+      resource.resource_id = resource.temp_resource_id;
+      delete resource['temp_resource_id'];
       updateFlag = false;
     }
+
     let response = await fetch('http://localhost:3000/api/upload_resource', {
       method: 'post',
       headers: ApiHeaders(),
@@ -147,6 +149,20 @@ export const uploadImage = (image, resource_id) => async dispatch => {
     let data = await response.json();
     console.log('data', data);
     return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+  
+}
+
+export const fetchSkeletonResource = (image, resource_id) => async dispatch => {
+  try {
+    let response = await fetch('http://localhost:3000/api/create_skeleton_resource', {
+      method: 'get',
+      headers:  ApiHeaders()
+    });
+    let data = await response.json();
+    return data.resource_id;
   } catch (error) {
     throw new Error(error);
   }

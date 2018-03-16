@@ -17,24 +17,19 @@ class ResourceInfoEditConfirm extends Component {
     this.props.clearSchedule();
   }
 
-  handleImageUpload = event => (
-    this.setState({ image: event.target.files[0] })
-  )
-
   handleCancel = () => {
     this.props.history.push('/resources');
   }
 
   handleSubmit = async e => {
     e.preventDefault();
-    const { addResource, resource, newEvents, submitAvailabilityBlocks, uploadImage } = this.props;
-    const { image } = this.state;
+    const { addResource, resource, newEvents, submitAvailabilityBlocks } = this.props;
+    
     const resource_id = await addResource(resource);
     await submitAvailabilityBlocks(newEvents.map(event => ({
       ...event,
       resource_id
     })));
-    await uploadImage(image, resource_id);
   }
 
   render() {
@@ -47,7 +42,6 @@ class ResourceInfoEditConfirm extends Component {
         newEvents={newEvents}
         onCancel={this.handleCancel}
         onConfirm={this.handleSubmit}
-        handleImageUpload={this.handleImageUpload}
       />
     );
   }
@@ -62,8 +56,7 @@ const mapStateToProps = (state, props) => ({
 const mapDispatchToProps = dispatch => ({
   addResource: bindActionCreators(resourceActions.addDataImport, dispatch),
   clearSchedule: bindActionCreators(scheduleActions.clearSchedule, dispatch),
-  submitAvailabilityBlocks: bindActionCreators(scheduleActions.submitAvailabilityBlocks, dispatch),
-  uploadImage: bindActionCreators(resourceActions.uploadImage, dispatch)
+  submitAvailabilityBlocks: bindActionCreators(scheduleActions.submitAvailabilityBlocks, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ResourceInfoEditConfirm);

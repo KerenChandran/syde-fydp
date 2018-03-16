@@ -41,7 +41,7 @@ class EditProfileView extends Component {
                                 Profile Image
                             </label>
                             <div class="col-sm-6">
-                                <input accept="*" id="file" type="file" onChange={handleImageUpload}/>
+                                <FormControl style={{ marginTop: 8 }} type="file" accept="*" onChange={handleImageUpload} />
                             </div>
                         </div>
                         <div class="row" controlId="formHorizontalFirstName">
