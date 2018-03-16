@@ -79,11 +79,11 @@ class FileUtil:
             filetype : {str}
                 type of file being uploaded
         """
-        suffix = ".".split(filename)[-1]
+        suffix = filename.split(".")[-1]
 
-        uid = uuid.uuid4()
+        uid = str(uuid.uuid4())
 
-        new_flnm = "_".join([str(resource_id), filetype, uid])
+        new_flnm = "_".join([str(entity_id), filetype, uid])
 
         new_flnm += "." + suffix
 
@@ -181,7 +181,7 @@ class FileUtil:
             user_id, file.filename, "user")
 
         try:
-            flpath = os.join(self.image_dir, new_flnm)
+            flpath = os.path.join(self.image_dir, new_flnm)
 
             file.save(flpath)
 
@@ -285,6 +285,9 @@ class FileUtil:
             user_id = kwargs['user_id']
 
             success = self._user_file_upload(user_id, file)
+
+        # commit all changes
+        self.crs.commit()
 
         return success, self.error_logs
 
