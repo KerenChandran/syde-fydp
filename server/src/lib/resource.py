@@ -66,6 +66,7 @@ class ResourceUtil(Pipeline):
             resource is created (e.g. file/image upload).
         """
         try:
+            # create empty resource record
             resource_creation_query = \
             """
                 INSERT INTO resource (description)
@@ -74,6 +75,45 @@ class ResourceUtil(Pipeline):
             """
 
             resource_id = self.crs.fetch_first(resource_creation_query)
+
+            # create empty location and incentive records for mapping purposes
+            # these are mandatory fields and so they're required to exist
+            # when a resource record exists
+
+            # temporarily use resource id as location id
+            location_creation_query = \
+            """
+                INSERT INTO location (placeid, name)
+                VALUES ('{rid}','placeholder location')
+                RETURNING placeid;
+            """.format(rid=resource_id)
+
+            location_id = self.crs.fetch_first(location_creation_query)
+
+            resource_location_mapping_query = \
+            """
+                INSERT INTO resource_location (resource_id, location_id)
+                VALUES ({rid}, '{lid}')
+            """.format(rid=resource_id, lid=location_id)
+
+            self.crs.execute(resource_location_mapping_query)
+
+            incentive_creation_query = \
+            """
+                INSERT INTO incentive (type)
+                VALUES ('placeholder incentive type')
+                RETURNING id;
+            """
+
+            incentive_id = self.crs.fetch_first(incentive_creation_query)
+
+            resource_incentive_mapping_query = \
+            """
+                INSERT INTO resource_incentive (resource_id, incentive_id)
+                VALUES ({rid}, {iid})
+            """.format(rid=resource_id, iid=incentive_id)
+
+            self.crs.execute(resource_incentive_mapping_query)
 
         except:
             self.error_logs.append("Unable to create resource")
