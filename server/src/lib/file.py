@@ -257,21 +257,28 @@ class FileUtil:
             return False, self.error_logs
 
         if entity_type == "resource":
+            if 'resource_id' not in kwargs:
+                self.error_logs.append("Resource identifier must be specified.")
+                return False, self.error_logs
+            elif 'file_type' not in kwargs:
+                self.error_logs.append("File type must be specified.")
+                return False, self.error_logs
+
             resource_id = kwargs['resource_id']
 
             file_type = kwargs['file_type']
 
-            if kwargs['image_type'] is None and kwargs['misc_type'] is None:
+            if 'image_type' not in kwargs and 'misc_type' not in kwargs:
                 self.error_logs.append(
                     "Type of resource file being uploaded was not specified.")
                 return False, self.error_logs
             
-            elif file_type == 'image_file' and kwargs['image_type'] is None:
+            elif file_type == 'image_file' and 'image_type' not in kwargs:
                 self.error_logs.append(
                     "Specify image type for image file upload.")
                 return False, self.error_logs
 
-            elif file_type == 'misc_file' and kwargs['misc_type'] is None:
+            elif file_type == 'misc_file' and 'misc_type' not in kwargs:
                 self.error_logs.append(
                     "Specify misc type for misc file upload.")
                 return False, self.error_logs
@@ -286,6 +293,10 @@ class FileUtil:
                 misc_type=misc_type)
 
         elif entity_type == "user":
+            if 'user_id' not in kwargs:
+                self.error_logs.append("User identifier must be specified.")
+                return False, self.error_logs
+
             user_id = kwargs['user_id']
 
             success = self._user_file_upload(user_id, file)
