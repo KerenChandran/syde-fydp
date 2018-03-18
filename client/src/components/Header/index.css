@@ -19,7 +19,8 @@
   align-items: center;
   flex: 0 0 auto;
   height: 40px;
-  margin-right: 60px;
+  margin-right: 75px;
+  margin-left: 60px;
 }
 
 .app-search {

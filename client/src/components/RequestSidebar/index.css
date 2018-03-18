@@ -2,12 +2,6 @@
   z-index: 999;
 }
 
-.active-link .list-group-item {
-  text-decoration: none;
-  background-color: beige;
-  font-weight: bold;
-}
-
 .requests-link:hover {
   text-decoration: none;
 }
@@ -19,9 +13,8 @@
 
 .requests-link .list-group-item:hover {
   cursor: pointer;
-  background-color: blanchedalmond;
+  background-color: #A5D0F4;
 }
-
 
 .requests-sidebar-container {
   min-width: 225px;
