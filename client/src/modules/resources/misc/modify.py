@@ -9,11 +9,17 @@ fields = ['Category', 'Model', 'Company', 'Fine']
 # dynamic generation of pre-populated values
 dynamic_map = {
     "faculty": ["Engineering", "Science", "Mathematics"],
-    "location": ["Engineering 5", "Engineering 2", "M3", "DWE"],
     "incentive": "User Fees",
     "available": [False, True],
-    "ownerId": [1,2,3,4,5],
+    "ownerId": [-1],
     "mobile": [False, True]
+}
+
+static_location = {
+  "placeid": "ChIJT0wkHAH0K4gRh3y_mDhkEAs",
+  "latitude": 43.4729791,
+  "longitude": -80.54010269999998,
+  "name": "Engineering 5, University Avenue West, Waterloo, ON, Canada"
 }
 
 # iterative population
@@ -21,7 +27,7 @@ iter_arr = ['id']
 
 # owner details
 owner_map = {
-    1: {
+    -1: {
         'name': 'John',
         'phone': '519 888 4567 x123',
         'email': 'john@resourcesharing.com',
@@ -95,6 +101,8 @@ if __name__ == '__main__':
             idx = random.randint(0,len(dynamic_map[fld])-1)
 
             res[fld] = dynamic_map[fld][idx]
+
+        res['location'] = static_location
 
     # add index+1 as unique identifier
     for idx, res in enumerate(store):
