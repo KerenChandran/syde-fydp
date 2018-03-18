@@ -7,6 +7,7 @@ import pandas as pd
 import datetime as dt
 
 from pipeline import Pipeline
+from file import FileUtil
 
 
 class ResourceUtil(Pipeline):
@@ -202,6 +203,13 @@ class ResourceUtil(Pipeline):
 
         for rid, dct in self.resource_data.iteritems():
             dct.update({'location': placeholder_data[rid]})
+
+        # get all relevant images and files for these resources
+        file_util = FileUtil()
+
+        for rid, dct in self.resource_data.iteritems():
+            file_info = file_util.get_uploaded_files(rid, 'resource')
+            dct.update({'file_information': file_info})
 
         self.resource_data = self.resource_data.values()
 
