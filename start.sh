@@ -90,6 +90,8 @@ curl localhost:9200/lab?pretty
 # sometimes empty reply is expected
 curl localhost:5000
 
+# load DEN data
+cd ..
 bash load_data.sh
 
 # database - local psql dependency
