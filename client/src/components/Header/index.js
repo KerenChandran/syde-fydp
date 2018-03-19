@@ -6,7 +6,7 @@ import { bindActionCreators } from 'redux';
 import { userActions } from '../../modules/users';
 
 import Search from '../../containers/Search';
-import { Button } from 'react-bootstrap';
+import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import './index.css';
 
@@ -19,24 +19,33 @@ class Header extends Component {
     const { pathname } = this.props.location;
     return (
       <header className='app-header'>
-        <Link to="/resources">
-          <span className="app-logo">ShareIt</span>
+        <Link to="/resources" style={{marginTop:5+'px'}}>
+            <span className="app-logo"><strong>ShareIt</strong></span>
         </Link>
         <div className="app-search">
           <Search />
         </div>
         <div className="app-links" style={{paddingTop:5+'px'}}>
-          <Link to="/requests">
-            <span className="app-logo">Requests</span>
-          </Link>
-            <div style={{marginTop:10+'px'}}>
-            <a class="dropdown-toggle">
-                    <span class="glyphicon glyphicon-user"></span> <span class="caret"></span>
-            </a>
-             <ul class="dropdown-menu">
-                <li><a href="#">Edit Profile</a></li>
-                <li><a onClick={this.logout}>Logout</a></li>
-             </ul>
+            {
+                (pathname.includes("requests")) ? (
+                    <Link to="/resources">
+                      <span className="app-logo" id="requests-link"><strong>Resources</strong></span>
+                  </Link>
+                ) : (
+                    <Link to="/requests">
+                      <span className="app-logo" id="requests-link"><strong>Requests</strong></span>
+                  </Link>
+                )
+            }
+            <div style={{marginTop:5+'px'}}>
+            <DropdownButton
+                title={<span class="glyphicon glyphicon-user"></span>}
+                pullRight
+                style={{border:0, backgroundColor:'#F6F8FC'}}
+            >
+                <MenuItem>Edit Profile</MenuItem>
+                <MenuItem onClick={this.logout}>Logout</MenuItem>
+            </DropdownButton>
             </div>
         </div>
           <script type="javascript">
