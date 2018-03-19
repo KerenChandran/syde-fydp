@@ -3,6 +3,7 @@ import { createAction } from 'redux-actions';
 
 import * as UserConstants from './constants';
 import ApiHeaders from '../api/headers';
+import BASE_URL from '../api/url';
 
 export const addLoginSuccess = createAction(UserConstants.LOGIN_USER, user => ({ user }));
 export const editProfileSuccess = createAction(UserConstants.EDIT_PROFILE, profile => ({ profile }));
@@ -31,7 +32,7 @@ export const signUp = user => async dispatch => {
 
 export const login = (user) => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/login', {
+    let response = await fetch(BASE_URL + '/login', {
       method: 'post',
       headers: {
         'Accept': 'application/json, text/plain, */*',
@@ -42,7 +43,7 @@ export const login = (user) => async dispatch => {
     let data = await response.json();
     localStorage.setItem('id_token', data.token);
     dispatch(addLoginSuccess(data));
-    response = await fetch('http://localhost:3000/api/get_accounts', {
+    response = await fetch(BASE_URL + '/get_accounts', {
       method: 'get',
       headers: ApiHeaders()
     });
@@ -57,7 +58,7 @@ export const login = (user) => async dispatch => {
 
 export const editProfile = (profile) => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/edit_profile', {
+    let response = await fetch(BASE_URL + '/edit_profile', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify({ profile: profile })
@@ -74,7 +75,7 @@ export const editProfile = (profile) => async dispatch => {
 
 export const authUser = () => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/auth_user', {
+    let response = await fetch(BASE_URL + '/auth_user', {
       method: 'post',
       headers: ApiHeaders()
     });
@@ -93,7 +94,7 @@ export const logout = () => async dispatch => {
 
 export const fetchUser = user_id => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/fetch_user_by_id', {
+    let response = await fetch(BASE_URL + '/fetch_user_by_id', {
       method: 'post',
       headers: {
         'Accept': 'application/json, text/plain, */*',
@@ -111,7 +112,7 @@ export const fetchUser = user_id => async dispatch => {
 
 export const fetchUsers = () => async dispatch => {
   try {
-    let response = await fetch(`http://localhost:3000/api/fetch_all_users`, {
+    let response = await fetch(BASE_URL + `/fetch_all_users`, {
       method: 'get',
       headers: {
         'Accept': 'application/json, text/plain, */*',

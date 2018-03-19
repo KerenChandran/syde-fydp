@@ -3,6 +3,7 @@ import * as ScheduleConstants from './constants';
 import ApiHeaders from '../api/headers';
 import { push } from 'react-router-redux';
 import moment from 'moment';
+import BASE_URL from '../api/url';
 
 export const fetchScheduleBlocksSuccess = createAction(ScheduleConstants.FETCH_SCHEDULE, schedule => ({ schedule }));
 export const validateRequestBlocksSuccess = createAction(ScheduleConstants.VALIDATE_BLOCKS, schedule => ({ schedule }));
@@ -25,7 +26,7 @@ export const fetchResourceSchedule = id => async dispatch => {
 }
 
 export const fetchResourceScheduleHelper = async (id, dispatch) => {
-  let response = await fetch('http://localhost:3000/api/get_resource_schedules', {
+  let response = await fetch(BASE_URL + '/get_resource_schedules', {
     method: 'post',
     headers: ApiHeaders(),
     body: JSON.stringify({ resource_list: [id] })
@@ -36,7 +37,7 @@ export const fetchResourceScheduleHelper = async (id, dispatch) => {
 
 export const submitScheduleBlock = (block) => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/submit_schedule_blocks', {
+    let response = await fetch(BASE_URL + '/submit_schedule_blocks', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify(block)
@@ -50,7 +51,7 @@ export const submitScheduleBlock = (block) => async dispatch => {
 
 export const validateRequestBlocks = (block) => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/validate_request_block', {
+    let response = await fetch(BASE_URL + '/validate_request_block', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify(block)
@@ -64,7 +65,7 @@ export const validateRequestBlocks = (block) => async dispatch => {
 
 export const submitAvailabilityBlocks = blocks => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/submit_availability_blocks', {
+    let response = await fetch(BASE_URL + '/submit_availability_blocks', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify(blocks)
@@ -78,7 +79,7 @@ export const submitAvailabilityBlocks = blocks => async dispatch => {
 
 export const saveAvailableEvent = (existing_blocks, event, user_id) => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/submit_intermediate_availability_blocks', {
+    let response = await fetch(BASE_URL + '/submit_intermediate_availability_blocks', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify({

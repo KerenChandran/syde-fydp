@@ -30,6 +30,7 @@ class ResourceInfoView extends Component {
     const incentive = incentive_type === 'user_fee' ? 'User Fee' : '';
 
     return (
+      <div style={{ marginLeft: 'auto', marginRight: 'auto' }}>
       <div className="resource-info-container">
         <ResourceImageCarousel images={images} />
         <h3>Resource Info</h3>
@@ -140,15 +141,15 @@ class ResourceInfoView extends Component {
             <ResourceFileList files={files} />
           </div> : null
         }
-
-        <div>
-          { currentUser != null && (
-            <ButtonToolbar className="center" style={{marginBottom:20}}>
-              {isMyResource && <Button onClick={onEditClick}>Edit Resource</Button>}
-              {available ? <Button bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Update Availability" : "Request Resource"}</Button> : null}
-            </ButtonToolbar>
-          )}
-        </div>
+      </div>
+      <div>
+        { currentUser != null && (
+          <ButtonToolbar className="center" style={{marginBottom:20}}>
+            {isMyResource && <Button bsStyle="primary" onClick={onEditClick}>Edit Resource</Button>}
+            {available ? <Button bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Update Availability" : "Request Resource"}</Button> : null}
+          </ButtonToolbar>
+        )}
+      </div>
       </div>
     );
   }

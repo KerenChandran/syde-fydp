@@ -16,6 +16,7 @@ import {
 } from 'react-bootstrap';
 
 import AccountPill from '../../components/Account';
+import '../ResourceInfo/index.css';
 
 class RequestInfo extends Component {
   constructor(props) {
@@ -50,30 +51,31 @@ class RequestInfo extends Component {
     const { accounts, request, requester, fee_total } = this.props;
     return (
       <div className="container form-horizontal">
+          <div class="resource-info-container">
         <h3>Requester Info</h3>
         <Row>
-          <Col componentClass={ControlLabel} xs={2}>Name</Col>
-          <Col xs={10}><FormControl.Static>{request.requester_name}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} xs={5}>Name</Col>
+          <Col xs={7}><FormControl.Static>{request.requester_name}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} xs={2}>Deparment</Col>
-          <Col xs={10}><FormControl.Static>{requester.department}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} xs={5}>Deparment</Col>
+          <Col xs={7}><FormControl.Static>{requester.department}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} xs={2}>Faculty</Col>
-          <Col xs={10}><FormControl.Static>{requester.faculty}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} xs={5}>Faculty</Col>
+          <Col xs={7}><FormControl.Static>{requester.faculty}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} xs={2}>Phone</Col>
-          <Col xs={10}><FormControl.Static>{requester.phone}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} xs={5}>Phone</Col>
+          <Col xs={7}><FormControl.Static>{requester.phone}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Email</Col>
-          <Col xs={10}><FormControl.Static>{requester.email}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Email</Col>
+          <Col xs={7}><FormControl.Static>{requester.email}</FormControl.Static></Col>
         </Row>
 
         <h3>Resource Info</h3>
@@ -104,13 +106,13 @@ class RequestInfo extends Component {
         </Table>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Fee</Col>
-          <Col sm={10}><FormControl.Static>${request.fee_amount} / {request.fee_cadence}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Fee</Col>
+          <Col sm={7}><FormControl.Static>${request.fee_amount} / {request.fee_cadence}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Total</Col>
-          <Col sm={10}><FormControl.Static>${fee_total}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Total</Col>
+          <Col sm={7}><FormControl.Static>${fee_total.toFixed(2)}</FormControl.Static></Col>
         </Row>
 
         <h3>Choose Deposit Account</h3>
@@ -129,13 +131,13 @@ class RequestInfo extends Component {
 
         {
           request.requester_message != null || request.requester_message != '' ? 
-          <Row>
+          <Row style={{marginTop:20}}>
             <Col componentClass={ControlLabel} sm={2}>Message</Col>
             <Col xs={10}><FormControl.Static>{request.requester_message}</FormControl.Static></Col>
           </Row> : null
         }
 
-        <FormGroup controlId="formMessage" className="top-spacing">
+        <FormGroup controlId="formMessage">
           <Col sm={12}>
             <FormControl
               componentClass="textarea"
@@ -146,7 +148,8 @@ class RequestInfo extends Component {
           </Col>
         </FormGroup>
 
-        <ButtonToolbar className="pull-right">
+          </div>
+          <ButtonToolbar className="center" style={{marginBottom:20}}>
           <Button bsStyle="primary" onClick={this.handleAccpet}>Accept</Button>
           <Button onClick={this.handleReject}>Reject</Button>
         </ButtonToolbar>

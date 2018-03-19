@@ -9,6 +9,7 @@
 .requests-link .list-group-item {
   padding-left: 20px;
   padding-right: 20px;
+  background-color: #F6F8FC;
 }
 
 .requests-link .list-group-item:hover {
@@ -17,9 +18,14 @@
 }
 
 .requests-sidebar-container {
-  min-width: 225px;
-  max-width: 400px;
+  width: 200px;
   height: 100%;
   overflow-y: hidden;
-  border-right: 1px solid rgba(34, 34, 34, 0.3);
+  border-right: 0;
+}
+
+.active-link .list-group-item {
+  text-decoration: none;
+  background-color: #DDE4F1;
+  font-weight: bold;
 }

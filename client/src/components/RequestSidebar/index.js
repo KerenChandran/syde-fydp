@@ -26,10 +26,10 @@ class Sidebar extends Component {
         <div className="requests-sidebar-container">
           <ListGroup>
             <NavLink to="/requests" exact className="requests-link" activeClassName="active-link">
-              <ListGroupItem>Requests</ListGroupItem>
+              <ListGroupItem>Received Requests</ListGroupItem>
             </NavLink>
             <NavLink to="/requests/myrequests" exact className="requests-link" activeClassName="active-link">
-              <ListGroupItem>My Requests</ListGroupItem>
+              <ListGroupItem>Sent Requests</ListGroupItem>
             </NavLink>
           </ListGroup>  
         </div>

@@ -3,6 +3,7 @@ import * as RequestConstants from './constants';
 import ApiHeaders from '../api/headers';
 import { push } from 'react-router-redux';
 import moment from 'moment';
+import BASE_URL from '../api/url';
 
 export const saveIncentive = createAction(RequestConstants.SAVE_INCENTIVE, incentive => ({ incentive }));
 export const clearIncentive = createAction(RequestConstants.CLEAR_INCENTIVE);
@@ -14,7 +15,7 @@ export const clearRequestTotal = createAction(RequestConstants.CLEAR_REQUEST_TOT
 
 export const fetchRequests = owner_id => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/get_requests', {
+    let response = await fetch(BASE_URL + '/get_requests', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify({ owner_id })
@@ -30,7 +31,7 @@ export const fetchRequests = owner_id => async dispatch => {
 
 export const submitRequest = request => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/submit_request', {
+    let response = await fetch(BASE_URL + '/submit_request', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify(request)
@@ -44,7 +45,7 @@ export const submitRequest = request => async dispatch => {
 
 export const acceptRequest = request => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/accept_request', {
+    let response = await fetch(BASE_URL + '/accept_request', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify(request)
@@ -58,7 +59,7 @@ export const acceptRequest = request => async dispatch => {
 
 export const rejectRequest = request => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/reject_request', {
+    let response = await fetch(BASE_URL + '/reject_request', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify(request)
@@ -72,7 +73,7 @@ export const rejectRequest = request => async dispatch => {
 
 export const fetchRequestTotal = (fee_amount, fee_cadence, block_list) => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/get_transfer_amount', {
+    let response = await fetch(BASE_URL + '/api/get_transfer_amount', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify({
