@@ -22,18 +22,22 @@ class ResourceInfoEdit extends Component {
   handleSubmit = async data => {
     const { saveResource } = this.props;
     const { image, files, ...resource } = data;
+    console.log('info images', image);
+    console.log('info files', files);
+    console.log('info resource', resource.resource_id);
+    let resource_id = resource.resource_id;
     
-    if (image != null || files != null) {
-      const resource_id = await this.props.fetchSkeletonResource();
+    if ((image != null || files.length > 0) && resource_id == null) {
+      resource_id = await this.props.fetchSkeletonResource();
       resource.temp_resource_id = resource_id;
     }
 
     if (image != null) {
-      await this.props.uploadImage(image, resource.temp_resource_id);
+      await this.props.uploadImage(image, resource_id);
     }
 
-    if (files != null) {
-      await this.props.uploadFile(files[0].file, resource.temp_resource_id);
+    if (files.length > 0) {
+      await this.props.uploadFile(files[0].file, resource_id);
     }
     
     saveResource(resource);
@@ -43,13 +47,16 @@ class ResourceInfoEdit extends Component {
     const {
       resource,
       updateResource,
-      match: { params },
-      files
+      match: { params }
     } = this.props;
 
     if (params.id >= 0 && resource == null) {
       return null;
     }
+
+    const files = resource.file_information && resource.file_information.misc_file ? resource.file_information.misc_file : [];
+    // const files = resource.file_information && resource.file_information.misc_file ? resource.file_information.misc_file : [];
+
     return (
       <ResourceInfoEditView
         resource={resource}

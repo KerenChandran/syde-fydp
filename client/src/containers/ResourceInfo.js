@@ -53,10 +53,13 @@ class ResourceInfo extends Component {
   }
 
   render() {
-    const { currentUser, resource, owner, images, files } = this.props;
+    const { currentUser, resource, owner } = this.props;
     if (!resource || !owner || this.state.loading) {
       return null;
     }
+
+    const files = resource.file_information && resource.file_information.misc_file ? resource.file_information.misc_file : [];
+    const images = resource.file_information && resource.file_information.resource ? resource.file_information.resource : [];
 
     return (
       <ResourceInfoView
