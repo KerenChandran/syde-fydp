@@ -64,7 +64,12 @@ class ResourceInfoEditView extends Component {
   }
   
   handleFileUpload = e => {
-    this.setState({ files: [e.target.files[0]] })
+    const { files } = this.state;
+    files.push({
+      file: e.target.files[0],
+      original_filename: e.target.files[0].name
+    });
+    this.setState({ files })
   }
 
   handleFileDelete = idx => () => {

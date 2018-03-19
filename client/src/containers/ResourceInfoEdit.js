@@ -33,7 +33,7 @@ class ResourceInfoEdit extends Component {
     }
 
     if (files != null) {
-      await this.props.uploadFile(files[0], resource.temp_resource_id);
+      await this.props.uploadFile(files[0].file, resource.temp_resource_id);
     }
     
     saveResource(resource);
