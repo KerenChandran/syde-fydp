@@ -3,6 +3,8 @@ import data from './data_modified.json';
 
 const initialState = {
   resources: data.resources,
+  files: {},
+  images: {},
   showBulkImport: false,
   newResource: {}
 };
@@ -120,10 +122,26 @@ export default (state = initialState, { type, payload }) => {
       };
     }
 
+    case ResourceConstants.FETCH_RESOURCE_FILES: {
+      return {
+        ...state,
+        files: {
+          ...state.files,
+          [payload.resource_id]: payload.file_data.file
+        },
+        images: {
+          ...state.images,
+          [payload.resource_id]: payload.file_data.resource
+        }
+      };
+    }
+
     case ResourceConstants.CLEAR_RESOURCES: {
       return {
         ...state,
-        resources: data.resources
+        resources: data.resources,
+        files: {},
+        images: {}
       }
     }
 

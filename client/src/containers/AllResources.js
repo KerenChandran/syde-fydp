@@ -14,6 +14,8 @@ import LocationMap from '../components/LocationMap';
 import Sidebar from '../components/ResourceSidebar';
 import ScheduleFilters from './ScheduleFilters';
 
+import ResourcesGridView from '../views/ResourcesGrid';
+
 const LIST = 'list';
 const MAP = 'map';
 const GRID = 'grid';
@@ -60,11 +62,17 @@ class AllResources extends Component {
                   showDetailsForm={this.detailResource}
                   currentUserId={currentUserId}
                 />
-              ) : (
+              ) : view === MAP ? (
                 <LocationMap
                   resources={resources}
                   deleteResource={deleteResource}
                   showEditForm={this.editResource}
+                  showDetailsForm={this.detailResource}
+                  currentUserId={currentUserId}
+                />
+              ) : (
+                <ResourcesGridView
+                  resources={resources}
                   showDetailsForm={this.detailResource}
                   currentUserId={currentUserId}
                 />

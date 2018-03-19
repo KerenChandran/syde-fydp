@@ -1,0 +1,11 @@
+.resource-grid-parent {
+  display: flex;
+  flex-wrap:wrap;
+  margin:-10px 0 0 -10px;
+  width: calc(100% - 224px);
+}
+
+.resource-grid-child {
+  margin:10px 0 0 10px;
+  flex: 1 0 30%;
+}
