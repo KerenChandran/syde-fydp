@@ -3,6 +3,7 @@ import { push } from 'react-router-redux';
 import { createAction } from 'redux-actions';
 import * as ResourceConstants from './constants';
 import ApiHeaders from '../api/headers';
+import BASE_URL from '../api/url';
 
 // Create Form Actions
 export const toggleBulkImportForm = createAction(ResourceConstants.TOGGLE_BULK_IMPORT_FORM);
@@ -23,7 +24,7 @@ export const clearResources = createAction(ResourceConstants.CLEAR_RESOURCES);
 
 export const fetchResources = () => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/get_resources', {
+    let response = await fetch(BASE_URL + '/get_resources', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify({ resource_list: [] })
@@ -37,7 +38,7 @@ export const fetchResources = () => async dispatch => {
 
 export const fetchResource = id => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/get_resources', {
+    let response = await fetch(BASE_URL + '/get_resources', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify({ resource_list: [id] })
@@ -67,7 +68,7 @@ export const addDataImport = (resource) => async dispatch => {
       delete resource['resource_id'];
       updateFlag = false;
     }
-    let response = await fetch('http://localhost:3000/api/upload_resource', {
+    let response = await fetch(BASE_URL + '/upload_resource', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify({ resource: resource })
@@ -89,7 +90,7 @@ export const addBulkImport = (data) => async dispatch => {
     formData.append('resources', data.file);
     formData.append('location', JSON.stringify(data.location));
 
-    let response = await fetch('http://localhost:3000/api/bulk_resource_upload', {
+    let response = await fetch(BASE_URL + '/bulk_resource_upload', {
       method: 'post',
       body: formData
     });
@@ -102,7 +103,7 @@ export const addBulkImport = (data) => async dispatch => {
 
 export const initialAvailability = (availability) => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/submit_initial_availability', {
+    let response = await fetch(BASE_URL + '/submit_initial_availability', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify(availability)
@@ -116,7 +117,7 @@ export const initialAvailability = (availability) => async dispatch => {
 
 export const fetchScheduleFilterResources = (filters) => async dispatch => {
   try {
-    let response = await fetch('http://localhost:3000/api/submit_schedule_filter', {
+    let response = await fetch(BASE_URL + '/submit_schedule_filter', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify(filters)
