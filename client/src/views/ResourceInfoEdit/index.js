@@ -17,6 +17,8 @@ import Select, { Creatable } from 'react-select';
 import BootstrapSwitch from 'react-bootstrap-switch';
 
 import LocationSearch from '../../components/LocationSearch';
+import ResourceFileList from '../../components/ResourceFileList';
+import ResourceFileEditList from '../../components/ResourceFileEditList';
 
 class ResourceInfoEditView extends Component {
   constructor(props) {
@@ -30,7 +32,8 @@ class ResourceInfoEditView extends Component {
       room_number: '',
       description: '',
       rules_restrictions: '',
-      ...this.props.resource
+      files: [],
+      ...this.props.resource,
     };
     this.categories = [{"category":"Aircrafts"},{"category":"Arduino Shields Etc."},{"category":"Arduinos"},{"category":"Audio Accessories"},{"category":"Batteries"},{"category":"Battery Chargers"},{"category":"Bio Medical Equipment"},{"category":"Brakes"},{"category":"Breadboards"},{"category":"Cables"},{"category":"Cameras"},{"category":"Clamps"},{"category":"Clutches (Electric)"},{"category":"Computer Accessories"},{"category":"Counters"},{"category":"Couplings"},{"category":"Data Acquisition"},{"category":"Drills"},{"category":"FPGAs"},{"category":"Fans"},{"category":"Gearboxes"},{"category":"Heat Guns"},{"category":"Heat Sinks"},{"category":"Instrumentation (Force)"},{"category":"Instrumentation (Light)"},{"category":"Instrumentation (Sound)"},{"category":"Instrumentation (Torque)"},{"category":"Leads"},{"category":"Lights"},{"category":"Linear Actuators (Electric)"},{"category":"Measuring Devices"},{"category":"Microcontrollers & DSPs"},{"category":"Mobile Platforms/Chassis"},{"category":"Motor Controllers"},{"category":"Motors (AC)"},{"category":"Motors (DC)"},{"category":"Motors (Servo)"},{"category":"Motors (Stepper)"},{"category":"Multimeters"},{"category":"Oscilloscopes"},{"category":"Pliers"},{"category":"Power Supplies"},{"category":"Relays"},{"category":"Robotic Arms/Manipulators"},{"category":"Safety Glasses"},{"category":"Scanners"},{"category":"Sensors (BioMed)"},{"category":"Sensors (Color)"},{"category":"Sensors (Flex)"},{"category":"Sensors (Force)"},{"category":"Sensors (Gas)"},{"category":"Sensors (Infrared)"},{"category":"Sensors (Laser)"},{"category":"Sensors (Light)"},{"category":"Sensors (Liquid)"},{"category":"Sensors (Magnetic)"},{"category":"Sensors (Motion, Orientation)"},{"category":"Sensors (Pressure)"},{"category":"Sensors (Proximity)"},{"category":"Sensors (RF)"},{"category":"Sensors (Sound)"},{"category":"Sensors (Temperature)"},{"category":"Sensors (Touch)"},{"category":"Sensors (Ultrasonic)"},{"category":"Signal Generators"},{"category":"Socket Sets"},{"category":"Solder Suckers"},{"category":"Soldering Stations"},{"category":"Solenoid Actuators (Electric)"},{"category":"Speakers"},{"category":"Tachometers"},{"category":"Transformers/Inverters"},{"category":"Tweezers"},{"category":"Vises"},{"category":"Wall Adapters"},{"category":"Wheels"},{"category":"Wire Cutters"}];
     this.rules = [{"rule" : "No weekend use"},{"rule": "Operators must be present"},{"rule": "Safety training required"},{"rule": "No undergrad students"}];
@@ -60,6 +63,16 @@ class ResourceInfoEditView extends Component {
     this.setState({ image: e.target.files[0] })
   }
   
+  handleFileUpload = e => {
+    this.setState({ files: [e.target.files[0]] })
+  }
+
+  handleFileDelete = idx => () => {
+    this.setState({
+      files: this.state.files.filter((file, index) => index !== idx)
+    });
+  }
+
   handleSubmit = e => {
     e.preventDefault();
 
@@ -108,8 +121,11 @@ class ResourceInfoEditView extends Component {
       fee_amount,
       fee_cadence,
       incentive_type,
-      room_number
+      room_number,
+      files
     } = this.state;
+
+    console.log('files', files);
 
     return (
       <Form horizontal className="container-center" onSubmit={this.handleSubmit}>
@@ -250,6 +266,23 @@ class ResourceInfoEditView extends Component {
               </Col>
             </FormGroup>
           </div>
+        }
+
+        <FormGroup controlId="formFile">
+          <Col componentClass={ControlLabel} sm={2}>Files</Col>
+          <Col sm={10}>
+            <FormControl style={{ marginTop: 8 }} type="file" accept="*" onChange={this.handleFileUpload} />
+          </Col>
+        </FormGroup>
+        
+        {
+          (files.length || this.props.files.length) && (
+            <div>
+              <h3>Files</h3>
+              <ResourceFileList files={this.props.files} />
+              <ResourceFileEditList files={files} onDelete={this.handleFileDelete} />
+            </div>
+          )
         }
 
         <ButtonToolbar className="right-align">

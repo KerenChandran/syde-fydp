@@ -2,9 +2,12 @@ import React, { Component } from 'react';
 
 import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup, ButtonToolbar } from 'react-bootstrap';
 
+import ResourceImageCarousel from '../../components/ResourceImageCarousel';
+import ResourceFileList from '../../components/ResourceFileList';
+
 class ResourceInfoView extends Component {
   render() {
-    const { currentUser, isMyResource, resource, owner, onDeleteClick, onEditClick, onRequestClick } = this.props;
+    const { currentUser, isMyResource, resource, owner, onDeleteClick, onEditClick, onRequestClick, images, files } = this.props;
     const {
       category,
       company,
@@ -27,6 +30,7 @@ class ResourceInfoView extends Component {
 
     return (
       <div className="container form-horizontal">
+        <ResourceImageCarousel images={images} />
         <h3>Resource Info</h3>
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Category</Col>
@@ -127,6 +131,14 @@ class ResourceInfoView extends Component {
           <Col componentClass={ControlLabel} sm={2}>Email</Col>
           <Col sm={10}><FormControl.Static>{owner.email}</FormControl.Static></Col>
         </Row>
+
+        {
+          files.length &&
+          <div>
+            <h3>Files</h3>
+            <ResourceFileList files={files} />
+          </div>
+        }
 
         { currentUser != null && (
           <ButtonToolbar className="right-align">

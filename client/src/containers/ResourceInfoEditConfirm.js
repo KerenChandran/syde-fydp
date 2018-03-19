@@ -9,10 +9,6 @@ import ResourceInfoEditConfirmView from '../views/ResourceInfoEditConfirm';
 import { isEmpty } from 'lodash';
 
 class ResourceInfoEditConfirm extends Component {
-  state = {
-    image: null
-  };
-
   componentWillUnmount() {
     this.props.clearSchedule();
   }

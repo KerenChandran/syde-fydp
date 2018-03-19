@@ -36,8 +36,6 @@ class MyRequests extends Component {
       return null;
     }
 
-    console.log('requests', requests);
-
     return (
       <div style={{ display: 'flex' }}>
         <Sidebar />

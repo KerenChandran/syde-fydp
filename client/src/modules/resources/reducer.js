@@ -2,6 +2,8 @@ import * as ResourceConstants from './constants';
 
 const initialState = {
   resources: [],
+  files: {},
+  images: {},
   showBulkImport: false,
   newResource: {}
 };
@@ -117,10 +119,26 @@ export default (state = initialState, { type, payload }) => {
       };
     }
 
+    case ResourceConstants.FETCH_RESOURCE_FILES: {
+      return {
+        ...state,
+        files: {
+          ...state.files,
+          [payload.resource_id]: payload.file_data.file
+        },
+        images: {
+          ...state.images,
+          [payload.resource_id]: payload.file_data.resource
+        }
+      };
+    }
+
     case ResourceConstants.CLEAR_RESOURCES: {
       return {
         ...state,
         resources: []
+        files: {},
+        images: {}
       }
     }
 

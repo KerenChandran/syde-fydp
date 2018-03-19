@@ -64,4 +64,10 @@ export const resourceOwnedByCurrentUser = (state, id) => {
   }
 };
 
+export const getFiles = state => state.resources.files;
+export const getImages = state => state.resources.images;
+
+export const getResourceFiles = (state, id) => state.resources.files[id] || [];
+export const getResourceImages = (state, id) => state.resources.images[id] || [];
+
 export const getNewResource = state => state.resources.newResource;

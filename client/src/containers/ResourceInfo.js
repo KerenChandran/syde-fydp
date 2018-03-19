@@ -20,6 +20,7 @@ class ResourceInfo extends Component {
       this.setState({ loading: false })
     } else {
       this.props.fetchResource(this.props.match.params.id).then(resource => {
+        this.props.fetchResourceFiles(this.props.match.params.id);
         this.props.fetchUser(resource.ownerid);
       }).then(() => {
         this.setState({ loading: false });
@@ -52,7 +53,7 @@ class ResourceInfo extends Component {
   }
 
   render() {
-    const { currentUser, resource, owner } = this.props;
+    const { currentUser, resource, owner, images, files } = this.props;
     if (!resource || !owner || this.state.loading) {
       return null;
     }
@@ -63,6 +64,8 @@ class ResourceInfo extends Component {
         isMyResource={resource.ownerid === currentUser.id}
         resource={resource}
         owner={owner}
+        images={images}
+        files={files}
         onBackClick={this.handleBackClick}
         onEditClick={this.handleEditClick}
         onDeleteClick={this.handleDeleteClick}
@@ -75,7 +78,9 @@ class ResourceInfo extends Component {
 const mapStateToProps = (state, props) => ({
   resource: resourceSelectors.getResource(state, props.match.params.id),
   currentUser: userSelectors.currentUser(state),
-  owner: userSelectors.getOwnerByResource(state, props.match.params.id)
+  owner: userSelectors.getOwnerByResource(state, props.match.params.id),
+  images: resourceSelectors.getResourceImages(state, props.match.params.id),
+  files: resourceSelectors.getResourceFiles(state, props.match.params.id)
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -83,7 +88,8 @@ const mapDispatchToProps = (dispatch) => ({
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
   clearAvailableEvents: bindActionCreators(scheduleActions.clearAvailableEvents, dispatch),
   saveResource: bindActionCreators(resourceActions.saveResource, dispatch),
-  fetchUser: bindActionCreators(userActions.fetchUser, dispatch)
+  fetchUser: bindActionCreators(userActions.fetchUser, dispatch),
+  fetchResourceFiles: bindActionCreators(resourceActions.fetchResourceFiles, dispatch)
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ResourceInfo));

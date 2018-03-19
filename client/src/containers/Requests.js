@@ -18,7 +18,6 @@ class Requests extends Component {
 
   componentDidMount() {
     const { currentUserId, fetchRequests, fetchResources, fetchUsers } = this.props;
-    console.log('currentUserId', currentUserId);
     Promise.all([fetchResources(), fetchRequests(currentUserId), fetchUsers()]).then(() => this.setState({ loading: false }));
   }
 

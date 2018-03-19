@@ -17,6 +17,8 @@ export const deleteResource = createAction(ResourceConstants.DELETE_RESOURCE, id
 export const fetchResourcesSuccess = createAction(ResourceConstants.FETCH_RESOURCES, resources => ({ resources }));
 export const fetchResourceSuccess = createAction(ResourceConstants.FETCH_RESOURCE, resource => ({ resource }));
 
+export const fetchResourceFilesSuccess = createAction(ResourceConstants.FETCH_RESOURCE_FILES, (data, resource_id) => ({ resource_id, ...data }));
+
 export const clearResources = createAction(ResourceConstants.CLEAR_RESOURCES);
 
 
@@ -168,3 +170,40 @@ export const fetchSkeletonResource = (image, resource_id) => async dispatch => {
   }
   
 }
+
+export const uploadFile = (resource_file, resource_id) => async dispatch => {
+  try {
+    let formData = new FormData();
+    formData.append('resource_file', resource_file);
+    formData.append('file_type', 'misc_file');
+    formData.append('misc_type', 'file');
+    formData.append('resource_id', resource_id);
+
+    let response = await fetch('http://localhost:3000/api/resource_file_upload', {
+      method: 'post',
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('id_token')
+      },
+      body: formData
+    });
+    let data = await response.json();
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+export const fetchResourceFiles = resource_id => async dispatch => {
+  try {
+    let response = await fetch(`http://localhost:3000/api/get_resource_files/${resource_id}`, {
+      method: 'get',
+      headers:  ApiHeaders()
+    });
+    let data = await response.json();
+    dispatch(fetchResourceFilesSuccess(data, resource_id))
+    return true;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+

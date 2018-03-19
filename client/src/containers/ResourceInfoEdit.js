@@ -21,13 +21,19 @@ class ResourceInfoEdit extends Component {
 
   handleSubmit = async data => {
     const { saveResource } = this.props;
-    const { image, ...resource } = data;
+    const { image, files, ...resource } = data;
     
-    if (image != null) {
+    if (image != null || files != null) {
       const resource_id = await this.props.fetchSkeletonResource();
-      console.log('resource_id', resource_id);
       resource.temp_resource_id = resource_id;
-      await this.props.uploadImage(image, resource_id);
+    }
+
+    if (image != null) {
+      await this.props.uploadImage(image, resource.temp_resource_id);
+    }
+
+    if (files != null) {
+      await this.props.uploadFile(files[0], resource.temp_resource_id);
     }
     
     saveResource(resource);
@@ -37,7 +43,8 @@ class ResourceInfoEdit extends Component {
     const {
       resource,
       updateResource,
-      match: { params }
+      match: { params },
+      files
     } = this.props;
 
     if (params.id >= 0 && resource == null) {
@@ -46,6 +53,7 @@ class ResourceInfoEdit extends Component {
     return (
       <ResourceInfoEditView
         resource={resource}
+        files={files}
         onBackClick={this.handleBackClick}
         onSubmitClick={this.handleSubmit}
       />
@@ -54,7 +62,8 @@ class ResourceInfoEdit extends Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  resource: resourceSelectors.getResource(state, props.match.params.id)
+  resource: resourceSelectors.getResource(state, props.match.params.id),
+  files: resourceSelectors.getResourceFiles(state, props.match.params.id)
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -62,7 +71,8 @@ const mapDispatchToProps = (dispatch) => ({
   saveResource: bindActionCreators(resourceActions.saveResource, dispatch),
   fetchResource: bindActionCreators(resourceActions.fetchResource, dispatch),
   fetchSkeletonResource: bindActionCreators(resourceActions.fetchSkeletonResource, dispatch),
-  uploadImage: bindActionCreators(resourceActions.uploadImage, dispatch)
+  uploadImage: bindActionCreators(resourceActions.uploadImage, dispatch),
+  uploadFile: bindActionCreators(resourceActions.uploadFile, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ResourceInfoEdit);
