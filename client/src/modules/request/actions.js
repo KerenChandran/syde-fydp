@@ -73,7 +73,7 @@ export const rejectRequest = request => async dispatch => {
 
 export const fetchRequestTotal = (fee_amount, fee_cadence, block_list) => async dispatch => {
   try {
-    let response = await fetch(BASE_URL + '/api/get_transfer_amount', {
+    let response = await fetch(BASE_URL + '/get_transfer_amount', {
       method: 'post',
       headers: ApiHeaders(),
       body: JSON.stringify({
