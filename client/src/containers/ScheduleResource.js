@@ -24,6 +24,8 @@ import {
   Row
 } from 'react-bootstrap';
 
+import './ScheduleResource.css';
+
 
 moment.locale('en');
 momentLocalizer();
@@ -322,16 +324,7 @@ class RequestResource extends Component {
     }
     const dateFormat = selectedEvent.allDay ? "MMMM DD, YYYY" : "MMMM DD, YYYY - h:mm A";
     return (
-      <div style={{display: 'flex', flexGrow: 1, flexDirection: 'column'}}>
-        <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: 10}}>
-          {
-            (isMyResource || params.id == null) ?
-            <Button bsStyle="primary" onClick={this.handleFinish}>Continue</Button> :
-            newRequestedEvents.length ? 
-            <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Continue</Button> :
-            null
-          }
-        </div>
+      <div class="schedule-container">
         <Calendar
           events={[...availableEvents, ...newAvailableEvents, ...requestedEvents, ...newRequestedEvents]}
           onEventResize={this.handleEventResize}
@@ -343,6 +336,15 @@ class RequestResource extends Component {
           endAccessor={event => new Date(event.block_end)}
           allDayAccessor={this.allDayCheck}
         />
+        <div style={{marginTop: 20+'px', textAlign:'center'}}>
+          {
+            (isMyResource || params.id == null) ?
+            <Button bsStyle="primary" onClick={this.handleFinish}>Continue</Button> :
+            newRequestedEvents.length ?
+            <Button bsStyle="primary" onClick={this.handleSubmitSchedule}>Continue</Button> :
+            null
+          }
+        </div>
         <Modal show={showEventDetails} onHide={this.handleEventDetailClose}>
           <Modal.Header closeButton>
             <Modal.Title>{selectedEvent.title}</Modal.Title>

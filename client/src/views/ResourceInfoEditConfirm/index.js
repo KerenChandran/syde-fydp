@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import { Row, FormControl, ControlLabel, Col, Button, ButtonGroup, Table, ButtonToolbar } from 'react-bootstrap';
 import moment from 'moment';
 
+import '../ResourceInfo/index.css'
+
 class ResourceInfoEditConfirm extends Component {
   render() {
     const { resource, newEvents, existingEvents, onConfirm, onCancel } = this.props;
