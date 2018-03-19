@@ -135,7 +135,7 @@ class ResourceInfoView extends Component {
           <div>
           { currentUser != null && (
               <ButtonToolbar className="center" style={{marginBottom:20}}>
-                {isMyResource && <Button onClick={onEditClick}>Edit Resource</Button>}
+                {isMyResource && <Button bsStyle="primary" onClick={onEditClick}>Edit Resource</Button>}
                 {available ? <Button bsStyle="primary" onClick={onRequestClick}>{isMyResource ? "Update Availability" : "Request Resource"}</Button> : null}
               </ButtonToolbar>
             )}

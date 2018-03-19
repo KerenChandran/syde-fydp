@@ -40,7 +40,7 @@ class Requests extends Component {
     return (
       <div style={{ display: 'flex' }}>
         <Sidebar />
-        <div style={{width: '100%'}}>
+        <div style={{width: '100%', paddingRight: 10}}>
           <RequestsView
             requests={requests}
             showRequestDetails={this.showRequestDetails}

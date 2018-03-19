@@ -15,6 +15,10 @@ class Header extends Component {
     this.props.logout();
   }
 
+  editProfile = () => {
+      this.props.history.push("/profile/edit");
+  }
+
   render() {
     const { pathname } = this.props.location;
     return (
@@ -43,7 +47,7 @@ class Header extends Component {
                 pullRight
                 style={{border:0, backgroundColor:'#F6F8FC'}}
             >
-                <MenuItem>Edit Profile</MenuItem>
+                <MenuItem onClick={this.editProfile}>Edit Profile</MenuItem>
                 <MenuItem onClick={this.logout}>Logout</MenuItem>
             </DropdownButton>
             </div>
