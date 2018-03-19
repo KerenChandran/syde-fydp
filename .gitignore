@@ -28,3 +28,6 @@ yarn-error.log*
 
 # ignore static directory on server
 server/src/static*
+
+# ignore modified data file moved to server
+server/src/lib/data.json

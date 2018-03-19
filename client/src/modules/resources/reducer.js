@@ -1,8 +1,7 @@
 import * as ResourceConstants from './constants';
-import data from './data_modified.json';
 
 const initialState = {
-  resources: data.resources,
+  resources: [],
   showBulkImport: false,
   newResource: {}
 };
@@ -79,7 +78,6 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         resources: [
-          ...data.resources,
           ...payload.resources.resource_data
         ]
       };
@@ -91,7 +89,6 @@ export default (state = initialState, { type, payload }) => {
         return {
           ...state,
           resources: [
-            ...data.resources,
             ...payload.resource.resource_data,
           ]
         }
@@ -123,7 +120,7 @@ export default (state = initialState, { type, payload }) => {
     case ResourceConstants.CLEAR_RESOURCES: {
       return {
         ...state,
-        resources: data.resources
+        resources: []
       }
     }
 
