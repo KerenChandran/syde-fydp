@@ -90,7 +90,7 @@ curl localhost:9200/lab?pretty
 # sometimes empty reply is expected
 curl localhost:5000
 
-bash data_load.sh
+bash load_data.sh
 
 # database - local psql dependency
 # psql -h localhost -U postgres -w -c "SELECT * FROM platform_user;"
