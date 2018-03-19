@@ -275,13 +275,13 @@ class ResourceInfoEditView extends Component {
         </FormGroup>
         
         {
-          (files.length || this.props.files.length) && (
+          (files.length || this.props.files.length) ? (
             <div>
               <h3>Files</h3>
               <ResourceFileList files={this.props.files} />
               <ResourceFileEditList files={files} onDelete={this.handleFileDelete} />
             </div>
-          )
+          ) : null
         }
 
         <ButtonToolbar className="right-align">

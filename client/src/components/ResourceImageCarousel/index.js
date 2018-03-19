@@ -7,7 +7,7 @@ const ResourceImageCarousel = ({ images }) => (
   <Carousel>
     {
       images.map(image => (
-        <img className="center-block" key={image.filename} src={BASE_URL + image.filename} />
+        <img className="center-block" key={image.filename} width={200} height={200} src={BASE_URL + image.filename} />
       ))
     }
   </Carousel>

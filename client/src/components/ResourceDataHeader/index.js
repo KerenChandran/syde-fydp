@@ -18,7 +18,7 @@ export default ({ view, handleViewToggle }) => (
       <Glyphicon glyph="map-marker" />
     </Button>
     <Button bsStyle={view === GRID ? 'primary' : 'default'} onClick={handleViewToggle(GRID)}>
-      <Glyphicon glyph="map-marker" />
+      <Glyphicon glyph="th" />
     </Button>
   </div>
 )
