@@ -136,7 +136,7 @@ export default (state = initialState, { type, payload }) => {
     case ResourceConstants.CLEAR_RESOURCES: {
       return {
         ...state,
-        resources: []
+        resources: [],
         files: {},
         images: {}
       }
