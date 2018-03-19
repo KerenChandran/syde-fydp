@@ -39,8 +39,13 @@ class SignUp extends React.Component {
                 handleChange={this.handleChange}
                 pageAction={pageAction}
                 footer={
-                    <div class="row" style={{textAlign: 'center'}}>
+                    <div class="row" style={{textAlign: 'center', marginTop:10+'px'}}>
                         Already have an account? <a href="/login">Log in here</a>.
+                    </div>
+                }
+                signUpText={
+                    <div class="row" style={{marginBottom: 20+'px'}}>
+                        Please sign up using WATIAM credentials.
                     </div>
                 }
             />

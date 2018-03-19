@@ -9,9 +9,9 @@
 }
 
 .account-box:hover {
-  background: aliceblue;
+  background: #DDE4F1;
 }
 
 .account-box.active {
-  background: lightblue;
+  background: #A5D0F4;
 }

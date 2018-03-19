@@ -812,12 +812,15 @@ class RequestUtil(Pipeline):
             LEFT JOIN user_fee uf
                 ON inc.fee_id = uf.id
             LEFT JOIN (
-                SELECT reqnotif.request_id, notif.message
+                SELECT reqnotif.request_id, notif.message, unotif.user_id
                 FROM notification_request reqnotif
                 INNER JOIN notification notif
                     ON reqnotif.notification_id = notif.id
+                INNER JOIN user_notification unotif
+                    ON reqnotif.notification_id = unotif.notification_id
             ) rn
                 ON req.id = rn.request_id
+                AND req.user_id = rn.user_id
             WHERE rus.user_id = {owner_id}
         """.format(owner_id=user_id)
 
@@ -867,12 +870,15 @@ class RequestUtil(Pipeline):
             LEFT JOIN user_fee uf
                 ON inc.fee_id = uf.id
             LEFT JOIN (
-                SELECT reqnotif.request_id, notif.message
+                SELECT reqnotif.request_id, notif.message, unotif.user_id
                 FROM notification_request reqnotif
                 INNER JOIN notification notif
                     ON reqnotif.notification_id = notif.id
+                INNER JOIN user_notification unotif
+                    ON reqnotif.notification_id = unotif.notification_id
             ) rn
                 ON req.id = rn.request_id
+                AND req.user_id = rn.user_id
             WHERE req.user_id = {requester_id}
         """.format(requester_id=user_id)
 

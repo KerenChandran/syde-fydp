@@ -6,7 +6,11 @@ const initialState = {
     category: '',
     company: '',
     mobile: '',
-    model: ''
+    model: '',
+    window_start: new Date(),
+    window_end: null,
+    type: 'hours',
+    quantity: 0
   }
 };
 

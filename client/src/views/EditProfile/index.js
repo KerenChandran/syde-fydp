@@ -45,7 +45,7 @@ class EditProfileView extends Component {
                             </div>
                         </div>
                         <div class="row" controlId="formHorizontalFirstName">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                            <label class="col-sm-4 control-label required" style={{marginTop: 8 + 'px', textAlign: 'right'}}d>
                                 First Name
                             </label>
                             <div class="col-sm-6">
@@ -54,7 +54,7 @@ class EditProfileView extends Component {
                         </div>
 
                         <div class="row" controlId="formHorizontalLastName">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                            <label class="col-sm-4 control-label required" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                                 Last Name
                             </label>
                             <div class="col-sm-6">
@@ -63,7 +63,7 @@ class EditProfileView extends Component {
                         </div>
 
                         <div class="row" controlId="formHorizontalEmail">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                            <label class="col-sm-4 control-label required" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                                 Email
                             </label>
                             <div class="col-sm-6">
@@ -72,7 +72,7 @@ class EditProfileView extends Component {
                         </div>
 
                         <div class="row" controlId="formHorizontalPhoneNumber">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                            <label class="col-sm-4 control-label required" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                                 Phone Number
                             </label>
                             <div class="col-sm-6">
@@ -82,7 +82,7 @@ class EditProfileView extends Component {
 
 
                         <div class="row" controlId="formHorizontalFaculty">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                            <label class="col-sm-4 control-label required" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                                 Faculty
                             </label>
                             <div class="col-sm-6">
@@ -92,7 +92,7 @@ class EditProfileView extends Component {
                         </div>
 
                         <div class="row" controlId="formHorizontalDepartment">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                            <label class="col-sm-4 control-label required" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                                 Department
                             </label>
                             <div class="col-sm-6">
@@ -101,7 +101,7 @@ class EditProfileView extends Component {
                         </div>
 
                         <div class="row" controlId="formHorizontalRole">
-                            <label class="col-sm-4 control-label" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
+                            <label class="col-sm-4 control-label required" style={{marginTop: 8 + 'px', textAlign: 'right'}}>
                                 Role
                             </label>
                             <div class="col-sm-6">

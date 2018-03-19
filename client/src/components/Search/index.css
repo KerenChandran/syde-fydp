@@ -1,4 +1,5 @@
 .search-root {
+  position: relative;
   width: 100%;
 }
 
@@ -45,7 +46,9 @@
 
 .search-container .search-btn:hover {
   color: #fff;
-  background-color: aqua; /*#8FBE00;*/
+  background-color: #4DABFD;
+  /* background-color: #286090; */
+  /* border-color: #204d74; */
 }
 
 .search-container .search-box {
@@ -69,6 +72,8 @@
 }
 
 .search-filter-panel {
+  position: absolute;
+  width: 100%;
   border-top: 0px;
 }
 

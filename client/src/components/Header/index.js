@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import classnames from 'classnames';
 
 import { userActions } from '../../modules/users';
 
@@ -19,22 +18,30 @@ class Header extends Component {
   render() {
     const { pathname } = this.props.location;
     return (
-      <header className={classnames('app-header', { 'large-header': pathname === '/resources'})}>
+      <header className='app-header'>
         <Link to="/resources">
           <span className="app-logo">ShareIt</span>
         </Link>
         <div className="app-search">
           <Search />
         </div>
-        <div className="app-links">
-          <Link to="/resources">
-            <span className="app-logo">Resources</span>
-          </Link>
+        <div className="app-links" style={{paddingTop:5+'px'}}>
           <Link to="/requests">
             <span className="app-logo">Requests</span>
           </Link>
-          <Button onClick={this.logout}>Logout</Button>
+            <div style={{marginTop:10+'px'}}>
+            <a class="dropdown-toggle">
+                    <span class="glyphicon glyphicon-user"></span> <span class="caret"></span>
+            </a>
+             <ul class="dropdown-menu">
+                <li><a href="#">Edit Profile</a></li>
+                <li><a onClick={this.logout}>Logout</a></li>
+             </ul>
+            </div>
         </div>
+          <script type="javascript">
+              $('.dropdown-toggle').dropdown()
+          </script>
       </header>
     );
   }

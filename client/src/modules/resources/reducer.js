@@ -84,6 +84,15 @@ export default (state = initialState, { type, payload }) => {
         ]
       };
     }
+
+    case ResourceConstants.FETCH_FILTER_RESOURCES: {
+      return {
+        ...state,
+        resources: [
+          ...payload.resources.resource_data
+        ]
+      };
+    }
     
     case ResourceConstants.FETCH_RESOURCE: {
       const { resources } = state;

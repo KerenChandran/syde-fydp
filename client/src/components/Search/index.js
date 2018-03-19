@@ -48,6 +48,7 @@ class Search extends Component {
   handleSubmit = () => {
     const { open, ...search } = this.state;
     this.props.submitSearch(search);
+    this.setState({ open: false });
   }
 
   handleReset = () => {
@@ -55,12 +56,21 @@ class Search extends Component {
     const newState = {};
 
     Object.keys(filters).forEach(key => newState[key] = '');
+    newState['window_start'] = null;
+    newState['window_end'] = null;
+    newState['type'] = 'hours';
     this.setState(newState);
   }
 
   handleClick = e => {
     if (!this.node.contains(e.target)) {
       this.setState({ open: false });
+    }
+  }
+
+  handleKeyUp = e => {
+    if (e.keyCode === 13) {
+      this.handleSubmit();
     }
   }
 
@@ -84,7 +94,7 @@ class Search extends Component {
           <div className="search-box">
             <FormGroup>
               <InputGroup>
-                <FormControl type="text" value={filters.searchText} onChange={this.handleChange('searchText')} onKeyPress={this.handleKeyPress}/>
+                <FormControl type="text" value={filters.searchText} onChange={this.handleChange('searchText')} onKeyUp={this.handleKeyUp}/>
                 <InputGroup.Button>
                   <Button bsStyle="link" className="search-filter-controls" onClick={this.toggleFilters}>
                     <Glyphicon glyph="triangle-bottom"/>

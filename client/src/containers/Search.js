@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { withRouter, matchPath } from 'react-router';
+import moment from 'moment';
+
 import { searchActions, searchSelectors } from '../modules/search';
+import { resourceActions } from '../modules/resources';
 
 import SearchBar from '../components/Search';
 import ResourceSearchFilters from '../components/ResourceSearchFilters';
-import { PageHeader } from 'react-bootstrap';
 
 const LABS = 'LABS';
 const RESOURCES = 'RESOURCES';
@@ -16,14 +18,27 @@ class Search extends Component {
     currentPath: RESOURCES
   }
   
-  submitSearch = (search) => {
+  submitSearch = async (search) => {
     switch (this.state.currentPath) {
       case LABS: {
         return 'hi';
       }
       case RESOURCES: 
       default: {
-        return this.props.submitResourceSearch(search);
+        const { window_start, window_end, type, quantity, ...others } = search;
+        if (window_start != null && window_end != null && quantity > 0) {
+          await this.props.submitResourceAvailability({
+            window_start: moment(window_start).format('YYYY-MM-DD'),
+            window_end: moment(window_end).format('YYYY-MM-DD'),
+            preferred_duration: {
+              type,
+              quantity
+            }
+          });
+        } else {
+          await this.props.fetchResources();
+        }
+        return this.props.submitResourceSearch(others);
       }
     }
   }
@@ -62,7 +77,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitResourceSearch: bindActionCreators(searchActions.submitResourceSearch, dispatch)
+  fetchResources: bindActionCreators(resourceActions.fetchResources, dispatch),
+  submitResourceSearch: bindActionCreators(searchActions.submitResourceSearch, dispatch),
+  submitResourceAvailability: bindActionCreators(resourceActions.fetchScheduleFilterResources, dispatch)
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Search));

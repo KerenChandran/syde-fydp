@@ -83,67 +83,69 @@ class RequestInfo extends Component {
     }
 
     return (
-      <div className="container form-horizontal">
+        <div style={{margin:'auto'}}>
+     <div class="resource-info-container">
+      <div className="form-horizontal">
         <h3>Resource Info</h3>
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Category</Col>
-          <Col sm={10}><FormControl.Static>{resource.category}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Category</Col>
+          <Col sm={7}><FormControl.Static>{resource.category}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Model</Col>
-          <Col sm={10}><FormControl.Static>{resource.model}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Model</Col>
+          <Col sm={7}><FormControl.Static>{resource.model}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Description</Col>
-          <Col sm={10}><FormControl.Static>{resource.description}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Description</Col>
+          <Col sm={7}><FormControl.Static>{resource.description}</FormControl.Static></Col>
         </Row>
     
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Manufacturer</Col>
-          <Col sm={10}><FormControl.Static>{resource.company}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Manufacturer</Col>
+          <Col sm={7}><FormControl.Static>{resource.company}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Mobile</Col>
-          <Col sm={10}><FormControl.Static>{resource.mobile ? 'Yes' : 'No'}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Mobile</Col>
+          <Col sm={7}><FormControl.Static>{resource.mobile ? 'Yes' : 'No'}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Location</Col>
-          <Col sm={10}><FormControl.Static>{resource.location.name}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Location</Col>
+          <Col sm={7}><FormControl.Static>{resource.location.name}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Room Number</Col>
-          <Col sm={10}><FormControl.Static>{resource.room_number}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Room Number</Col>
+          <Col sm={7}><FormControl.Static>{resource.room_number}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Rules for Use</Col>
-          <Col sm={10}><FormControl.Static>{resource.rules_restrictions}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Rules for Use</Col>
+          <Col sm={7}><FormControl.Static>{resource.rules_restrictions}</FormControl.Static></Col>
         </Row>
 
         <h3>Owner Info</h3>
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Name</Col>
-          <Col sm={10}><FormControl.Static>{owner.first_name} {owner.last_name}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Name</Col>
+          <Col sm={7}><FormControl.Static>{owner.first_name} {owner.last_name}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Deparment</Col>
-          <Col sm={10}><FormControl.Static>{owner.department}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Deparment</Col>
+          <Col sm={7}><FormControl.Static>{owner.department}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Faculty</Col>
-          <Col sm={10}><FormControl.Static>{owner.faculty}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Faculty</Col>
+          <Col sm={7}><FormControl.Static>{owner.faculty}</FormControl.Static></Col>
         </Row>
 
         <Row>
-          <Col componentClass={ControlLabel} sm={2}>Role</Col>
-          <Col sm={10}><FormControl.Static>{owner.role}</FormControl.Static></Col>
+          <Col componentClass={ControlLabel} sm={5}>Role</Col>
+          <Col sm={7}><FormControl.Static>{owner.role}</FormControl.Static></Col>
         </Row>
 
         <h3>Fee Breakdown</h3>
@@ -173,11 +175,11 @@ class RequestInfo extends Component {
 
         <Row>
           <Col componentClass={ControlLabel} sm={2}>Total</Col>
-          <Col sm={10}><FormControl.Static>${fee_total}</FormControl.Static></Col>
+          <Col sm={10}><FormControl.Static>${fee_total.toFixed(2)}</FormControl.Static></Col>
         </Row>
 
-        <h3>Choose account</h3>
-        <div style={{ display: 'flex' }}>
+        <h3>Choose Payment Account</h3>
+        <div style={{ display: 'flex', overflow:'auto'}}>
           {
             accounts.map(account => (
               <AccountPill
@@ -200,8 +202,12 @@ class RequestInfo extends Component {
             />
           </Col>
         </FormGroup>
-        <Button bsClass="col-sm-12 btn" bsStyle="primary" disabled={source_account == null} onClick={this.handleSubmit}>Submit</Button>
       </div>
+     </div>
+        <div style={{textAlign:'center'}}>
+            <Button bsClass="btn" bsStyle="primary" disabled={source_account == null} onClick={this.handleSubmit} style={{marginBottom:10}}>Submit</Button>
+        </div>
+        </div>
     );
   }
 }

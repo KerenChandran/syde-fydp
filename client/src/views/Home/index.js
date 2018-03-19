@@ -5,15 +5,16 @@ import './index.css';
 
 class HomeView extends Component {
   render() {
-    const {email, password, handleChange, handleSubmit, pageAction, footer} = this.props;
+    const {email, password, handleChange, handleSubmit, pageAction, footer, signUpText} = this.props;
     return (
         <div id="loginPage">
           <div class="container">
               <div class="loginBox">
                   <form class="loginContent" onSubmit={handleSubmit}>
                     <div class="row">
-                      <h1>{pageAction}</h1>
+                      <h1 style={{marginTop:0+'px'}}>{pageAction}</h1>
                     </div>
+                      {signUpText}
                       <div class="row" controlId="formHorizontalEmail">
                           <label class="control-label">
                               Email
@@ -24,7 +25,7 @@ class HomeView extends Component {
                               <FormControl type="email" placeholder="Email" value={email} onChange={handleChange('email')}/>
                       </div>
 
-                      <div class="row" controlId="formHorizontalPassword">
+                      <div class="row" controlId="formHorizontalPassword" style={{marginTop:10+'px'}}>
                           <label class="control-label">
                               Password
                           </label>

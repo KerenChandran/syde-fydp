@@ -16,6 +16,7 @@ export const deleteResource = createAction(ResourceConstants.DELETE_RESOURCE, id
 
 export const fetchResourcesSuccess = createAction(ResourceConstants.FETCH_RESOURCES, resources => ({ resources }));
 export const fetchResourceSuccess = createAction(ResourceConstants.FETCH_RESOURCE, resource => ({ resource }));
+export const fetchResourcesFilterSuccess = createAction(ResourceConstants.FETCH_FILTER_RESOURCES, resources => ({ resources }));
 
 export const fetchResourceFilesSuccess = createAction(ResourceConstants.FETCH_RESOURCE_FILES, (data, resource_id) => ({ resource_id, ...data }));
 
@@ -125,7 +126,7 @@ export const fetchScheduleFilterResources = (filters) => async dispatch => {
       body: JSON.stringify(filters)
     });
     let data = await response.json();
-    return dispatch(fetchResourcesSuccess({
+    return dispatch(fetchResourcesFilterSuccess({
       ...data,
       resource_data: data.resources
     }));

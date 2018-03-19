@@ -552,32 +552,94 @@ class ScheduleFilter(Pipeline):
         # use pipeline super class for transformation utils.
         super(ScheduleFilter, self).__init__("schedule_filter.json")
 
-        self.reldelta_map = {
-            'hours': lambda x: relativedelta(hours=x),
-            'days': lambda x: relativedelta(days=x),
-            'weeks': lambda x: relativedelta(weeks=x)
-        }
-
         self.timedelta_map = {
             'hours': lambda x: dt.timedelta(hours=x),
             'days': lambda x: dt.timedelta(days=x),
             'weeks': lambda x: dt.timedelta(weeks=x)
         }
 
-    def _window_filter(self):
-        """
-            Helper method used to get the resulting resource dataframe after
-            applying the window criterion.
-        """
-        resource_fetch_query = \
-        """
-            SELECT DISTINCT resource_id
-            FROM resource_availability
-            WHERE availability_start <= '{window_start}'
-                OR availability_end >= '{window_end}'
-        """.format(window_start=self.start, window_end=self.end)
+        self.expected_date_format = '%Y-%m-%d'
 
-        self.resource_df = self.crs.fetch_dataframe(resource_fetch_query)
+    def _check_overlap(self, block_start, block_end, block_list, required_duration):
+        """
+            Helper method with checks to see whether a passed 'block'
+            overlaps with any of the blocks in the passed list, and whether
+            said overlap satisfies the overlap criterion.
+
+            Parameters
+            ----------
+            block_start : {datetime.datetime}
+                start of the block being checked
+
+            block_end : {datetime.datetime}
+                end of the block being checked
+
+            block_list : {list}
+                list of blocks to check overlaps against
+
+            required_duration : {datetime.timedelta}
+                required duration for overlap
+        """
+        criterion_met = False
+        start = None
+        end = None
+
+        for block in block_list:
+            # first check: is there no overlap whatsoever
+            if block_end < block['block_start'] or \
+                block_start > block['block_end']:
+                continue
+
+            # second check: does the check block sit within the iterator block
+            within_check = \
+                block_start >= block['block_start'] and \
+                block_end <= block['block_end']
+
+            if within_check:
+                # sanity overlap duration check
+                if block_end - block_start >= total_duration:
+                    overlap_flag = True
+                    start = block_start
+                    end = block_end
+                    break
+
+            # third check: does the check block envelop the iterator block
+            envelope_check = \
+                block_start < block['block_start'] and \
+                block_end > block['block_end']
+
+            if envelope_check:
+                # this check might have already taken place but conduct for
+                # sanity
+                if block['block_end'] - block['block_start'] >= total_duration:
+                    overlap_flag = True
+                    start = block['block_start']
+                    end = block['block_end']
+                    break
+
+            # fourth check: does the check block start before the iterator block
+            early_check = block_start < block['block_start']
+
+            if early_check:
+                # check that the overlap satisfies the duration criterion
+                if block_end - block['block_start'] >= total_duration:
+                    overlap_flag = True
+                    start = block['block_start']
+                    end = block['block_end']
+                    break
+
+            # fifth check: does the check block end after the iterator block
+            late_check = block_end > block['block_end']
+
+            if late_check:
+                # check that the overlap satisfies the duration criterion
+                if block['block_end'] - block_start >= total_duration:
+                    overlap_flag = True
+                    start = block_start
+                    end = block['block_end']
+                    break
+
+        return overlap_flag, start, end
 
     def _duration_filter(self):
         """
@@ -585,201 +647,121 @@ class ScheduleFilter(Pipeline):
             duration criterion is met. For an hourly duration constraint, there
             must exist x hours within the time frame of 8AM - 8PM.
         """
+        # retrieve all usage/requested blocks
         retrieve_block_query = \
         """
             SELECT resource_id, block_start, block_end
             FROM resource_schedule_blocks
         """
 
-        resource_blocks = self.crs.fetch_dict(retrieve_block_query)
-            
-        # flatten retrieved resource blocks
-        resource_store = {}
+        usage_blocks = self.crs.fetch_dict(retrieve_block_query)
 
-        for elem in resource_blocks:
-            if elem['resource_id'] not in resource_store:
-                resource_store[elem['resource_id']] = \
-                    [elem['block_start'], elem['block_end']]
+        # find all resources for which usage blocks do not exist
+        # these are resources that automatically satisfy the filtering criterion
+        usage_resource_list = \
+            list(set([block['resource_id'] for block in usage_blocks]))
 
-                continue
+        valid_resources = \
+            list(set(self.availability_blocks.keys()) - set(usage_resource_list))
 
-            resource_store[elem['resource_id']] += \
-                [elem['block_start'], elem['block_end']]
+        # create first set of final resources
+        self.final_resources = {}
 
-        # sort all block elements - returned as datetime objects
-        for res, dt_list in resource_store.iteritems():
-            resource_store[res] = sorted(dt_list)
-        
-            # sanity check
-            assert(len(resource_store[res]) % 2 == 0)
+        for rid in valid_resources:
+            # availability block list
+            abl = self.availability_blocks[rid]
+            abl = [block['block_start'] for block in abl]
+            abl = sorted(abl)
 
-        # block overlaps cannot exist so all block start and ends are adjacent
-        # iterate through each resource and check to see if there exists
-        # at least one contiguous block that matches the filtering criterion
-        # only interested in the timedelta between block_end and block_start
-        resource_flags = {}
+            self.final_resources[rid] = abl[0]
 
-        for res in resource_store:
-            if res not in resource_flags:
-                resource_flags[res] = {
-                    'match': False,
-                    'valid_starts': []
-                }
-
-        # convert availability start and end dates to datetime objects
-        expected_date_format = '%Y-%m-%d'
-
-        self.start = dt.datetime.strptime(self.start, expected_date_format)
-        self.end = dt.datetime.strptime(self.end, expected_date_format)
-
-        for res, dtlist in resource_store.iteritems():
-            # initial checks:
-            # 1) do blocks exist for this particular resource
-            # 2) does avail start + timedelta overlap w/ first block
-            if len(dtlist) == 0 or \
-                self.start + self.reldelta_map[self.dtype](self.dquantity) < dtlist[0]:
-                resource_flags[res]['match'] = True
-
-                resource_flags[res]['valid_starts'].append(self.start)
-
-            for idx in range(1, len(dtlist), 2):
-                if idx == len(dtlist) - 1:
-                    # last element
-                    # check to see if timedelta exists between last block
-                    # and window end
-                    if dtlist[idx] + self.reldelta_map[self.dtype](self.dquantity) < self.end:
-                        resource_flags[res]['match'] = True
-
-                        resource_flags[res]['valid_starts'].append(dtlist[idx])
-                    
-                    continue
-
-                # check to see if the timedelta between current block_end
-                # and next block_start matches filtering criterion
-                # use strictly less than conditional to allow for small buffers
-                if dtlist[idx] + self.reldelta_map[self.dtype](self.dquantity) < dtlist[idx+1]:
-                    resource_flags[res]['match'] = True
-
-                    resource_flags[res]['valid_starts'].append(dtlist[idx])
-
-        # retrieve all resources that match the criterion
-        self.duration_resources = \
-            {res: data['valid_starts'] for res, data in 
-             resource_flags.iteritems() if data['match']}
-
-        self.duration_resources = {res: sorted(data) for res, data in 
-                                   self.duration_resources.iteritems()}
-
-    def _availability_filter(self):
-        """
-            Helper method to filter resources based on their availability
-            blocks.
-        """
-        block_retrieval_query = \
-        """
-            SELECT resource_id, block_start, block_end
-            FROM resource_availability_blocks
-        """
-
-        avail_dict = self.crs.fetch_dict(block_retrieval_query)
-
-        self.avail_resources = {}
-
-        # iterate through each resource and block to see whether
-        # an availability block exists that corresponds to required duration
-        for block in avail_dict:
-            if block['resource_id'] in self.avail_resources:
-                # this is already a valid resource
-                continue
-
-            # check that the block exists within the required window
-            boundary_check = block['block_start'] > self.start and \
-                block['block_end'] < self.end
-
-            timedelta_check = block['block_end'] - block['block_start'] >= \
-                self.timedelta_map[self.dtype](self.dquantity)
-
-            if (boundary_check and timedelta_check):
-                if block['resource_id'] not in self.avail_resources or \
-                    self.avail_resources[block['resource_id']] > block['block_start']:
-                    # prioritize earlier availability start
-                    self.avail_resources[block['resource_id']] = block['block_start']
-
-        # find all available resources that do not have any usage blocks
-        resource_retrieval_query = \
-        """
-            SELECT DISTINCT resource_id AS rid
-            FROM resource_schedule_blocks
-        """
-
-        resource_list = self.crs.fetch_dict(resource_retrieval_query)
-
-        resource_list = {dp['rid']: None for dp in resource_list}
-
-        store = {}
-
-        for res, block_start in self.avail_resources.iteritems():
-            if res not in resource_list:
-                store[res] = block_start
-
-        self.avail_resources = store
-
-        # transform avail dict to map resources to availability blocks
+        # transform usage block list to map resource id to underlying blocks
         placeholder = {}
 
-        for dp in avail_dict:
-            data = {'start': dp['block_start'], 'end': dp['block_end']}
-
-            if dp['resource_id'] not in placeholder:
-                placeholder[dp['resource_id']] = [data]
+        for block in usage_blocks:
+            if block['resource_id'] not in placeholder:
+                placeholder[block['resource_id']] = \
+                    [block['block_start'], block['block_end']]
                 continue
 
-            placeholder[dp['resource_id']].append(data)
+            placeholder[block['resource_id']] += \
+                [block['block_start'], block['block_end']]
 
-        avail_dict = placeholder
+        usage_blocks = placeholder
 
-        store = {}
+        # sort usage blocks so that consecutive block spaces can be computed
+        usage_blocks = {rid: sorted(blocks) for rid, blocks in usage_blocks}
 
-        # iterate through resources that passed the duration criterion
-        for res, blocks in self.duration_resources.iteritems():
-            # check to see that the resource meets first pass availability
-            if res not in avail_dict:
-                continue
+        # block overlaps cannot exist so all block start and ends are adjacent -
+        # iterate through each resource and check to see if there exist
+        # contiguous blocks that match the filtering criterion
 
-            # iterate through each contiguous block
-            for block_start in blocks:
-                
-                valid_block = False
+        valid_usage_blocks = {rid: [] for rid in usage_blocks}
 
-                # iterate through availability blocks for this resource
-                for av_block in avail_dict[res]:
-                    if valid_block:
-                        break
+        total_duration = self.timedelta_map[self.dtype](self.dquantity)
 
-                    # check to see if the contig block fits in avail block
-                    check_1 = block_start >= av_block['start']
-                    check_2 = \
-                        block_start + self.reldelta_map[self.dtype](self.dquantity) \
-                        <= av_block['end']
+        for rid, blocks in usage_blocks.iteritems():
+            # first check: does the start of the first block happen after the
+            # start of the window
+            start_check = self.start < blocks[0]
 
-                    if check_1 and check_2:
-                        valid_block = True
+            if start_check:
+                # does the 'space' exceed the required duration
+                space_check = blocks[0] - self.start >= total_duration
+
+                if space_check:
+                    # does the modified block fit in an availability block
+                    # of the underlying resource
+                    overlap, start, end = self._check_overlap(
+                        self.start, blocks[0], self.availability_blocks[rid], 
+                        total_duration)
+
+                    if overlap:
+                        valid_usage_blocks[rid].append(start)
                         continue
 
-                if valid_block:
-                    if res not in store:
-                        store[res] = [block_start]
-                        continue
+            # iterate through all remaining blocks
+            for idx in range(1, len(blocks), 2):
+                if idx == len(blocks) - 1:        
+                    # check: does space exist between the last block and the end
+                    # of the window
+                    end_check = blocks[idx] < self.end
 
-                    store[res].append(block_start)
+                    if end_check:
+                        # does the 'space' exceed the required duration
+                        space_check = self.end - blocks[idx] >= total_duration
 
-        for res in store:
-            store[res] = sorted(store[res])
-            store[res] = store[res][0]
+                        if space_check:
+                            # does the modified block fit in an availability 
+                            # block of the underlying resource
+                            overlap, start, end = self._check_overlap(
+                                blocks[idx], self.end, 
+                                self.availability_blocks[rid], total_duration)
 
-        self.avail_resources.update(store)
+                            if overlap:
+                                valid_usage_blocks[rid].append(self.end)
+                                continue
 
-        self.final_resources = self.avail_resources
+                # check: does space exist between the current block end
+                # and the start of the next block
+                space_check = blocks[idx+1] - blocks[idx] > total_duration
+
+                if space_check:
+                    # does the current space fit within an availability block
+                    # of the underlying resource
+                    overlap, start, end = self._check_overlap(
+                        blocks[idx], blocks[idx+1], 
+                        self.availability_blocks[rid], 
+                        total_duration)
+
+                    if overlap:
+                        valid_usage_blocks[rid].append(self.end)
+
+        valid_usage_blocks = {rid: blocks for rid, blocks in 
+                              valid_usage_blocks.iteritems() if len(blocks) > 0}
+
+        for rid, blocks in valid_usage_blocks.iteritems():
+            self.final_resources[rid] = sorted(blocks)[0]
 
         self.final_resources = \
             zip(self.final_resources.keys(), self.final_resources.values())
@@ -790,6 +772,99 @@ class ScheduleFilter(Pipeline):
         self.final_resources = \
             [(lst[0], lst[1].isoformat()) for lst in self.final_resources]
 
+    def _availability_filter(self):
+        """
+            Helper method to filter resources based on their availability
+            blocks.
+        """
+        # retrieve all resource availability blocks
+        block_retrieval_query = \
+        """
+            SELECT resource_id, block_start, block_end
+            FROM resource_availability_blocks
+        """
+
+        availability_blocks = self.crs.fetch_dict(block_retrieval_query)
+
+        # container to store resources and valid availability blocks
+        unique_resources = \
+            list(set([block['resource_id'] for block in availability_blocks]))
+
+        availability_store = {rid: [] for rid in unique_resources}
+
+        # iterate through each availability block and check validity
+        for block in availability_blocks:
+            # first check: is there no overlap between the block and the window
+            no_overlap_check = \
+                block['block_end'] < self.start or \
+                block['block_start'] > self.end
+
+            if no_overlap_check:
+                # we ignore this block altogether
+                continue
+
+            # second check: does the window sit within the availability block
+            # skip duration criterion as we can assume that required duration
+            # is within the availability window
+            window_within_check = \
+                self.start >= block['block_start'] and \
+                self.end <= block['block_end']
+
+            if window_within_check:
+                # create modified block to reflect window
+                mod_block = {'block_start': self.start, 'block_end': self.end}
+
+                availability_store[block['resource_id']].append(mod_block)
+                continue
+
+            # third check: does the block sit within the window and if so
+            # does the block duration match the passed criterion
+            block_within_check = \
+                block['block_start'] > self.start and \
+                block['block_end'] < self.end
+
+            timedelta_check = block['block_end'] - block['block_start'] >= \
+                self.timedelta_map[self.dtype](self.dquantity)
+
+            if block_within_check and timedelta_check:
+                availability_store[block['resource_id']].append(block)
+                continue
+
+            # fourth check: does the block start before the window and if so
+            # is the overlap between the block and window longer than the
+            # required duration
+            block_starts_before_window = block['block_start'] < self.start
+
+            timedelta_check = block['block_end'] - self.start >= \
+                self.timedelta_map[self.dtype](self.dquantity)
+
+            if block_starts_before_window and timedelta_check:
+                # create a modified block to reflect overlap
+                mod_block = \
+                    {'block_start': self.start, 'block_end': block['block_end']}
+
+                availability_store[block['resource_id']].append(mod_block)
+                continue
+
+            # fifth check: does the block end after the window and if so
+            # is the overlap between the block and window longer than the
+            # required duration
+            block_ends_after_window = block['block_end'] > self.end
+
+            timedelta_check = self.end - block['block_start'] >= \
+                self.timedelta_map[self.dtype](self.dquantity)
+
+            if block_ends_after_window and timedelta_check:
+                # create modified block to reflect overlap
+                mod_block = \
+                    {'block_start': block['block_start'], 'block_end': self.end}
+
+                availability_store[block['resource_id']].append(mod_block)
+                continue
+
+        self.availability_blocks = \
+            {rid: block for rid, block in availability_store.iteritems() if
+             len(block) > 0}
 
     def _filter(self):
         """
@@ -802,15 +877,18 @@ class ScheduleFilter(Pipeline):
 
         self.end = record['window_end']
 
+        # convert start and end dates
+        self.start = dt.datetime.strptime(self.start, self.expected_date_format)
+
+        self.end = dt.datetime.strptime(self.end, self.expected_date_format)
+
         self.dtype = record['duration_type']
 
         self.dquantity = record['duration_quantity']
 
-        # self._window_filter()
+        self._availability_filter()
 
         self._duration_filter()
-
-        self._availability_filter()
 
         return
 

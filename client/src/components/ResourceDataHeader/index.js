@@ -11,7 +11,6 @@ const GRID = 'grid';
 
 export default ({ view, handleViewToggle }) => (
   <div className="resource-data-header-container">
-    <ScheduleFilters />
     <Button bsStyle={view === LIST ? 'primary' : 'default'} onClick={handleViewToggle(LIST)}>
       <Glyphicon glyph="list" />
     </Button>

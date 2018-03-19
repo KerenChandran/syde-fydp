@@ -53,3 +53,7 @@ body {
 .top-spacing {
   margin-top: 30px;
 }
+
+.divider {
+  border-bottom: 2px solid #ddd;
+}
